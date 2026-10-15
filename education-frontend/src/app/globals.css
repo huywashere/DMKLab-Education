@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #21242C;
+
+  /* Khan Academy Official Palette */
+  --khan-blue: #1865F2;
+  --khan-blue-hover: #0B4ED7;
+  --khan-green: #14BF96;
+  --khan-green-dark: #0B6A56;
+  --khan-navy: #0A2540;
+  --khan-charcoal: #21242C;
+  --khan-gold: #FFC700;
+  --khan-warm-bg: #FEF8E7;
+  --khan-slate-bg: #F7F8FA;
+
+  --border: #E2E8F0;
+  --card: #FFFFFF;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Khan Academy CTA Buttons */
+.khan-btn-primary {
+  background-color: #1865F2;
+  color: #FFFFFF;
+  font-weight: 700;
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 2px 4px rgba(24, 101, 242, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.khan-btn-primary:hover {
+  background-color: #0B4ED7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(24, 101, 242, 0.3);
+}
+
+.khan-btn-green {
+  background-color: #14BF96;
+  color: #FFFFFF;
+  font-weight: 700;
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 2px 4px rgba(20, 191, 150, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.khan-btn-green:hover {
+  background-color: #10A380;
+  transform: translateY(-1px);
+}
+
+.khan-btn-secondary {
+  background-color: #FFFFFF;
+  color: #1865F2;
+  border: 2px solid #1865F2;
+  font-weight: 700;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.khan-btn-secondary:hover {
+  background-color: #F0F5FF;
+}
+
+.khan-btn-outline {
+  background-color: #FFFFFF;
+  color: #21242C;
+  border: 1px solid #D5D9E2;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  transition: all 0.15s ease-in-out;
+}
+
+.khan-btn-outline:hover {
+  border-color: #21242C;
+  background-color: #F7F8FA;
+}
+
+/* Khan card style */
+.khan-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E4E7EB;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.khan-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
