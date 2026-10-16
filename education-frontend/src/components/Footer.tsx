@@ -1,5 +1,14 @@
 import React from "react";
-import { Heart, GraduationCap, Lock, ShieldCheck } from "lucide-react";
+import { 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Building2, 
+  ShieldCheck, 
+  Heart,
+  ChevronRight,
+  ExternalLink
+} from "lucide-react";
 
 interface FooterProps {
   onOpenAbout?: () => void;
@@ -13,122 +22,269 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenContact,
 }) => {
   return (
-    <footer className="bg-[#21242C] text-slate-300 pt-14 pb-8">
+    <footer className="bg-[#EDF6F9] text-[#285366] border-t-2 border-[#1E6782] pt-12 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top: Brand + Nav Columns */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 pb-10 border-b border-slate-700/50">
-          {/* Brand Column */}
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-[#1865F2] flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-base font-extrabold text-white">DMKLab Education</span>
+        {/* Main 4-Column Grid matching the user's reference image */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-[#D2E7EF]">
+          
+          {/* Column 1: VỀ CHÚNG TÔI (5 cols on lg) */}
+          <div className="lg:col-span-5 space-y-4">
+            <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              VỀ CHÚNG TÔI
+            </h3>
+            
+            {/* Official DMKLab Logo */}
+            <div className="pt-1">
+              <img
+                src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+                alt="DMKLab - Công ty Đức Mai Khôi"
+                className="h-11 w-auto object-contain"
+              />
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Nền tảng giáo dục trực tuyến K–12 hiện đại, cá nhân hóa lộ trình học tập và hỗ trợ tư duy Socratic thông minh.
+
+            {/* Exact Company Description from Reference Image */}
+            <p className="text-xs text-[#285366] leading-relaxed text-justify pr-2">
+              Công ty Đức Mai Khôi chuyên sản xuất, nhập khẩu, phân phối thiết bị phòng thí nghiệm cho trường học từ cấp Tiểu học, THCS, THPT đến Đại học. Chúng tôi tự hào là công ty đầu tiên tại Việt Nam sản xuất tiêu bản hiển vi phục vụ dạy học. Chúng tôi là đại diện của nhiều kính hiển vi chính hãng như Labomed, Leica, Nikon, Olympus, Carton...
             </p>
-            <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
-              <Lock className="w-3 h-3" />
-              <span>Dữ liệu học sinh được bảo vệ an toàn</span>
+
+            {/* Official Certification Badges */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              {/* Badge Bộ Công Thương */}
+              <a 
+                href="http://online.gov.vn" 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0B65C2] text-white shadow-xs hover:opacity-95 transition"
+                title="Đã thông báo Bộ Công Thương"
+              >
+                <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center font-bold text-[10px]">
+                  ✓
+                </div>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="text-[9px] font-bold uppercase tracking-wider">ĐÃ THÔNG BÁO</span>
+                  <span className="text-[8px] font-medium opacity-90">BỘ CÔNG THƯƠNG</span>
+                </div>
+              </a>
+
+              {/* Badge DMCA Protected */}
+              <a 
+                href="https://www.dmca.com" 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center border border-slate-300 rounded overflow-hidden text-[9px] shadow-xs hover:opacity-95 transition"
+                title="DMCA Protected"
+              >
+                <span className="bg-[#60B832] text-white px-2 py-1 font-bold">PROTECTED BY</span>
+                <span className="bg-white text-slate-800 px-2 py-1 font-black">DMCA.com</span>
+              </a>
+            </div>
+
+            {/* 4 Social Media Buttons exactly as in the photo */}
+            <div className="pt-2 flex items-center gap-2.5">
+              {/* LinkedIn */}
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#0077B5] text-white flex items-center justify-center hover:scale-105 transition shadow-xs"
+                title="LinkedIn DMKLab"
+              >
+                <span className="font-bold text-xs tracking-tighter">in</span>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href="https://facebook.com/dmklab.vn"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-105 transition shadow-xs"
+                title="Facebook DMKLab"
+              >
+                <span className="font-bold text-sm">f</span>
+              </a>
+
+              {/* YouTube */}
+              <a
+                href="https://youtube.com/@dmklab"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#FF0000] text-white flex items-center justify-center hover:scale-105 transition shadow-xs"
+                title="YouTube DMKLab"
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+              </a>
+
+              {/* TikTok */}
+              <a
+                href="https://tiktok.com/@dmklab"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#000000] text-white flex items-center justify-center hover:scale-105 transition shadow-xs"
+                title="TikTok DMKLab"
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                </svg>
+              </a>
             </div>
           </div>
 
-          {/* Column 1: Môn Học */}
-          <div className="space-y-2">
-            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">Môn Học</h4>
-            <ul className="space-y-1.5 text-xs text-slate-400">
-              <li><span className="hover:text-white transition cursor-pointer">Toán học K–12</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Khoa học STEM</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Tiếng Anh & Ngữ Văn</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Lịch sử & Địa lý</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">AI & Lập trình</span></li>
+          {/* Column 2: LIÊN HỆ (3.5 cols on lg) */}
+          <div className="lg:col-span-3 space-y-4">
+            <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              LIÊN HỆ
+            </h3>
+
+            <div className="space-y-3.5 text-xs text-[#285366]">
+              {/* Address */}
+              <div className="flex items-start gap-2.5">
+                <span className="font-extrabold text-[#0B65C2] text-sm shrink-0 mt-0.5">A</span>
+                <p className="leading-relaxed">
+                  <strong className="text-[#0A4358]">Trụ sở:</strong> 702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam
+                </p>
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-[#0B65C2] shrink-0" />
+                <a 
+                  href="tel:0909907861" 
+                  className="font-bold text-[#0A4358] hover:text-[#0B65C2] transition"
+                >
+                  0909907861
+                </a>
+              </div>
+
+              {/* Email */}
+              <div className="flex items-center gap-2.5">
+                <Mail className="w-4 h-4 text-[#0B65C2] shrink-0" />
+                <a 
+                  href="mailto:info@dmklab.vn" 
+                  className="font-medium text-[#0A4358] hover:text-[#0B65C2] transition"
+                >
+                  info@dmklab.vn
+                </a>
+              </div>
+
+              {/* Quick direct contact button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onOpenContact}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#B8D7E3] text-[#0A4358] font-bold text-xs hover:bg-blue-50/50 hover:border-[#0B65C2] transition cursor-pointer"
+                >
+                  <span>Gửi tin nhắn tư vấn</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: THÔNG TIN (2 cols on lg) */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              THÔNG TIN
+            </h3>
+
+            <ul className="space-y-2 text-xs text-[#285366]">
+              <li>
+                <a href="#payment-guide" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Hướng Dẫn Thanh Toán</span>
+                </a>
+              </li>
+              <li>
+                <a href="#warranty" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Quy Định Bảo Hành</span>
+                </a>
+              </li>
+              <li>
+                <a href="#returns" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Quy định đổi trả sản phẩm</span>
+                </a>
+              </li>
+              <li>
+                <a href="#shipping" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Quy Định Vận Chuyển</span>
+                </a>
+              </li>
+              <li>
+                <a href="#privacy" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Chính Sách Bảo Mật</span>
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Column 2: Đối Tượng */}
-          <div className="space-y-2">
-            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">Đối Tượng</h4>
-            <ul className="space-y-1.5 text-xs text-slate-400">
-              <li><span className="hover:text-white transition cursor-pointer">Học sinh K–12</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Giáo viên & Nhà trường</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Gia đình & Phụ huynh</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Quản trị viên</span></li>
-            </ul>
-          </div>
+          {/* Column 4: GIÁO DỤC K–12 (1.5 cols on lg) */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              GIÁO DỤC K–12
+            </h3>
 
-          {/* Column 3: Về Chúng Tôi */}
-          <div className="space-y-2">
-            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">Về Chúng Tôi</h4>
-            <ul className="space-y-1.5 text-xs text-slate-400">
+            <ul className="space-y-2 text-xs text-[#285366]">
               <li>
                 <button
                   type="button"
                   onClick={onOpenAbout}
-                  className="hover:text-[#38BDF8] transition text-left cursor-pointer"
+                  className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
                 >
-                  Giới thiệu về DMKLab
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Giới thiệu DMKLab</span>
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={onOpenAbout}
-                  className="hover:text-[#38BDF8] transition text-left cursor-pointer"
+                  className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
                 >
-                  Sứ mệnh & Triết lý Socratic
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Phương Pháp Socratic</span>
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={onOpenArticles}
-                  className="hover:text-[#38BDF8] transition text-left cursor-pointer"
+                  className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
                 >
-                  Bài viết & Cẩm nang K-12
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Bài viết & Cẩm nang</span>
                 </button>
               </li>
-              <li><span className="hover:text-white transition cursor-pointer">Chính sách bảo mật (COPPA)</span></li>
+              <li>
+                <button
+                  type="button"
+                  onClick={onOpenContact}
+                  className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <span>Tổng đài: 1900 6868</span>
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Column 4: Hỗ Trợ & Liên Hệ */}
-          <div className="space-y-2">
-            <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">Hỗ Trợ & Liên Hệ</h4>
-            <ul className="space-y-1.5 text-xs text-slate-400">
-              <li>
-                <button
-                  type="button"
-                  onClick={onOpenContact}
-                  className="hover:text-[#38BDF8] transition text-left cursor-pointer font-medium"
-                >
-                  Liên hệ chúng tôi
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={onOpenContact}
-                  className="hover:text-[#38BDF8] transition text-left cursor-pointer"
-                >
-                  Tổng đài: 1900 6868
-                </button>
-              </li>
-              <li><span className="hover:text-white transition cursor-pointer">Email: contact@dmklab.edu.vn</span></li>
-              <li><span className="hover:text-white transition cursor-pointer">Cộng đồng học sinh tinh thông</span></li>
-            </ul>
-          </div>
         </div>
 
-        {/* Bottom: Copyright & Safety */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 DMKLab Education Platform. Nền tảng giáo dục trực tuyến K–12 Việt Nam.</p>
+        {/* Bottom Bar: Copyright & Safety */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A7285]">
+          <p>
+            © 2026 DMKLab - Công Ty TNHH MTV Đức Mai Khôi & Nền Tảng Giáo Dục Trực Tuyến DMKLab Education. Tất cả quyền được bảo lưu.
+          </p>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 text-slate-400">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Tuân thủ chuẩn bảo vệ dữ liệu trẻ em</span>
+            <div className="flex items-center gap-1 text-[#285366]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Chuẩn an toàn dữ liệu học sinh & COPPA</span>
             </div>
-            <div className="flex items-center gap-1 text-slate-400">
+            <div className="flex items-center gap-1 text-[#285366]">
               <span>Đồng hành cùng học sinh Việt Nam</span>
               <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
             </div>

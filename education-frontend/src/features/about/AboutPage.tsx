@@ -87,6 +87,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({
       {/* 1. Hero Banner */}
       <section className="bg-gradient-to-b from-[#FEF8E7] via-white to-white border-b border-[#E8E3D0]/60 pt-12 pb-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <div className="flex justify-center mb-1">
+            <div className="px-5 py-2.5 bg-white rounded-2xl shadow-sm border border-slate-100 inline-flex items-center justify-center">
+              <img
+                src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+                alt="DMKLab"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-[#1865F2] text-xs font-bold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Về Hệ Thống Giáo Dục DMKLab</span>

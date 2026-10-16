@@ -325,26 +325,23 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Official DMKLab Emblem & Brand */}
+        {/* Center: Official DMKLab Brand Logo */}
         <div className="flex items-center">
           <button
             onClick={() => onChangeView('student')}
             className="flex items-center gap-2.5 group cursor-pointer"
           >
-            {/* DMKLab Logo Badge */}
-            <div className="w-8 h-8 rounded-full bg-[#1865F2] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-xl font-extrabold text-[#0A2540] tracking-tight leading-none">
-                DMKLab <span className="text-[#1865F2] font-semibold text-xs ml-0.5">Education</span>
+            <img
+              src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+              alt="DMKLab"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <div className="hidden sm:flex flex-col text-left border-l border-slate-200 pl-2.5">
+              <span className="text-xs font-black text-[#1865F2] uppercase tracking-wider leading-none">
+                Education
               </span>
-              <span className="text-[9px] text-slate-400 tracking-wider font-semibold uppercase">
-                Nền Tảng Giáo Dục K–12
+              <span className="text-[9px] text-slate-400 tracking-wider font-semibold uppercase mt-0.5">
+                K–12 Platform
               </span>
             </div>
           </button>

@@ -79,6 +79,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({
       <section className="relative overflow-hidden bg-gradient-to-b from-[#0A2540] via-[#0E3560] to-[#124278] text-white py-20 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#1865F2_1px,transparent_1px)] [background-size:24px_24px]" />
         <div className="relative max-w-5xl mx-auto text-center space-y-4">
+          <div className="flex justify-center mb-1">
+            <div className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-md inline-flex items-center justify-center">
+              <img
+                src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+                alt="DMKLab"
+                className="h-9 w-auto object-contain"
+              />
+            </div>
+          </div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200">
             <Sparkles className="w-4 h-4 text-amber-300" />
             Đồng Hành Cùng 100.000+ Học Sinh & Phụ Huynh Việt Nam
@@ -114,11 +123,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng Đài Học Tập</div>
-                    <a href="tel:19006868" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
-                      1900 6868 <span className="text-xs font-normal text-emerald-600">(Miễn phí)</span>
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng Đài & Hotline Hỗ Trợ</div>
+                    <a href="tel:0909907861" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
+                      0909907861 <span className="text-xs font-normal text-emerald-600">(Hotline/Zalo)</span>
                     </a>
-                    <div className="text-xs text-slate-500 mt-0.5">8:00 – 21:30 các ngày trong tuần</div>
+                    <div className="text-xs text-slate-500 mt-0.5">Tổng đài CSKH: 1900 6868 (8:00 – 21:30)</div>
                   </div>
                 </div>
 
@@ -129,10 +138,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   </div>
                   <div>
                     <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Hòm Thư Điện Tử</div>
-                    <a href="mailto:contact@dmklab.edu.vn" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
-                      contact@dmklab.edu.vn
+                    <a href="mailto:info@dmklab.vn" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
+                      info@dmklab.vn
                     </a>
-                    <div className="text-xs text-slate-500 mt-0.5">Phản hồi cam kết trong vòng 2 giờ</div>
+                    <div className="text-xs text-slate-500 mt-0.5">Tiếp nhận thông tin 24/7 (Phản hồi trong 2h)</div>
                   </div>
                 </div>
 
@@ -142,9 +151,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Trung Tâm R&D Công Nghệ Giáo Dục</div>
-                    <div className="text-sm font-semibold text-[#0A2540] mt-0.5">
-                      Tầng 8, Tòa nhà DMK Innovation, Phố Duy Tân, Cầu Giấy, Hà Nội
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Trụ Sở Công Ty Đức Mai Khôi</div>
+                    <div className="text-sm font-semibold text-[#0A2540] mt-0.5 leading-snug">
+                      702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam
                     </div>
                   </div>
                 </div>

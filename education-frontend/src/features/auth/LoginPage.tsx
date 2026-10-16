@@ -80,12 +80,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         {/* Khan Top Accent Bar */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#14BF96] via-[#1865F2] to-[#8B5CF6]" />
 
-        {/* Brand Sprout & Title */}
+        {/* Brand Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-full bg-[#14BF96] items-center justify-center text-white shadow-md mb-3">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22V12M12 12C12 7 7 4 2 5C3 10 7 12 12 12ZM12 12C12 7 17 4 22 5C21 10 17 12 12 12Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <div className="inline-flex items-center justify-center mb-3">
+            <img
+              src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+              alt="DMKLab"
+              className="h-11 w-auto object-contain"
+            />
           </div>
           <h1 className="text-2xl font-black text-[#0A2540] tracking-tight">
             Đăng nhập vào DMKLab Education
