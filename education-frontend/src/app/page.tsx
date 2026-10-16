@@ -14,11 +14,16 @@ import { AdminDashboard } from "@/features/admin/AdminDashboard";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
+import { AboutPage } from "@/features/about/AboutPage";
+import { ArticlesPage } from "@/features/articles/ArticlesPage";
+import { ContactPage } from "@/features/contact/ContactPage";
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(MOCK_USERS.student);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(MOCK_GRADES[4]); // Lớp 5
-  const [activeView, setActiveView] = useState<'home' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile'>('home');
+  const [activeView, setActiveView] = useState<
+    'home' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile' | 'about' | 'articles' | 'contact'
+  >('home');
   const [selectedLesson, setSelectedLesson] = useState<Lesson>(MOCK_LESSONS[1]);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
@@ -94,6 +99,21 @@ export default function HomePage() {
     }
   };
 
+  const handleOpenAbout = () => {
+    setActiveView('about');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenArticles = () => {
+    setActiveView('articles');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenContact = () => {
+    setActiveView('contact');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Real-time Backend + DB Status Banner */}
@@ -129,6 +149,12 @@ export default function HomePage() {
             ? 'register'
             : activeView === 'profile'
             ? 'profile'
+            : activeView === 'about'
+            ? 'about'
+            : activeView === 'articles'
+            ? 'articles'
+            : activeView === 'contact'
+            ? 'contact'
             : 'student'
         }
         onChangeView={(v) => {
@@ -137,6 +163,9 @@ export default function HomePage() {
           else if (v === 'login') setActiveView('login');
           else if (v === 'register') setActiveView('register');
           else if (v === 'profile') setActiveView('profile');
+          else if (v === 'about') handleOpenAbout();
+          else if (v === 'articles') handleOpenArticles();
+          else if (v === 'contact') handleOpenContact();
           else setActiveView('home');
         }}
         selectedGrade={selectedGrade}
@@ -147,6 +176,9 @@ export default function HomePage() {
         onOpenProfile={() => setActiveView('profile')}
         onLogout={handleLogout}
         onSelectLesson={handleOpenLesson}
+        onOpenAbout={handleOpenAbout}
+        onOpenArticles={handleOpenArticles}
+        onOpenContact={handleOpenContact}
       />
 
       <main className="flex-1">
@@ -168,6 +200,42 @@ export default function HomePage() {
               onOpenAiChat={() => setIsAiChatOpen(true)}
             />
           </div>
+        )}
+
+        {activeView === 'about' && (
+          <AboutPage
+            onBackToHome={() => {
+              setActiveView('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenRegister={() => {
+              setActiveView('register');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenContact={handleOpenContact}
+          />
+        )}
+
+        {activeView === 'articles' && (
+          <ArticlesPage
+            onBackToHome={() => {
+              setActiveView('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenContact={handleOpenContact}
+            onOpenAbout={handleOpenAbout}
+          />
+        )}
+
+        {activeView === 'contact' && (
+          <ContactPage
+            onBackToHome={() => {
+              setActiveView('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onOpenArticles={handleOpenArticles}
+            onOpenAbout={handleOpenAbout}
+          />
         )}
 
         {activeView === 'login' && (
@@ -225,7 +293,11 @@ export default function HomePage() {
         onClose={() => setIsAiChatOpen(false)}
       />
 
-      <Footer />
+      <Footer
+        onOpenAbout={handleOpenAbout}
+        onOpenArticles={handleOpenArticles}
+        onOpenContact={handleOpenContact}
+      />
     </div>
   );
 }

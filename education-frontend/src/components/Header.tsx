@@ -31,8 +31,8 @@ import { MOCK_LESSONS } from "@/lib/mock-data";
 interface HeaderProps {
   currentUser: User | null;
   onSwitchUser: (role: UserRole) => void;
-  activeView: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile';
-  onChangeView: (view: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile') => void;
+  activeView: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile' | 'about' | 'articles' | 'contact';
+  onChangeView: (view: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile' | 'about' | 'articles' | 'contact') => void;
   selectedGrade: Grade;
   onSelectGrade: (grade: Grade) => void;
   onOpenAiChat: () => void;
@@ -41,6 +41,9 @@ interface HeaderProps {
   onOpenProfile: () => void;
   onLogout: () => void;
   onSelectLesson?: (lesson: any) => void;
+  onOpenAbout?: () => void;
+  onOpenArticles?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -56,6 +59,9 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfile,
   onLogout,
   onSelectLesson,
+  onOpenAbout,
+  onOpenArticles,
+  onOpenContact,
 }) => {
   const [showCoursesMenu, setShowCoursesMenu] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -166,9 +172,77 @@ export const Header: React.FC<HeaderProps> = ({
                     ))}
                   </div>
                 </div>
+
+                {/* Quick Links inside Courses Dropdown */}
+                <div className="col-span-2 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-semibold">
+                  <span>Khám phá thêm về DMKLab:</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        onChangeView('about');
+                        setShowCoursesMenu(false);
+                      }}
+                      className="text-[#1865F2] hover:underline cursor-pointer"
+                    >
+                      Giới thiệu
+                    </button>
+                    <button
+                      onClick={() => {
+                        onChangeView('articles');
+                        setShowCoursesMenu(false);
+                      }}
+                      className="text-[#1865F2] hover:underline cursor-pointer"
+                    >
+                      Bài viết
+                    </button>
+                    <button
+                      onClick={() => {
+                        onChangeView('contact');
+                        setShowCoursesMenu(false);
+                      }}
+                      className="text-[#1865F2] hover:underline cursor-pointer"
+                    >
+                      Liên hệ
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
+
+          {/* Nav links: Giới thiệu, Bài viết, Liên hệ */}
+          <nav className="hidden lg:flex items-center gap-1">
+            <button
+              onClick={() => onChangeView('about')}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                activeView === 'about'
+                  ? 'bg-blue-50 text-[#1865F2]'
+                  : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
+              }`}
+            >
+              Giới thiệu
+            </button>
+            <button
+              onClick={() => onChangeView('articles')}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                activeView === 'articles'
+                  ? 'bg-blue-50 text-[#1865F2]'
+                  : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
+              }`}
+            >
+              Bài viết
+            </button>
+            <button
+              onClick={() => onChangeView('contact')}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                activeView === 'contact'
+                  ? 'bg-blue-50 text-[#1865F2]'
+                  : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
+              }`}
+            >
+              Liên hệ
+            </button>
+          </nav>
 
           {/* Search Input with Live Dropdown */}
           <div className="hidden md:flex relative w-52 lg:w-72">

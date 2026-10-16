@@ -77,3 +77,35 @@ Mật khẩu chung cho các tài khoản seed là: `password123`
 - **Biến môi trường**: `education-frontend/.env` (`DATABASE_URL="postgresql://postgres:postgres@localhost:5432/learning_db?schema=public"`)
 - **Test Endpoint (Next.js API Route)**: [http://localhost:3000/api/prisma-test](http://localhost:3000/api/prisma-test)
 
+---
+
+## 6. Tối Ưu Hóa SEO & Các Trang Mới (DMKLab Education)
+### A. Hệ thống trang mới & Thanh điều hướng (Navbar)
+1. **Giới thiệu về DMKLab (`/about` & SPA view)**:
+   - Sứ mệnh giáo dục miễn phí chuẩn quốc tế cho học sinh K–12 Việt Nam.
+   - 4 trụ cột cốt lõi: Phương pháp gợi mở Socratic, Tinh thông kỹ năng (Mastery Learning), Trợ lý AI và Bảo mật tuyệt đối.
+   - Thống kê tác động và đội ngũ chuyên gia sư phạm.
+2. **Bài viết & Cẩm nang K–12 (`/articles` & SPA view)**:
+   - Kho bài viết chuyên sâu: Học Toán tư duy, Gia sư AI trong lớp học K-12, Kỹ thuật Pomodoro, Cẩm nang phụ huynh.
+   - Bộ lọc danh mục, thanh tìm kiếm thời gian thực, bộ đếm lượt thích và modal đọc bài viết chi tiết.
+3. **Liên hệ & Tư vấn học tập (`/contact` & SPA view)**:
+   - Các kênh hỗ trợ trực tiếp: Hotline 1900 6868, Email `contact@dmklab.edu.vn`, Văn phòng R&D Duy Tân, Cầu Giấy.
+   - Form gửi yêu cầu tư vấn lộ trình học Socratic với phản hồi tức thì.
+   - Hệ thống câu hỏi thường gặp (FAQ accordion) giải đáp chính sách và công nghệ.
+
+### B. Bộ giải pháp SEO toàn diện (Next.js Metadata API)
+- **Cấu hình Metadata chuẩn Google (`layout.tsx`)**:
+  - `metadataBase: new URL('https://dmklab.edu.vn')`
+  - Canonical URL, Tiêu đề động theo template `%s | DMKLab Education`.
+  - OpenGraph cards (`og:title`, `og:description`, `og:image`, `og:site_name`, `og:locale: vi_VN`).
+  - Twitter summary card (`summary_large_image`).
+  - Robots crawler directives (`max-snippet`, `max-image-preview: large`).
+- **Dữ liệu cấu trúc JSON-LD (`schema.org`)**:
+  - Schema `EducationalOrganization`: Thông tin pháp nhân, hotline, địa chỉ, logo, mạng xã hội.
+  - Schema `WebSite` + `SearchAction`: Tối ưu Google Rich Snippets và ô tìm kiếm trực tiếp trên kết quả tìm kiếm.
+- **Sitemap tự động (`sitemap.xml`)**:
+  - Tự động sinh danh mục URL (`/`, `/about`, `/articles`, `/contact`, `/dashboard`) kèm `changeFrequency` và `priority`.
+- **File Robots (`robots.txt`)**:
+  - Quy tắc phân quyền crawler cho phép lập chỉ mục nội dung giáo dục và chặn các endpoint nội bộ.
+
+
