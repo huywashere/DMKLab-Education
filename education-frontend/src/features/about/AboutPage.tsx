@@ -15,6 +15,9 @@ import {
   ArrowRight,
   Heart
 } from "lucide-react";
+import { FaLightbulb, FaShieldHalved } from "react-icons/fa6";
+import { TbTargetArrow } from "react-icons/tb";
+import { RiRobot2Fill } from "react-icons/ri";
 
 interface AboutPageProps {
   onBackToHome: () => void;
@@ -29,25 +32,25 @@ export const AboutPage: React.FC<AboutPageProps> = ({
 }) => {
   const CORE_VALUES = [
     {
-      icon: <Lightbulb className="w-6 h-6 text-[#1865F2]" />,
+      icon: <FaLightbulb className="w-6 h-6 text-[#1865F2]" />,
       title: "Phương Pháp Gợi Mở (Socratic)",
       desc: "Không đưa ra đáp án có sẵn để học sinh sao chép. DMKLab đặt câu hỏi định hướng, kích hoạt tư duy phản biện và giúp học sinh tự tìm ra câu trả lời.",
       bg: "bg-blue-50/80",
     },
     {
-      icon: <Target className="w-6 h-6 text-emerald-600" />,
+      icon: <TbTargetArrow className="w-6 h-6 text-emerald-600" />,
       title: "Tinh Thông Từng Kỹ Năng (Mastery Learning)",
       desc: "Học sinh tiến bộ theo nhịp độ riêng. Mỗi kỹ năng đều được luyện tập qua 4 cấp độ: Chưa học → Làm quen → Thành thạo → Tinh thông.",
       bg: "bg-emerald-50/80",
     },
     {
-      icon: <Cpu className="w-6 h-6 text-purple-600" />,
+      icon: <RiRobot2Fill className="w-6 h-6 text-purple-600" />,
       title: "Công Nghệ Trí Tuệ Nhân Tạo",
       desc: "Trợ lý DMK AI Tutor đồng hành 24/7 với hạn mức 30 lượt/ngày có kiểm soát, bảo vệ học sinh và hỗ trợ giáo viên theo dõi tiến độ chính xác.",
       bg: "bg-purple-50/80",
     },
     {
-      icon: <ShieldCheck className="w-6 h-6 text-amber-600" />,
+      icon: <FaShieldHalved className="w-6 h-6 text-amber-600" />,
       title: "An Toàn & Bảo Mật Tuyệt Đối",
       desc: "Tuân thủ nghiêm ngặt chuẩn bảo vệ quyền riêng tư trẻ em (COPPA). Mọi dữ liệu học tập đều được mã hóa bằng thuật toán HMAC-SHA512.",
       bg: "bg-amber-50/80",

@@ -17,6 +17,9 @@ import {
   User,
   GraduationCap
 } from "lucide-react";
+import { FaPhoneVolume, FaEnvelopeOpenText, FaLocationDot } from "react-icons/fa6";
+import { RiCustomerService2Fill, RiMailSendFill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
+import { TbHeadset, TbClockHour4 } from "react-icons/tb";
 
 interface ContactPageProps {
   onBackToHome: () => void;
@@ -120,7 +123,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 {/* Hotline */}
                 <div className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
                   <div className="w-10 h-10 rounded-lg bg-blue-100 text-[#1865F2] flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5" />
+                    <FaPhoneVolume className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng Đài & Hotline Hỗ Trợ</div>
@@ -134,7 +137,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 {/* Email */}
                 <div className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
                   <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                    <Mail className="w-5 h-5" />
+                    <FaEnvelopeOpenText className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Hòm Thư Điện Tử</div>
@@ -148,7 +151,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 {/* Office */}
                 <div className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
                   <div className="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5" />
+                    <FaLocationDot className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Trụ Sở Công Ty Đức Mai Khôi</div>
@@ -161,7 +164,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 {/* Working hours */}
                 <div className="flex items-start gap-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
                   <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5" />
+                    <TbClockHour4 className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Thời Gian Làm Việc Văn Phòng</div>

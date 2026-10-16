@@ -20,6 +20,24 @@ import {
   ChevronRight,
   Sparkles
 } from "lucide-react";
+import { 
+  FaCalculator, 
+  FaEarthAmericas, 
+  FaLandmarkDome, 
+  FaCoins, 
+  FaFire, 
+  FaStar 
+} from "react-icons/fa6";
+import { 
+  RiBookOpenFill, 
+  RiRobot2Fill, 
+  RiSparklingFill 
+} from "react-icons/ri";
+import { 
+  TbMathFunction, 
+  TbMathSymbols, 
+  TbAtom 
+} from "react-icons/tb";
 
 interface KhanHomepageProps {
   currentUser: User;
@@ -39,15 +57,15 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
   const [activeAudienceTab, setActiveAudienceTab] = useState<'schools' | 'teachers' | 'students' | 'families'>('schools');
 
   const SUBJECT_ITEMS = [
-    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_primary", fallback: "Toán: Tiểu học (Lớp 1–5)", color: "#1865F2", bg: "#EBF2FF" },
-    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_secondary", fallback: "Toán: THCS & THPT (Lớp 6–12)", color: "#1865F2", bg: "#EBF2FF" },
-    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_by_grade", fallback: "Toán: Phân theo lớp học", color: "#1865F2", bg: "#EBF2FF" },
-    { icon: <Atom className="w-5 h-5" />, labelKey: "subject_stem", fallback: "Khoa học Tự nhiên & STEM", color: "#14BF96", bg: "#E6FAF6" },
-    { icon: <Globe className="w-5 h-5" />, labelKey: "subject_english", fallback: "Tiếng Anh giao tiếp K–12", color: "#8B5CF6", bg: "#F3F0FF" },
-    { icon: <BookOpen className="w-5 h-5" />, labelKey: "subject_literature", fallback: "Ngữ Văn & Ngôn ngữ học", color: "#F59E0B", bg: "#FFF9EB" },
-    { icon: <Compass className="w-5 h-5" />, labelKey: "subject_history", fallback: "Lịch sử & Địa lý Việt Nam", color: "#EF4444", bg: "#FEF2F2" },
-    { icon: <BarChart2 className="w-5 h-5" />, labelKey: "subject_economics", fallback: "Kinh tế & Giáo dục tài chính", color: "#10B981", bg: "#ECFDF5" },
-    { icon: <Sparkles className="w-5 h-5" />, labelKey: "subject_ai_coding", fallback: "AI & Lập trình cho học sinh", color: "#6366F1", bg: "#EEEFFF" },
+    { icon: <TbMathFunction className="w-5 h-5" />, labelKey: "subject_math_primary", fallback: "Toán: Tiểu học (Lớp 1–5)", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <FaCalculator className="w-5 h-5" />, labelKey: "subject_math_secondary", fallback: "Toán: THCS & THPT (Lớp 6–12)", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <TbMathSymbols className="w-5 h-5" />, labelKey: "subject_math_by_grade", fallback: "Toán: Phân theo lớp học", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <TbAtom className="w-5 h-5" />, labelKey: "subject_stem", fallback: "Khoa học Tự nhiên & STEM", color: "#14BF96", bg: "#E6FAF6" },
+    { icon: <FaEarthAmericas className="w-5 h-5" />, labelKey: "subject_english", fallback: "Tiếng Anh giao tiếp K–12", color: "#8B5CF6", bg: "#F3F0FF" },
+    { icon: <RiBookOpenFill className="w-5 h-5" />, labelKey: "subject_literature", fallback: "Ngữ Văn & Ngôn ngữ học", color: "#F59E0B", bg: "#FFF9EB" },
+    { icon: <FaLandmarkDome className="w-5 h-5" />, labelKey: "subject_history", fallback: "Lịch sử & Địa lý Việt Nam", color: "#EF4444", bg: "#FEF2F2" },
+    { icon: <FaCoins className="w-5 h-5" />, labelKey: "subject_economics", fallback: "Kinh tế & Giáo dục tài chính", color: "#10B981", bg: "#ECFDF5" },
+    { icon: <RiRobot2Fill className="w-5 h-5" />, labelKey: "subject_ai_coding", fallback: "AI & Lập trình cho học sinh", color: "#6366F1", bg: "#EEEFFF" },
   ];
 
   const STATS = [
