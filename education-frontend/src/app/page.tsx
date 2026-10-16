@@ -297,6 +297,14 @@ export default function HomePage() {
         onOpenAbout={handleOpenAbout}
         onOpenArticles={handleOpenArticles}
         onOpenContact={handleOpenContact}
+        onGetStarted={() => {
+          if (!currentUser) {
+            setActiveView('register');
+          } else {
+            setActiveView('home');
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
     </div>
   );

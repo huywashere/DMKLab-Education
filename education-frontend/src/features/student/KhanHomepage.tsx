@@ -271,12 +271,12 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
             </ul>
           </div>
 
-          {/* Right: Real progress graphic from img-web */}
-          <div className="relative flex justify-center">
+          {/* Right: Mastery Growth graphic from img-web */}
+          <div className="relative flex justify-center items-center bg-slate-50/80 rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm">
             <img
-              src="/img-web/75eaf31453137fba-pre_footer_graphic_desktop@2x.webp"
-              alt="Biểu đồ tiến độ học tập thực sự"
-              className="w-full max-w-md rounded-2xl object-contain drop-shadow-lg"
+              src="/img-web/v2_growing_asset.svg"
+              alt="4 cấp độ tinh thông kỹ năng: Chưa học - Làm quen - Thành thạo - Tinh thông"
+              className="w-full max-w-md object-contain drop-shadow-sm"
             />
           </div>
         </div>
