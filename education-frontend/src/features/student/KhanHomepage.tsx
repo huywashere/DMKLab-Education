@@ -151,6 +151,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 alt="Học sinh học tập trực tuyến"
                 className="w-full rounded-3xl object-cover shadow-xl border border-[#E8E3D0]"
                 style={{ aspectRatio: "4/3" }}
+                fetchPriority="high"
+                decoding="async"
               />
               {/* Floating mascot-style badge */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl border border-slate-200 px-4 py-3 flex items-center gap-3">
@@ -158,6 +160,9 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                   src="/img-web/khan-illustration.svg"
                   alt="DMK mascot"
                   className="w-12 h-12 object-contain"
+                  width={48}
+                  height={48}
+                  decoding="async"
                 />
                 <div>
                   <p className="text-xs font-bold text-slate-800">{t("ai_tutor_badge", "DMK AI Tutor")}</p>
@@ -279,6 +284,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               src="/img-web/v2_growing_asset.svg"
               alt="4 cấp độ tinh thông kỹ năng: Chưa học - Làm quen - Thành thạo - Tinh thông"
               className="w-full max-w-md object-contain drop-shadow-sm"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -297,6 +304,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 alt="Kết quả học sinh"
                 className="w-full rounded-3xl object-cover shadow-xl"
                 style={{ aspectRatio: "1/1" }}
+                loading="lazy"
+                decoding="async"
               />
               {/* Floating progress chart overlay */}
               <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl border border-slate-100 p-3">
@@ -304,6 +313,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                   src="/img-web/ebae4d32de6a73eb-real_progress_graphic.svg"
                   alt="Biểu đồ kỹ năng"
                   className="w-36 h-auto"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -398,6 +409,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                   }
                   alt="Minh hoạ"
                   className="w-full h-56 object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="p-4 space-y-2">
                   <div className="flex items-center gap-2">
@@ -454,6 +467,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                   src="/img-web/khan-illustration.svg"
                   alt="DMK AI Mascot"
                   className="w-48 h-48 object-contain drop-shadow-2xl"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               {/* Floating chat bubble */}

@@ -136,6 +136,11 @@ export interface UploadUrlResponse {
   message: string;
 }
 
+const apiCache = {
+  grades: null as Grade[] | null,
+  subjects: new Map<string, Subject[]>(),
+};
+
 export const api = {
   // Token Management
   getToken(): string | null {
@@ -312,20 +317,25 @@ export const api = {
     return json.message || 'Đổi mật khẩu thành công!';
   },
 
-  // Academics & Content
+  // Academics & Content (With in-memory caching to optimize network roundtrips)
   async getGrades(): Promise<Grade[]> {
+    if (apiCache.grades && apiCache.grades.length > 0) {
+      return apiCache.grades;
+    }
     try {
       const res = await fetch(`${API_BASE}/grades`);
       if (!res.ok) throw new Error('API failed');
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        return json.data.map((g: BackendGrade) => ({
+        const mapped = json.data.map((g: BackendGrade) => ({
           id: g.id,
           name: g.name,
           code: g.code,
           level: g.level,
           displayOrder: g.displayOrder,
         }));
+        apiCache.grades = mapped;
+        return mapped;
       }
     } catch {
       // Fallback
@@ -334,12 +344,15 @@ export const api = {
   },
 
   async getSubjects(gradeId: string): Promise<Subject[]> {
+    if (apiCache.subjects.has(gradeId)) {
+      return apiCache.subjects.get(gradeId)!;
+    }
     try {
       const res = await fetch(`${API_BASE}/grades/${gradeId}/subjects`);
       if (!res.ok) throw new Error('API failed');
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        return json.data.map((s: BackendSubject) => ({
+        const mapped = json.data.map((s: BackendSubject) => ({
           id: s.id,
           gradeId: gradeId,
           name: s.name,
@@ -349,6 +362,8 @@ export const api = {
           totalLessons: 12,
           completedLessons: 3,
         }));
+        apiCache.subjects.set(gradeId, mapped);
+        return mapped;
       }
     } catch {
       // Fallback

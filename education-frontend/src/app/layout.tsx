@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+});
 
 export const viewport: Viewport = {
   themeColor: "#1865F2",
@@ -132,21 +140,15 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="vi" className="h-full antialiased">
+    <html lang="vi" className={`h-full antialiased ${plusJakartaSans.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
         {/* JSON-LD Structured Data Schema for Google & Search Engines */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F8FAFC] text-[#0F172A] font-sans">
+      <body className={`min-h-full flex flex-col bg-[#F8FAFC] text-[#0F172A] ${plusJakartaSans.className}`}>
         <LanguageProvider>
           {children}
         </LanguageProvider>

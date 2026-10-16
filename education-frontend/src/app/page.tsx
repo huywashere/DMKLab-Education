@@ -6,17 +6,63 @@ import { MOCK_USERS, MOCK_GRADES, MOCK_LESSONS } from "@/lib/mock-data";
 import { api } from "@/lib/api";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import dynamic from "next/dynamic";
 import { KhanHomepage } from "@/features/student/KhanHomepage";
-import { LessonRoom } from "@/features/student/LessonRoom";
-import { SocraticChatbot } from "@/features/student/SocraticChatbot";
-import { StudentDashboard } from "@/features/student/StudentDashboard";
-import { AdminDashboard } from "@/features/admin/AdminDashboard";
-import { LoginPage } from "@/features/auth/LoginPage";
-import { RegisterPage } from "@/features/auth/RegisterPage";
-import { ProfilePage } from "@/features/profile/ProfilePage";
-import { AboutPage } from "@/features/about/AboutPage";
-import { ArticlesPage } from "@/features/articles/ArticlesPage";
-import { ContactPage } from "@/features/contact/ContactPage";
+
+// Fast lightweight loading skeleton for code-split components
+const ViewSkeleton = () => (
+  <div className="max-w-5xl mx-auto px-4 py-16 space-y-6 animate-pulse">
+    <div className="h-8 bg-slate-200 rounded-lg w-1/3 mx-auto" />
+    <div className="h-4 bg-slate-200 rounded w-2/3 mx-auto" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+      <div className="h-48 bg-slate-200 rounded-2xl" />
+      <div className="h-48 bg-slate-200 rounded-2xl" />
+      <div className="h-48 bg-slate-200 rounded-2xl" />
+    </div>
+  </div>
+);
+
+// Code-split dynamic imports: loaded on-demand only when user opens each view
+const LessonRoom = dynamic(
+  () => import("@/features/student/LessonRoom").then((m) => m.LessonRoom),
+  { loading: () => <ViewSkeleton /> }
+);
+const SocraticChatbot = dynamic(
+  () => import("@/features/student/SocraticChatbot").then((m) => m.SocraticChatbot),
+  { ssr: false }
+);
+const StudentDashboard = dynamic(
+  () => import("@/features/student/StudentDashboard").then((m) => m.StudentDashboard),
+  { loading: () => <ViewSkeleton /> }
+);
+const AdminDashboard = dynamic(
+  () => import("@/features/admin/AdminDashboard").then((m) => m.AdminDashboard),
+  { loading: () => <ViewSkeleton /> }
+);
+const LoginPage = dynamic(
+  () => import("@/features/auth/LoginPage").then((m) => m.LoginPage),
+  { loading: () => <ViewSkeleton /> }
+);
+const RegisterPage = dynamic(
+  () => import("@/features/auth/RegisterPage").then((m) => m.RegisterPage),
+  { loading: () => <ViewSkeleton /> }
+);
+const ProfilePage = dynamic(
+  () => import("@/features/profile/ProfilePage").then((m) => m.ProfilePage),
+  { loading: () => <ViewSkeleton /> }
+);
+const AboutPage = dynamic(
+  () => import("@/features/about/AboutPage").then((m) => m.AboutPage),
+  { loading: () => <ViewSkeleton /> }
+);
+const ArticlesPage = dynamic(
+  () => import("@/features/articles/ArticlesPage").then((m) => m.ArticlesPage),
+  { loading: () => <ViewSkeleton /> }
+);
+const ContactPage = dynamic(
+  () => import("@/features/contact/ContactPage").then((m) => m.ContactPage),
+  { loading: () => <ViewSkeleton /> }
+);
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(MOCK_USERS.student);

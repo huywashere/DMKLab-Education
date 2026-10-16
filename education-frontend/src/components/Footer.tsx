@@ -77,6 +77,8 @@ export const Footer: React.FC<FooterProps> = ({
               src="/img-web/75eaf31453137fba-pre_footer_graphic_desktop@2x.webp"
               alt="Strengthen every classroom with DMKLab"
               className="w-full max-w-4xl lg:max-w-5xl h-auto object-contain select-none pointer-events-none -mb-1 block"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </section>
@@ -102,6 +104,8 @@ export const Footer: React.FC<FooterProps> = ({
                   src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
                   alt="DMKLab - Công ty Đức Mai Khôi"
                   className="h-11 w-auto object-contain"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
 
