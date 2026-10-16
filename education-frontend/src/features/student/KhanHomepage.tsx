@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { User, Grade, Lesson } from "@/types";
 import { MOCK_SUBJECTS, MOCK_LESSONS } from "@/lib/mock-data";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 import {
   Play,
   CheckCircle,
@@ -27,76 +28,77 @@ interface KhanHomepageProps {
   onOpenAiChat: () => void;
 }
 
-const SUBJECT_ITEMS = [
-  { icon: <Calculator className="w-5 h-5" />, label: "Toán: Tiểu học (Lớp 1–5)", color: "#1865F2", bg: "#EBF2FF" },
-  { icon: <Calculator className="w-5 h-5" />, label: "Toán: THCS & THPT (Lớp 6–12)", color: "#1865F2", bg: "#EBF2FF" },
-  { icon: <Calculator className="w-5 h-5" />, label: "Toán: Phân theo lớp học", color: "#1865F2", bg: "#EBF2FF" },
-  { icon: <Atom className="w-5 h-5" />, label: "Khoa học Tự nhiên & STEM", color: "#14BF96", bg: "#E6FAF6" },
-  { icon: <Globe className="w-5 h-5" />, label: "Tiếng Anh giao tiếp K–12", color: "#8B5CF6", bg: "#F3F0FF" },
-  { icon: <BookOpen className="w-5 h-5" />, label: "Ngữ Văn & Ngôn ngữ học", color: "#F59E0B", bg: "#FFF9EB" },
-  { icon: <Compass className="w-5 h-5" />, label: "Lịch sử & Địa lý Việt Nam", color: "#EF4444", bg: "#FEF2F2" },
-  { icon: <BarChart2 className="w-5 h-5" />, label: "Kinh tế & Giáo dục tài chính", color: "#10B981", bg: "#ECFDF5" },
-  { icon: <Sparkles className="w-5 h-5" />, label: "AI & Lập trình cho học sinh", color: "#6366F1", bg: "#EEEFFF" },
-];
-
-const STATS = [
-  { value: "180M+", label: "học sinh đăng ký học" },
-  { value: "63B+", label: "phút học tập thực sự" },
-  { value: "Miễn phí", label: "cho học sinh & giáo viên" },
-  { value: "15+ năm", label: "tập trung vào một sứ mệnh" },
-];
-
-const WHO_ARE_YOU = [
-  {
-    role: "Học sinh",
-    desc: "Học tập theo tốc độ của bản thân",
-    href: "#",
-    color: "text-[#1865F2]",
-    border: "border-[#1865F2]",
-  },
-  {
-    role: "Gia đình",
-    desc: "Hỗ trợ việc học của con bạn",
-    href: "#",
-    color: "text-slate-700",
-    border: "border-slate-200",
-  },
-  {
-    role: "Giáo viên",
-    desc: "Giáo viên với lớp học",
-    href: "#",
-    color: "text-slate-700",
-    border: "border-slate-200",
-  },
-  {
-    role: "Trường học & Sở",
-    desc: "Triển khai AI toàn trường",
-    href: "#",
-    color: "text-slate-700",
-    border: "border-slate-200",
-  },
-];
-
-const HOW_WORKS_CHECKS = [
-  "Luyện tập xây dựng hiểu biết thông qua các kỹ năng theo chuẩn chương trình",
-  "Phản hồi tức thì giúp học sinh vượt qua điểm khó khi gặp",
-  "Thấu hiểu học sinh giúp giáo viên định hướng chính xác",
-];
-
-const LEARNER_CHECKS = [
-  "1 kỹ năng thành thạo = +0.5 điểm phần trăm",
-  "10 kỹ năng thành thạo = +5 điểm phần trăm",
-  "60 kỹ năng thành thạo = +30 điểm phần trăm",
-];
-
 export const KhanHomepage: React.FC<KhanHomepageProps> = ({
   currentUser,
   selectedGrade,
   onOpenLesson,
   onOpenAiChat,
 }) => {
+  const { t, lang } = useLanguage();
   const [activeWho, setActiveWho] = useState(0);
   const [activeAudienceTab, setActiveAudienceTab] = useState<'schools' | 'teachers' | 'students' | 'families'>('schools');
+
+  const SUBJECT_ITEMS = [
+    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_primary", fallback: "Toán: Tiểu học (Lớp 1–5)", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_secondary", fallback: "Toán: THCS & THPT (Lớp 6–12)", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <Calculator className="w-5 h-5" />, labelKey: "subject_math_by_grade", fallback: "Toán: Phân theo lớp học", color: "#1865F2", bg: "#EBF2FF" },
+    { icon: <Atom className="w-5 h-5" />, labelKey: "subject_stem", fallback: "Khoa học Tự nhiên & STEM", color: "#14BF96", bg: "#E6FAF6" },
+    { icon: <Globe className="w-5 h-5" />, labelKey: "subject_english", fallback: "Tiếng Anh giao tiếp K–12", color: "#8B5CF6", bg: "#F3F0FF" },
+    { icon: <BookOpen className="w-5 h-5" />, labelKey: "subject_literature", fallback: "Ngữ Văn & Ngôn ngữ học", color: "#F59E0B", bg: "#FFF9EB" },
+    { icon: <Compass className="w-5 h-5" />, labelKey: "subject_history", fallback: "Lịch sử & Địa lý Việt Nam", color: "#EF4444", bg: "#FEF2F2" },
+    { icon: <BarChart2 className="w-5 h-5" />, labelKey: "subject_economics", fallback: "Kinh tế & Giáo dục tài chính", color: "#10B981", bg: "#ECFDF5" },
+    { icon: <Sparkles className="w-5 h-5" />, labelKey: "subject_ai_coding", fallback: "AI & Lập trình cho học sinh", color: "#6366F1", bg: "#EEEFFF" },
+  ];
+
+  const STATS = [
+    { value: "180M+", label: t("stats_students_label", "học sinh đăng ký học") },
+    { value: "63B+", label: t("stats_minutes_label", "phút học tập thực sự") },
+    { value: t("stats_free_val", "Miễn phí"), label: t("stats_free_label", "cho học sinh & giáo viên") },
+    { value: t("stats_years_val", "15+ năm"), label: t("stats_years_label", "tập trung vào một sứ mệnh") },
+  ];
+
+  const WHO_ARE_YOU = [
+    {
+      role: t("hero_role_student", "Học sinh"),
+      desc: t("hero_role_student_desc", "Học tập theo tốc độ của bản thân"),
+      href: "#",
+      color: "text-[#1865F2]",
+      border: "border-[#1865F2]",
+    },
+    {
+      role: t("hero_role_family", "Gia đình"),
+      desc: t("hero_role_family_desc", "Hỗ trợ việc học của con bạn"),
+      href: "#",
+      color: "text-slate-700",
+      border: "border-slate-200",
+    },
+    {
+      role: t("hero_role_teacher", "Giáo viên"),
+      desc: t("hero_role_teacher_desc", "Giáo viên với lớp học"),
+      href: "#",
+      color: "text-slate-700",
+      border: "border-slate-200",
+    },
+    {
+      role: t("hero_role_school", "Trường học & Sở"),
+      desc: t("hero_role_school_desc", "Triển khai AI toàn trường"),
+      href: "#",
+      color: "text-slate-700",
+      border: "border-slate-200",
+    },
+  ];
+
+  const HOW_WORKS_CHECKS = [
+    t("hero_check_1", "Luyện tập xây dựng hiểu biết thông qua các kỹ năng theo chuẩn chương trình"),
+    t("hero_check_2", "Phản hồi tức thì giúp học sinh vượt qua điểm khó khi gặp"),
+    t("hero_check_3", "Thấu hiểu học sinh giúp giáo viên định hướng chính xác"),
+  ];
+
+  const LEARNER_CHECKS = [
+    t("results_check_1", "1 kỹ năng thành thạo = +0.5 điểm phần trăm"),
+    t("results_check_2", "10 kỹ năng thành thạo = +5 điểm phần trăm"),
+    t("results_check_3", "60 kỹ năng thành thạo = +30 điểm phần trăm"),
+  ];
 
   return (
     <div className="w-full">
@@ -108,11 +110,11 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Left: Headlines + Bullets */}
           <div className="space-y-6">
             <h1 className="text-4xl sm:text-5xl font-extrabold text-[#21242C] leading-tight tracking-tight">
-              Biến mục tiêu học tập lớn thành{" "}
-              <em className="not-italic text-[#1865F2]">kết quả thực sự.</em>
+              {t("hero_headline_1", "Biến mục tiêu học tập lớn thành")}{" "}
+              <em className="not-italic text-[#1865F2]">{t("hero_headline_2", "kết quả thực sự.")}</em>
             </h1>
             <p className="text-base text-slate-600 leading-relaxed max-w-lg">
-              DMKLab giúp cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh từ lớp 1 đến lớp 12 tiến bộ mỗi ngày.
+              {t("hero_desc", "DMKLab giúp cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh từ lớp 1 đến lớp 12 tiến bộ mỗi ngày.")}
             </p>
 
             <ul className="space-y-2 text-sm text-slate-700">
@@ -130,12 +132,12 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 className="khan-btn-primary text-sm px-6 py-3 gap-2 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-white" />
-                Bắt đầu học ngay
+                {t("hero_btn_start", "Bắt đầu học ngay")}
               </button>
               <button
                 className="khan-btn-secondary text-sm px-6 py-3 cursor-pointer"
               >
-                Tìm hiểu thêm
+                {t("hero_btn_learn_more", "Tìm hiểu thêm")}
               </button>
             </div>
           </div>
@@ -158,21 +160,21 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                   className="w-12 h-12 object-contain"
                 />
                 <div>
-                  <p className="text-xs font-bold text-slate-800">DMK AI Tutor</p>
-                  <p className="text-[11px] text-slate-500">Gia sư gợi mở Socratic</p>
+                  <p className="text-xs font-bold text-slate-800">{t("ai_tutor_badge", "DMK AI Tutor")}</p>
+                  <p className="text-[11px] text-slate-500">{t("ai_tutor_subbadge", "Gia sư gợi mở Socratic")}</p>
                 </div>
               </div>
               {/* Floating streak badge top right */}
               <div className="absolute -top-3 -right-3 bg-[#FFC700] text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-white" />
-                <span>{currentUser.energyPoints.toLocaleString()} Điểm</span>
+                <span>{currentUser.energyPoints.toLocaleString()} {t("points_label", "Điểm")}</span>
               </div>
             </div>
 
             {/* "Get started" role selector card — mimics Khan Academy's right column */}
             <div className="w-full max-w-md mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="px-5 pt-4 pb-2">
-                <p className="text-sm font-bold text-slate-800 mb-3">Bạn là ai?</p>
+                <p className="text-sm font-bold text-slate-800 mb-3">{t("hero_who_are_you", "Bạn là ai?")}</p>
                 <div className="divide-y divide-slate-100">
                   {WHO_ARE_YOU.map((w, idx) => (
                     <button
@@ -190,8 +192,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 </div>
               </div>
               <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-500">
-                Đã có tài khoản?{" "}
-                <button className="text-[#1865F2] font-bold hover:underline">Đăng nhập</button>
+                {t("hero_has_account", "Đã có tài khoản?")}{" "}
+                <button className="text-[#1865F2] font-bold hover:underline cursor-pointer">{t("hero_login_link", "Đăng nhập")}</button>
               </div>
             </div>
           </div>
@@ -219,7 +221,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       <section className="bg-white py-16 border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-4 text-center space-y-8">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-[#21242C]">
-            Khám phá các môn học
+            {t("courses_heading", "Khám phá các môn học")}
           </h2>
 
           <div className="flex flex-wrap justify-center gap-3">
@@ -236,7 +238,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 >
                   {item.icon}
                 </span>
-                <span className="text-[#21242C]">{item.label}</span>
+                <span className="text-[#21242C]">{t(item.labelKey, item.fallback)}</span>
               </button>
             ))}
           </div>
@@ -251,15 +253,15 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Left text */}
           <div className="space-y-5">
             <p className="text-xs font-bold uppercase tracking-widest text-[#1865F2]">
-              Cách DMKLab hoạt động
+              {t("how_badge", "Cách DMKLab hoạt động")}
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] leading-tight">
-              Tiến bộ thực sự bắt đầu từ{" "}
-              <em className="not-italic text-[#1865F2]">cách</em>{" "}
-              học sinh học.
+              {t("how_title_1", "Tiến bộ thực sự bắt đầu từ")}{" "}
+              <em className="not-italic text-[#1865F2]">{t("how_title_emphasis", "cách")}</em>{" "}
+              {t("how_title_2", "học sinh học.")}
             </h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Học sinh học tốt nhất khi thực hành đều đặn, nhận phản hồi ngay và được hỗ trợ kịp thời. EduK12 giúp điều đó khả thi để học sinh luôn tiến về phía trước, dù ở đâu trong hành trình học tập.
+              {t("how_desc", "Học sinh học tốt nhất khi thực hành đều đặn, nhận phản hồi ngay và được hỗ trợ kịp thời. DMKLab giúp điều đó khả thi để học sinh luôn tiến về phía trước, dù ở đâu trong hành trình học tập.")}
             </p>
             <ul className="space-y-3">
               {HOW_WORKS_CHECKS.map((c, i) => (
@@ -310,13 +312,13 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Right text */}
           <div className="space-y-5">
             <p className="text-xs font-bold uppercase tracking-widest text-[#14BF96]">
-              Kết quả học sinh
+              {t("results_badge", "Kết quả học sinh")}
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] leading-tight">
-              Mỗi kỹ năng đều có giá trị.
+              {t("results_title", "Mỗi kỹ năng đều có giá trị.")}
             </h2>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Mỗi kỹ năng học sinh làm chủ đều xây dựng lên kỹ năng tiếp theo, giúp lấp đầy lỗ hổng kiến thức, tạo tự tin và tiến lên. Tiến bộ là có thể đo lường – và nó cộng dồn theo thời gian.
+              {t("results_desc", "Mỗi kỹ năng học sinh làm chủ đều xây dựng lên kỹ năng tiếp theo, giúp lấp đầy lỗ hổng kiến thức, tạo tự tin và tiến lên. Tiến bộ là có thể đo lường – và nó cộng dồn theo thời gian.")}
             </p>
             <ul className="space-y-3">
               {LEARNER_CHECKS.map((c, i) => (
@@ -327,7 +329,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               ))}
             </ul>
             <button className="khan-btn-primary text-sm px-6 py-3 cursor-pointer gap-2">
-              Xem tác động thực tế
+              {t("results_btn", "Xem tác động thực tế")}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -342,21 +344,21 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Tab Nav */}
           <div className="flex gap-6 border-b border-slate-200 overflow-x-auto">
             {[
-              { key: 'schools', label: 'Trường học & Sở GD' },
-              { key: 'teachers', label: 'Giáo viên' },
-              { key: 'students', label: 'Học sinh' },
-              { key: 'families', label: 'Gia đình' },
-            ].map((t) => (
+              { key: 'schools', label: t('audience_tab_schools', 'Trường học & Sở GD') },
+              { key: 'teachers', label: t('audience_tab_teachers', 'Giáo viên') },
+              { key: 'students', label: t('audience_tab_students', 'Học sinh') },
+              { key: 'families', label: t('audience_tab_families', 'Gia đình') },
+            ].map((tItem) => (
               <button
-                key={t.key}
-                onClick={() => setActiveAudienceTab(t.key as any)}
+                key={tItem.key}
+                onClick={() => setActiveAudienceTab(tItem.key as any)}
                 className={`pb-3 text-sm font-bold whitespace-nowrap border-b-2 transition cursor-pointer ${
-                  activeAudienceTab === t.key
+                  activeAudienceTab === tItem.key
                     ? 'border-[#1865F2] text-[#1865F2]'
                     : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
-                {t.label}
+                {tItem.label}
               </button>
             ))}
           </div>
@@ -365,23 +367,23 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-5">
               <h2 className="text-3xl font-extrabold text-[#21242C] leading-tight">
-                {activeAudienceTab === 'schools' && "Thúc đẩy tiến bộ trên mọi lớp học."}
-                {activeAudienceTab === 'teachers' && "Cung cấp cho mỗi học sinh sự hỗ trợ cần thiết."}
-                {activeAudienceTab === 'students' && "Tự học theo tốc độ của bản thân, miễn phí."}
-                {activeAudienceTab === 'families' && "Xem con bạn học thật sự hiệu quả."}
+                {activeAudienceTab === 'schools' && t('audience_schools_title', "Thúc đẩy tiến bộ trên mọi lớp học.")}
+                {activeAudienceTab === 'teachers' && t('audience_teachers_title', "Cung cấp cho mỗi học sinh sự hỗ trợ cần thiết.")}
+                {activeAudienceTab === 'students' && t('audience_students_title', "Tự học theo tốc độ của bản thân, miễn phí.")}
+                {activeAudienceTab === 'families' && t('audience_families_title', "Xem con bạn học thật sự hiệu quả.")}
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed">
-                {activeAudienceTab === 'schools' && "EduK12 được giáo viên tin dùng mỗi ngày. Các quan hệ đối tác cấp trường xây dựng trên nền tảng đó, mang lại sự nhất quán và học tập sâu hơn trên toàn trường."}
-                {activeAudienceTab === 'teachers' && "Hiểu chính xác mỗi học sinh cần gì, tiết kiệm thời gian chuẩn bị bài và tập trung vào những khoảnh khắc dạy học quan trọng nhất."}
-                {activeAudienceTab === 'students' && "Hàng nghìn video bài giảng, bài tập và giải thích. Học mọi thứ từ toán cơ bản đến đại số nâng cao, khoa học, lịch sử và nhiều hơn nữa."}
-                {activeAudienceTab === 'families' && "Theo dõi tiến độ học tập của con, biết con đang học gì và cần hỗ trợ ở đâu – tất cả trong một nơi."}
+                {activeAudienceTab === 'schools' && t('audience_schools_desc', "DMKLab được giáo viên tin dùng mỗi ngày. Các quan hệ đối tác cấp trường xây dựng trên nền tảng đó, mang lại sự nhất quán và học tập sâu hơn trên toàn trường.")}
+                {activeAudienceTab === 'teachers' && t('audience_teachers_desc', "Hiểu chính xác mỗi học sinh cần gì, tiết kiệm thời gian chuẩn bị bài và tập trung vào những khoảnh khắc dạy học quan trọng nhất.")}
+                {activeAudienceTab === 'students' && t('audience_students_desc', "Hàng nghìn video bài giảng, bài tập và giải thích. Học mọi thứ từ toán cơ bản đến đại số nâng cao, khoa học, lịch sử và nhiều hơn nữa.")}
+                {activeAudienceTab === 'families' && t('audience_families_desc', "Theo dõi tiến độ học tập của con, biết con đang học gì và cần hỗ trợ ở đâu – tất cả trong một nơi.")}
               </p>
               <div className="flex gap-3">
                 <button className="khan-btn-primary text-sm px-5 py-2.5 cursor-pointer">
-                  {activeAudienceTab === 'schools' ? "Khám phá quan hệ đối tác" : "Bắt đầu ngay"}
+                  {activeAudienceTab === 'schools' ? t('audience_btn_partnership', "Khám phá quan hệ đối tác") : t('audience_btn_get_started', "Bắt đầu ngay")}
                 </button>
                 <button className="khan-btn-outline text-sm px-5 py-2.5 cursor-pointer">
-                  Liên hệ với chúng tôi
+                  {t('audience_btn_contact', "Liên hệ với chúng tôi")}
                 </button>
               </div>
             </div>
@@ -402,12 +404,12 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                     <div className="w-5 h-5 rounded-full bg-[#14BF96] flex items-center justify-center">
                       <CheckCircle className="w-3.5 h-3.5 text-white fill-[#14BF96]" />
                     </div>
-                    <span className="text-xs font-semibold text-slate-700">Thực hành 25 bài tập kỹ năng</span>
+                    <span className="text-xs font-semibold text-slate-700">{t('audience_card_skill_practiced', "Thực hành 25 bài tập kỹ năng")}</span>
                   </div>
                   <div className="w-full h-2 bg-slate-100 rounded-full">
                     <div className="h-full w-2/3 bg-[#14BF96] rounded-full" />
                   </div>
-                  <p className="text-[11px] text-slate-400">Đang ở mức Thành Thạo — tiếp tục để đạt Tinh Thông!</p>
+                  <p className="text-[11px] text-slate-400">{t('audience_card_status', "Đang ở mức Thành Thạo — tiếp tục để đạt Tinh Thông!")}</p>
                 </div>
               </div>
             </div>
@@ -423,14 +425,15 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           <div className="space-y-5 text-white">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-emerald-300 text-xs font-bold">
               <Sparkles className="w-3.5 h-3.5" />
-              Trợ lý AI giáo dục K–12
+              {t("ai_banner_tag", "Trợ lý AI giáo dục K–12")}
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight">
-              DMK AI – Gia sư AI gợi mở{" "}
-              <span className="text-[#14BF96]">Socratic</span> của bạn.
+              {t("ai_banner_title_1", "DMK AI – Gia sư AI gợi mở")}{" "}
+              <span className="text-[#14BF96]">{t("ai_banner_title_socratic", "Socratic")}</span>{" "}
+              {t("ai_banner_title_2", "của bạn.")}
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Không cho chép bài. Không đưa đáp án ngay. DMK AI đặt câu hỏi dẫn dắt tư duy giúp học sinh thực sự hiểu – không chỉ làm xong bài tập.
+              {t("ai_banner_desc", "Không cho chép bài. Không đưa đáp án ngay. DMK AI đặt câu hỏi dẫn dắt tư duy giúp học sinh thực sự hiểu – không chỉ làm xong bài tập.")}
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <button
@@ -438,7 +441,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 className="khan-btn-green text-sm px-6 py-3 cursor-pointer gap-2"
               >
                 <Sparkles className="w-4 h-4" />
-                Trải nghiệm DMK AI ngay
+                {t("ai_banner_btn", "Trải nghiệm DMK AI ngay")}
               </button>
             </div>
           </div>
@@ -456,7 +459,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               {/* Floating chat bubble */}
               <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-xl p-3 max-w-[180px] border border-slate-100">
                 <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
-                  💡 "Bước đầu tiên em định làm gì với bài toán này?"
+                  {t("ai_bubble_prompt", '💡 "Bước đầu tiên em định làm gì với bài toán này?"')}
                 </p>
               </div>
             </div>

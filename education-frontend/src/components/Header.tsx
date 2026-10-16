@@ -27,6 +27,7 @@ import {
   BookMarked
 } from "lucide-react";
 import { MOCK_LESSONS } from "@/lib/mock-data";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface HeaderProps {
   currentUser: User | null;
@@ -63,8 +64,10 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenArticles,
   onOpenContact,
 }) => {
+  const { lang, setLang, t } = useLanguage();
   const [showCoursesMenu, setShowCoursesMenu] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showLangMenu, setShowLangMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -111,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setShowCoursesMenu(!showCoursesMenu)}
               className="flex items-center gap-2 px-3 py-2 text-[#0A2540] hover:text-[#1865F2] font-extrabold text-sm rounded-full transition cursor-pointer"
             >
-              <span>Môn học</span>
+              <span>{t('nav_courses', 'Môn học')}</span>
               <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showCoursesMenu ? 'rotate-180' : ''}`} />
             </button>
 
@@ -122,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <div className="space-y-3">
                   <p className="font-bold text-slate-400 uppercase tracking-wider text-[11px]">
-                    Lĩnh vực nổi bật
+                    {t('nav_featured_fields', 'Lĩnh vực nổi bật')}
                   </p>
                   <div className="space-y-1">
                     <button 
@@ -130,28 +133,28 @@ export const Header: React.FC<HeaderProps> = ({
                       className="w-full text-left p-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-800 font-semibold"
                     >
                       <Calculator className="w-4 h-4 text-[#1865F2]" />
-                      <span>Toán: Lớp 1 – Lớp 12</span>
+                      <span>{t('nav_math_k12', 'Toán: Lớp 1 – Lớp 12')}</span>
                     </button>
                     <button 
                       onClick={() => setShowCoursesMenu(false)}
                       className="w-full text-left p-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-800 font-semibold"
                     >
                       <Atom className="w-4 h-4 text-emerald-600" />
-                      <span>Khoa học & Tự nhiên</span>
+                      <span>{t('nav_science_stem', 'Khoa học & Tự nhiên')}</span>
                     </button>
                     <button 
                       onClick={() => setShowCoursesMenu(false)}
                       className="w-full text-left p-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-800 font-semibold"
                     >
                       <Globe className="w-4 h-4 text-purple-600" />
-                      <span>Tiếng Anh & Ngôn ngữ</span>
+                      <span>{t('nav_english_lang', 'Tiếng Anh & Ngôn ngữ')}</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-3 border-l border-slate-100 pl-4">
                   <p className="font-bold text-slate-400 uppercase tracking-wider text-[11px]">
-                    Khối Lớp Hiện Tại
+                    {t('nav_current_grade', 'Khối Lớp Hiện Tại')}
                   </p>
                   <div className="grid grid-cols-3 gap-1.5">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
@@ -167,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
                             : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                         }`}
                       >
-                        Lớp {g}
+                        {lang === 'en' ? `Grade ${g}` : `Lớp ${g}`}
                       </button>
                     ))}
                   </div>
@@ -175,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {/* Quick Links inside Courses Dropdown */}
                 <div className="col-span-2 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-semibold">
-                  <span>Khám phá thêm về DMKLab:</span>
+                  <span>{t('nav_explore_more', 'Khám phá thêm về DMKLab:')}</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => {
@@ -184,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="text-[#1865F2] hover:underline cursor-pointer"
                     >
-                      Giới thiệu
+                      {t('nav_about', 'Giới thiệu')}
                     </button>
                     <button
                       onClick={() => {
@@ -193,7 +196,7 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="text-[#1865F2] hover:underline cursor-pointer"
                     >
-                      Bài viết
+                      {t('nav_articles', 'Bài viết')}
                     </button>
                     <button
                       onClick={() => {
@@ -202,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({
                       }}
                       className="text-[#1865F2] hover:underline cursor-pointer"
                     >
-                      Liên hệ
+                      {t('nav_contact', 'Liên hệ')}
                     </button>
                   </div>
                 </div>
@@ -220,7 +223,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
               }`}
             >
-              Giới thiệu
+              {t('nav_about', 'Giới thiệu')}
             </button>
             <button
               onClick={() => onChangeView('articles')}
@@ -230,7 +233,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
               }`}
             >
-              Bài viết
+              {t('nav_articles', 'Bài viết')}
             </button>
             <button
               onClick={() => onChangeView('contact')}
@@ -240,7 +243,7 @@ export const Header: React.FC<HeaderProps> = ({
                   : 'text-slate-600 hover:text-[#1865F2] hover:bg-slate-50'
               }`}
             >
-              Liên hệ
+              {t('nav_contact', 'Liên hệ')}
             </button>
           </nav>
 
@@ -254,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
                 setShowSearchResults(true);
               }}
               onFocus={() => setShowSearchResults(true)}
-              placeholder="Tìm kiếm môn học, bài giảng..."
+              placeholder={t('nav_search_placeholder', 'Tìm kiếm môn học, bài giảng...')}
               className="w-full bg-[#F7F8FA] text-slate-800 placeholder-slate-400 text-xs rounded-full pl-9 pr-8 py-2 border border-slate-200 focus:outline-none focus:border-[#1865F2] focus:bg-white transition"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -410,6 +413,61 @@ export const Header: React.FC<HeaderProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-[#1865F2]" />
             <span>DMK AI Tutor</span>
           </button>
+
+          {/* Language Switcher (Tiếng Việt mặc định & English) */}
+          <div className="relative">
+            <button
+              onClick={() => setShowLangMenu(!showLangMenu)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-blue-400 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs"
+              title={t('lang_select_title', 'Chọn ngôn ngữ')}
+            >
+              <Globe className="w-3.5 h-3.5 text-[#1865F2]" />
+              <span className="font-extrabold">{lang === 'vi' ? '🇻🇳 VN' : '🇬🇧 EN'}</span>
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showLangMenu ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showLangMenu && (
+              <div 
+                className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
+                onMouseLeave={() => setShowLangMenu(false)}
+              >
+                <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  {t('lang_select_title', 'Chọn ngôn ngữ')}
+                </div>
+                <button
+                  onClick={() => {
+                    setLang('vi');
+                    setShowLangMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-xl flex items-center justify-between font-semibold transition cursor-pointer ${
+                    lang === 'vi' ? 'bg-blue-50 text-[#1865F2] font-bold' : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="text-base">🇻🇳</span>
+                    <span>Tiếng Việt <span className="text-[10px] text-emerald-600 font-bold">(Mặc định)</span></span>
+                  </span>
+                  {lang === 'vi' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2]" />}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLang('en');
+                    setShowLangMenu(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-xl flex items-center justify-between font-semibold transition cursor-pointer ${
+                    lang === 'en' ? 'bg-blue-50 text-[#1865F2] font-bold' : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="text-base">🇬🇧</span>
+                    <span>English</span>
+                  </span>
+                  {lang === 'en' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2]" />}
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* If user is logged in */}
           {currentUser ? (
@@ -580,14 +638,14 @@ export const Header: React.FC<HeaderProps> = ({
                 className="px-3.5 py-1.5 text-xs font-extrabold text-[#1865F2] hover:bg-blue-50/60 rounded-full transition cursor-pointer flex items-center gap-1.5"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Đăng nhập</span>
+                <span>{t('nav_login', 'Đăng nhập')}</span>
               </button>
               <button
                 onClick={onOpenRegister}
                 className="px-4 py-1.5 text-xs font-extrabold bg-[#1865F2] hover:bg-[#1557D0] text-white rounded-full shadow-xs transition cursor-pointer flex items-center gap-1.5"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>Đăng ký</span>
+                <span>{t('nav_register', 'Đăng ký')}</span>
               </button>
             </div>
           )}
