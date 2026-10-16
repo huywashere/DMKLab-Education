@@ -280,7 +280,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            Bộ sưu tập Huy hiệu Khan
+            Bộ sưu tập Huy hiệu DMKLab
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -398,11 +398,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
               </div>
 
-              {/* Socratic Khanmigo AI card */}
+              {/* Socratic DMK AI card */}
               <div className="bg-gradient-to-br from-[#0B2138] to-[#0A2540] text-white rounded-3xl p-6 shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-[#14BF96]" />
-                  <h4 className="font-extrabold text-sm">Khanmigo AI Tutor</h4>
+                  <h4 className="font-extrabold text-sm">DMK AI Tutor</h4>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Trợ lý gia sư Socratic luôn sẵn sàng giải đáp thắc mắc về các khái niệm Toán, Lý, Hóa và hướng dẫn từng bước.
@@ -412,11 +412,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
           </div>
         )}
 
-        {/* TAB 2: KHAN BADGES */}
+        {/* TAB 2: DMKLAB BADGES */}
         {activeTab === 'badges' && (
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
             <div className="mb-6">
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">Bộ sưu tập Huy hiệu Khan Academy</h3>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">Bộ sưu tập Huy hiệu DMKLab</h3>
               <p className="text-xs text-slate-500 mt-1">
                 Tích lũy điểm năng lượng và chinh phục các bài học để mở khóa huy hiệu danh giá
               </p>
@@ -608,7 +608,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               {/* Avatar Selector */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-2">
-                  Chọn ảnh đại diện Khan Avatar:
+                  Chọn ảnh đại diện Avatar cá nhân:
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {AVATAR_OPTIONS.map((av, idx) => (

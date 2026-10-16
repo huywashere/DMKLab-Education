@@ -112,7 +112,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               <em className="not-italic text-[#1865F2]">kết quả thực sự.</em>
             </h1>
             <p className="text-base text-slate-600 leading-relaxed max-w-lg">
-              EduK12 giúp nhà trường cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh – dù đang bắt kịp, giữ nhịp hay sẵn sàng tiến xa hơn.
+              DMKLab giúp cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh từ lớp 1 đến lớp 12 tiến bộ mỗi ngày.
             </p>
 
             <ul className="space-y-2 text-sm text-slate-700">
@@ -140,7 +140,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
             </div>
           </div>
 
-          {/* Right: Khan-style illustration using user's images + "Get started" card */}
+          {/* Right: DMKLab illustration using user's images + "Get started" card */}
           <div className="relative flex flex-col items-center">
             {/* Illustration image from img-web */}
             <div className="relative w-full max-w-md mx-auto">
@@ -154,11 +154,11 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-xl border border-slate-200 px-4 py-3 flex items-center gap-3">
                 <img
                   src="/img-web/khan-illustration.svg"
-                  alt="Khan mascot"
+                  alt="DMK mascot"
                   className="w-12 h-12 object-contain"
                 />
                 <div>
-                  <p className="text-xs font-bold text-slate-800">Khanmigo AI</p>
+                  <p className="text-xs font-bold text-slate-800">DMK AI Tutor</p>
                   <p className="text-[11px] text-slate-500">Gia sư gợi mở Socratic</p>
                 </div>
               </div>
@@ -251,7 +251,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Left text */}
           <div className="space-y-5">
             <p className="text-xs font-bold uppercase tracking-widest text-[#1865F2]">
-              Cách EduK12 hoạt động
+              Cách DMKLab hoạt động
             </p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] leading-tight">
               Tiến bộ thực sự bắt đầu từ{" "}
@@ -426,11 +426,11 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               Trợ lý AI giáo dục K–12
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight">
-              Khanmigo – Gia sư AI gợi mở{" "}
+              DMK AI – Gia sư AI gợi mở{" "}
               <span className="text-[#14BF96]">Socratic</span> của bạn.
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Không cho chép bài. Không đưa đáp án ngay. Khanmigo đặt câu hỏi dẫn dắt tư duy giúp học sinh thực sự hiểu – không chỉ làm xong bài tập.
+              Không cho chép bài. Không đưa đáp án ngay. DMK AI đặt câu hỏi dẫn dắt tư duy giúp học sinh thực sự hiểu – không chỉ làm xong bài tập.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <button
@@ -438,18 +438,18 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 className="khan-btn-green text-sm px-6 py-3 cursor-pointer gap-2"
               >
                 <Sparkles className="w-4 h-4" />
-                Thử Khanmigo AI ngay
+                Trải nghiệm DMK AI ngay
               </button>
             </div>
           </div>
 
-          {/* Khanmigo Illustration */}
+          {/* DMK AI Illustration */}
           <div className="flex justify-center">
             <div className="relative">
               <div className="w-72 h-72 bg-gradient-to-br from-emerald-500/20 to-blue-500/10 rounded-3xl flex items-center justify-center border border-white/10 shadow-xl">
                 <img
                   src="/img-web/khan-illustration.svg"
-                  alt="Khanmigo AI Mascot"
+                  alt="DMK AI Mascot"
                   className="w-48 h-48 object-contain drop-shadow-2xl"
                 />
               </div>

@@ -29,17 +29,17 @@ export const Footer: React.FC = () => {
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-[#14BF96] flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-[#1865F2] flex items-center justify-center">
                 <GraduationCap className="w-4 h-4 text-white" />
               </div>
-              <span className="text-base font-extrabold text-white">EduK12</span>
+              <span className="text-base font-extrabold text-white">DMKLab Education</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Giáo dục chuẩn hóa K–12 hoàn toàn miễn phí. Lấy cảm hứng từ sứ mệnh của Khan Academy.
+              Nền tảng giáo dục trực tuyến K–12 hiện đại, cá nhân hóa lộ trình học tập và hỗ trợ tư duy thông minh.
             </p>
             <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
               <Lock className="w-3 h-3" />
-              <span>Dữ liệu học sinh được bảo vệ</span>
+              <span>Dữ liệu học sinh được bảo vệ an toàn</span>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom: Copyright & Safety */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 EduK12 Platform. Lấy cảm hứng từ Khan Academy. Thiết kế vì học sinh Việt Nam.</p>
+          <p>© 2026 DMKLab Education Platform. Hệ sinh thái giáo dục trực tuyến K–12 Việt Nam.</p>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 text-slate-400">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />

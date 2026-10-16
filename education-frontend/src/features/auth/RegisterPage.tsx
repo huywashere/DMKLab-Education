@@ -108,17 +108,17 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
             </svg>
           </div>
           <h1 className="text-2xl font-black text-[#0A2540] tracking-tight">
-            Tham gia Khan Academy
+            Tham gia DMKLab Education
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
             Xây dựng nền tảng tri thức vững chắc cho tương lai của bạn
           </p>
         </div>
 
-        {/* 1. Khan Academy Role Selector */}
+        {/* 1. DMKLab Role Selector */}
         <div className="mb-7">
           <label className="block text-xs font-bold text-slate-700 mb-2.5 text-center">
-            Tham gia Khan Academy với tư cách là:
+            Tham gia DMKLab Education với tư cách là:
           </label>
           <div className="grid grid-cols-3 gap-3">
             <button
@@ -308,7 +308,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
           </div>
 
           <div className="pt-2 text-[11px] text-slate-500 leading-relaxed">
-            Bằng cách đăng ký, bạn đồng ý với <a href="#" className="text-[#1865F2] hover:underline">Điều khoản dịch vụ</a> và <a href="#" className="text-[#1865F2] hover:underline">Chính sách quyền riêng tư</a> của Khan Academy.
+            Bằng cách đăng ký, bạn đồng ý với <a href="#" className="text-[#1865F2] hover:underline">Điều khoản dịch vụ</a> và <a href="#" className="text-[#1865F2] hover:underline">Chính sách quyền riêng tư</a> của DMKLab Education.
           </div>
 
           {/* Submit */}

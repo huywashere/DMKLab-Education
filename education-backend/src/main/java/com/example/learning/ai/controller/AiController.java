@@ -18,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ai")
 @RequiredArgsConstructor
-@Tag(name = "AI Chatbots", description = "Chatbot học tập Socratic Khanmigo & Trợ lý Quản trị")
+@Tag(name = "AI Chatbots", description = "Chatbot học tập Socratic DMK AI & Trợ lý Quản trị")
 public class AiController {
 
     private final AiService aiService;

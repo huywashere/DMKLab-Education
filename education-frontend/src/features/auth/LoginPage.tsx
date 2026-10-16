@@ -88,10 +88,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </svg>
           </div>
           <h1 className="text-2xl font-black text-[#0A2540] tracking-tight">
-            Đăng nhập vào Khan Academy
+            Đăng nhập vào DMKLab Education
           </h1>
           <p className="text-xs text-slate-500 mt-1.5 font-medium">
-            Học tập miễn phí, chất lượng cao cho bất kỳ ai, ở bất cứ đâu
+            Hệ sinh thái học tập trực tuyến thông minh K–12
           </p>
         </div>
 

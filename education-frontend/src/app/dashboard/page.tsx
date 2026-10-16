@@ -95,7 +95,7 @@ export default function DedicatedDashboardPage() {
             </Link>
             <span className="text-slate-300">/</span>
             <span className="text-xs font-bold text-[#0A2540]">
-              Bảng Điều Khiển Hệ Thống K–12
+              Bảng Điều Khiển DMKLab Education
             </span>
           </div>
 

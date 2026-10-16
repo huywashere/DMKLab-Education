@@ -1,8 +1,8 @@
-# TÀI LIỆU KIẾN TRÚC HỆ THỐNG WEBSITE GIÁO DỤC TRỰC TUYẾN K–12
-## (Phiên bản cập nhật mới nhất — Chuẩn Khan Academy & Đặc tả Kỹ thuật 12 trang)
+# TÀI LIỆU KIẾN TRÚC HỆ THỐNG WEBSITE GIÁO DỤC TRỰC TUYẾN K–12 DMKLAB
+## (Phiên bản cập nhật mới nhất — DMKLab Education Platform)
 
 > **Dự án**: Nền Tảng Giáo Dục Trực Tuyến K–12 (Lớp 1 đến Lớp 12)  
-> **Phong cách trải nghiệm**: [Khan Academy](https://www.khanacademy.org/)  
+> **Thương hiệu**: DMKLab Education  
 > **Mô hình kiến trúc**: Modular Monolith tách biệt Client-Server + Dual-ORM Support (Spring Data JPA & Prisma ORM)  
 > **Ngày cập nhật**: Tháng 10/2026  
 
@@ -30,7 +30,7 @@
 Hệ thống được thiết kế theo đúng tiêu chuẩn trong tài liệu đặc tả 12 trang:
 * **Tính sẵn sàng & Khả năng mở rộng**: Backend xây dựng dưới dạng **Modular Monolith** phân chia rõ ràng theo Domain-Driven Design (Identity, Academics, Content, Progress, Assessment, AI, Audit). Sẵn sàng tách thành microservices khi lượng truy cập vượt ngưỡng 10,000 CCU.
 * **Bảo mật tuyệt đối**: Toàn bộ luồng dữ liệu bảo vệ qua Spring Security kết hợp JSON Web Token (JJWT) sử dụng thuật toán **HMAC-SHA512** và mã băm mật khẩu **BCrypt (Cost Factor 10)**.
-* **Giao diện đẳng cấp Khan Academy**: Gamification toàn diện (Điểm năng lượng, chuỗi học tập Streak, huy hiệu), bố cục tối giản tập trung, tone màu nhận diện thương hiệu (`#14BF96`, `#1865F2`, `#0A2540`).
+* **Giao diện hiện đại DMKLab**: Gamification toàn diện (Điểm năng lượng, chuỗi học tập Streak, huy hiệu), bố cục tối giản tập trung, tone màu nhận diện thương hiệu (`#14BF96`, `#1865F2`, `#0A2540`).
 
 ---
 
@@ -87,7 +87,7 @@ graph TB
 | Tầng hệ thống | Công nghệ sử dụng | Vai trò & Mục đích |
 | :--- | :--- | :--- |
 | **Frontend Framework** | **Next.js 16.4 (Turbopack)** | Server-side rendering (SSR), Client routing, Static generation |
-| **Giao diện (UI)** | **React 19 + Tailwind CSS v4** | Hệ thống component phong cách Khan Academy, micro-interactions |
+| **Giao diện (UI)** | **React 19 + Tailwind CSS v4** | Hệ thống component chuẩn K-12 DMKLab, micro-interactions |
 | **Frontend ORM** | **Prisma 6.4.0** | Hỗ trợ Server Actions & Route Handlers truy vấn trực tiếp DB |
 | **Backend Framework** | **Java 23 + Spring Boot 3.3.4** | Tầng nghiệp vụ trung tâm (Business Logic & Authorization) |
 | **Kiến trúc Backend**| **Modular Monolith** | Chia module rành mạch theo ngữ cảnh (Bounded Contexts) |
@@ -209,7 +209,7 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     actor HọcViên as Học Viên
-    participant Bot as Khanmigo UI
+    participant Bot as DMK AI UI
     participant AIService as Spring Boot (AiService)
     participant DB as PostgreSQL (chat_sessions, chat_messages)
 

@@ -9,7 +9,7 @@ export interface User {
   avatarUrl: string;
   bio?: string;
   gradeLevel?: number; // Ví dụ: Lớp 5
-  energyPoints: number; // Điểm năng lượng Khan Academy
+  energyPoints: number; // Điểm năng lượng DMKLab
   streakDays: number;
   createdAt?: string;
 }

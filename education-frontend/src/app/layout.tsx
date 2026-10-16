@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EduK12 - Nền Tảng Giáo Dục Trực Tuyến K–12 | Khan Academy Style",
-  description: "Website học tập trực tuyến dành cho học sinh từ lớp 1 đến lớp 12 theo chuẩn đặc tả kiến trúc Modular Monolith v1.1",
+  title: "DMKLab - Nền Tảng Giáo Dục Trực Tuyến K–12",
+  description: "Nền tảng học tập trực tuyến thông minh K-12 DMKLab với lộ trình chuẩn hóa và trợ lý AI gợi mở",
 };
 
 export default function RootLayout({

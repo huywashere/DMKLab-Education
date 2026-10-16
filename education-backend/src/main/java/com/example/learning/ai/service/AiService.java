@@ -139,7 +139,7 @@ public class AiService {
         } else if (qLower.contains("bất phương trình") || qLower.contains("miền nghiệm")) {
             return "Để biểu diễn miền nghiệm của bất phương trình ax + by ≤ c, bước 1 em vẽ đường thẳng ax + by = c. Bước 2, em chọn một điểm thử (thường là gốc tọa độ O(0,0)) để kiểm tra. Điểm O(0,0) có thỏa mãn bất phương trình của em không?";
         } else if (qLower.contains("đáp án") || qLower.contains("giải hộ") || qLower.contains("làm hộ")) {
-            return "Thầy Khanmigo luôn đồng hành để giúp em tự mình hiểu bài! Hãy chia sẻ bước đầu tiên em đã nghĩ ra hoặc chỗ em cảm thấy bối rối nhất, chúng ta cùng gỡ rối từng bước nhé!";
+            return "Thầy DMK AI luôn đồng hành để giúp em tự mình hiểu bài! Hãy chia sẻ bước đầu tiên em đã nghĩ ra hoặc chỗ em cảm thấy bối rối nhất, chúng ta cùng gỡ rối từng bước nhé!";
         } else {
             return "Câu hỏi rất hay! Để cùng giải quyết vấn đề này, theo em khái niệm cốt lõi nào liên quan đến bài học '" 
                     + (lessonTitle != null ? lessonTitle : "K-12") + "' mà chúng ta có thể áp dụng trước tiên?";

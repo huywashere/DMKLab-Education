@@ -89,7 +89,7 @@ public class ProgressService {
         int streak = user != null ? user.getStreakDays() : 1;
 
         String rank = "Học Viên Năng Nổ";
-        if (points >= 15000) rank = "Bậc Thầy Khan Academy";
+        if (points >= 15000) rank = "Bậc Thầy DMKLab";
         else if (points >= 5000) rank = "Chiến Binh Tri Thức";
 
         return ProgressDto.ProgressSummaryResponse.builder()

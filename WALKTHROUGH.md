@@ -1,6 +1,6 @@
-# Báo Cáo Tiến Độ & Nghiệm Thu Hệ Thống Giáo Dục Trực Tuyến K–12 (Phong cách Khan Academy)
+# Báo Cáo Tiến Độ & Nghiệm Thu Hệ Thống Giáo Dục Trực Tuyến K–12 DMKLab (DMKLab Education)
 
-Dự án đã được triển khai và hoàn thiện bám sát 100% **Đặc Tả Kiến Trúc Hệ Thống (File PDF 12 trang)** cùng phong cách trải nghiệm chuẩn của **[Khan Academy](https://www.khanacademy.org/)**.
+Dự án đã được triển khai và hoàn thiện bám sát 100% **Đặc Tả Kiến Trúc Hệ Thống (File PDF 12 trang)** cho nền tảng giáo dục **DMKLab Education**.
 
 ---
 
@@ -13,7 +13,7 @@ Dự án đã được triển khai và hoàn thiện bám sát 100% **Đặc T�
 | **Database & Migration** | **PostgreSQL 17** (`learning_db`), **Flyway** (`V1`, `V2`, `V3`) | Đã migrate & seed dữ liệu |
 | **Security & Auth** | **Spring Security** + **JJWT 0.12.6** (Thuật toán **HMAC-SHA512**) | Đã xác thực Bearer Token |
 | **Video Streaming** | HTML5 Video Player + HLS Streaming + Định kỳ Heartbeat lưu tiến độ | Đã tích hợp sync tiến độ |
-| **AI Assistants** | Chatbot Socratic Khanmigo (Học sinh) & Chatbot Quản trị (Admin) | Quota 30 câu/ngày, gợi mở tư duy |
+| **AI Assistants** | Chatbot Socratic DMK AI (Học sinh) & Chatbot Quản trị (Admin) | Quota 30 câu/ngày, gợi mở tư duy |
 | **Object Storage Simulation**| Cấp **Presigned S3 URL** có chữ ký & thời hạn (Tránh nghẽn CPU Spring Boot) | PDF Mục 8.2 & Mục 7 |
 
 ---

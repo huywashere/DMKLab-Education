@@ -186,7 +186,7 @@ export const api = {
       email: rawUser.email,
       role: rawUser.role,
       avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-      bio: rawUser.bio || 'Học viên Khan Academy K-12',
+      bio: rawUser.bio || 'Học viên DMKLab Education K-12',
       energyPoints: rawUser.energyPoints || 1000,
       streakDays: rawUser.streakDays || 1,
       createdAt: rawUser.createdAt,
@@ -223,7 +223,7 @@ export const api = {
       email: rawUser.email,
       role: rawUser.role,
       avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-      bio: rawUser.bio || 'Học viên mới Khan Academy K-12',
+      bio: rawUser.bio || 'Học viên mới DMKLab Education K-12',
       energyPoints: rawUser.energyPoints || 1000,
       streakDays: rawUser.streakDays || 1,
       createdAt: rawUser.createdAt,
@@ -259,7 +259,7 @@ export const api = {
           email: rawUser.email,
           role: rawUser.role,
           avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-          bio: rawUser.bio || 'Học viên Khan Academy K-12',
+          bio: rawUser.bio || 'Học viên DMKLab Education K-12',
           energyPoints: rawUser.energyPoints || 1000,
           streakDays: rawUser.streakDays || 1,
           createdAt: rawUser.createdAt,
@@ -481,7 +481,7 @@ export const api = {
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Lỗi kết nối Trợ lý AI Khanmigo');
+      throw new Error(json.message || 'Lỗi kết nối Trợ lý DMK AI');
     }
     return json.data;
   },

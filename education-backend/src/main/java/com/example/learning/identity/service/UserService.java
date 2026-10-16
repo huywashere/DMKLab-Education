@@ -59,7 +59,7 @@ public class UserService {
                 .fullName(req.getFullName())
                 .role(role)
                 .avatarUrl(defaultAvatar)
-                .bio("Chào mừng bạn đến với Khan Academy K-12!")
+                .bio("Chào mừng bạn đến với DMKLab Education K-12!")
                 .energyPoints(1000)
                 .streakDays(1)
                 .active(true)

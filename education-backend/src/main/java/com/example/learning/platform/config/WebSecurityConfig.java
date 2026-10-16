@@ -83,7 +83,7 @@ public class WebSecurityConfig {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
-                        .title("K-12 Khan Academy Education Platform API")
+                        .title("K-12 DMKLab Education Platform API")
                         .description("REST API nền tảng giáo dục trực tuyến K-12 tích hợp xác thực JWT bảo mật cao")
                         .version("1.0.0"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))

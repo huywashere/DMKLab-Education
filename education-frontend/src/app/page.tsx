@@ -102,7 +102,7 @@ export default function HomePage() {
           <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
           <span className="font-medium text-slate-200">
             {isBackendConnected 
-              ? 'Hệ thống K–12: Spring Boot 3.3 + PostgreSQL 17 (Bảo mật JWT HMAC-512 Kích Hoạt)' 
+              ? 'DMKLab Education K–12: Spring Boot 3.3 + PostgreSQL 17 + Prisma ORM (Bảo mật JWT HMAC-512)' 
               : 'Đang kết nối API Backend & Database...'}
           </span>
         </div>

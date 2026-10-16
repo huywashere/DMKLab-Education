@@ -251,24 +251,26 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Center: Official Khan Academy Emblem & Brand */}
+        {/* Center: Official DMKLab Emblem & Brand */}
         <div className="flex items-center">
           <button
             onClick={() => onChangeView('student')}
             className="flex items-center gap-2.5 group cursor-pointer"
           >
-            {/* Khan Sprout Logo SVG */}
-            <div className="w-8 h-8 rounded-full bg-[#14BF96] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
+            {/* DMKLab Logo Badge */}
+            <div className="w-8 h-8 rounded-full bg-[#1865F2] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22V12M12 12C12 7 7 4 2 5C3 10 7 12 12 12ZM12 12C12 7 17 4 22 5C21 10 17 12 12 12Z" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <div className="flex flex-col text-left">
               <span className="text-xl font-extrabold text-[#0A2540] tracking-tight leading-none">
-                Khan Academy <span className="text-[#14BF96] font-semibold text-xs ml-0.5">K-12</span>
+                DMKLab <span className="text-[#1865F2] font-semibold text-xs ml-0.5">Education</span>
               </span>
               <span className="text-[9px] text-slate-400 tracking-wider font-semibold uppercase">
-                Giáo Dục Chuẩn Hóa
+                Nền Tảng Giáo Dục K–12
               </span>
             </div>
           </button>
@@ -329,13 +331,13 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Khanmigo AI Tutor Quick Button */}
+          {/* DMK AI Tutor Quick Button */}
           <button
             onClick={onOpenAiChat}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-[#0B6A56] hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-[#1865F2] hover:bg-blue-100 border border-blue-200 text-xs font-bold transition cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#14BF96]" />
-            <span>Khanmigo AI</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#1865F2]" />
+            <span>DMK AI Tutor</span>
           </button>
 
           {/* If user is logged in */}
