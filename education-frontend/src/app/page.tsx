@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { KhanHomepage } from "@/features/student/KhanHomepage";
 import { LessonRoom } from "@/features/student/LessonRoom";
 import { SocraticChatbot } from "@/features/student/SocraticChatbot";
+import { StudentDashboard } from "@/features/student/StudentDashboard";
 import { AdminDashboard } from "@/features/admin/AdminDashboard";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
@@ -17,7 +18,7 @@ import { ProfilePage } from "@/features/profile/ProfilePage";
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(MOCK_USERS.student);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(MOCK_GRADES[4]); // Lớp 5
-  const [activeView, setActiveView] = useState<'home' | 'lesson' | 'admin' | 'login' | 'register' | 'profile'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile'>('home');
   const [selectedLesson, setSelectedLesson] = useState<Lesson>(MOCK_LESSONS[1]);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
@@ -117,9 +118,22 @@ export default function HomePage() {
       <Header
         currentUser={currentUser}
         onSwitchUser={handleSwitchUser}
-        activeView={activeView === 'admin' ? 'admin' : activeView === 'login' ? 'login' : activeView === 'register' ? 'register' : activeView === 'profile' ? 'profile' : 'student'}
+        activeView={
+          activeView === 'admin'
+            ? 'admin'
+            : activeView === 'dashboard'
+            ? 'dashboard'
+            : activeView === 'login'
+            ? 'login'
+            : activeView === 'register'
+            ? 'register'
+            : activeView === 'profile'
+            ? 'profile'
+            : 'student'
+        }
         onChangeView={(v) => {
           if (v === 'admin') setActiveView('admin');
+          else if (v === 'dashboard') setActiveView('dashboard');
           else if (v === 'login') setActiveView('login');
           else if (v === 'register') setActiveView('register');
           else if (v === 'profile') setActiveView('profile');
@@ -143,6 +157,17 @@ export default function HomePage() {
             onOpenLesson={handleOpenLesson}
             onOpenAiChat={() => setIsAiChatOpen(true)}
           />
+        )}
+
+        {activeView === 'dashboard' && currentUser && (
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+            <StudentDashboard
+              currentUser={currentUser}
+              selectedGrade={selectedGrade}
+              onOpenLesson={handleOpenLesson}
+              onOpenAiChat={() => setIsAiChatOpen(true)}
+            />
+          </div>
         )}
 
         {activeView === 'login' && (

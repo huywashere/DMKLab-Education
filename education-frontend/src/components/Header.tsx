@@ -31,8 +31,8 @@ import { MOCK_LESSONS } from "@/lib/mock-data";
 interface HeaderProps {
   currentUser: User | null;
   onSwitchUser: (role: UserRole) => void;
-  activeView: 'student' | 'lesson' | 'admin' | 'login' | 'register' | 'profile';
-  onChangeView: (view: 'student' | 'lesson' | 'admin' | 'login' | 'register' | 'profile') => void;
+  activeView: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile';
+  onChangeView: (view: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile') => void;
   selectedGrade: Grade;
   onSelectGrade: (grade: Grade) => void;
   onOpenAiChat: () => void;
@@ -353,18 +353,30 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
 
-              {/* Admin CMS Button */}
-              {(currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'TEACHER') && (
+              {/* Dashboard Navigation Button */}
+              {currentUser && (
                 <button
-                  onClick={() => onChangeView(activeView === 'admin' ? 'student' : 'admin')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full transition border ${
-                    activeView === 'admin'
-                      ? 'bg-[#1865F2] text-white border-transparent'
+                  onClick={() => {
+                    if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'TEACHER') {
+                      onChangeView(activeView === 'admin' ? 'student' : 'admin');
+                    } else {
+                      onChangeView(activeView === 'dashboard' ? 'student' : 'dashboard');
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full transition border cursor-pointer ${
+                    activeView === 'dashboard' || activeView === 'admin'
+                      ? 'bg-[#1865F2] text-white border-transparent shadow-xs'
                       : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
                   }`}
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{activeView === 'admin' ? "Trang Học Sinh" : "Cổng Quản Trị"}</span>
+                  <span className="hidden sm:inline">
+                    {activeView === 'dashboard' || activeView === 'admin'
+                      ? "Trang Chủ Khóa Học"
+                      : currentUser.role === 'STUDENT'
+                      ? "Bảng Điều Khiển"
+                      : "Cổng Quản Trị"}
+                  </span>
                 </button>
               )}
 
@@ -397,12 +409,29 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="py-1 space-y-1">
                       <button
                         onClick={() => {
+                          if (currentUser.role === 'STUDENT') {
+                            onChangeView('dashboard');
+                          } else {
+                            onChangeView('admin');
+                          }
+                          setShowUserDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700 cursor-pointer"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-[#1865F2]" />
+                        <span>
+                          {currentUser.role === 'STUDENT' ? "Bảng Điều Khiển Cá Nhân" : "Bảng Quản Trị Hệ Thống"}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => {
                           onOpenProfile();
                           setShowUserDropdown(false);
                         }}
                         className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 flex items-center gap-2 font-bold text-slate-700 cursor-pointer"
                       >
-                        <UserIcon className="w-4 h-4 text-[#1865F2]" />
+                        <UserIcon className="w-4 h-4 text-[#14BF96]" />
                         <span>Xem Hồ Sơ & Huy Hiệu</span>
                       </button>
 
