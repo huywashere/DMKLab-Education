@@ -20,8 +20,13 @@ import {
   LogOut,
   Key,
   LogIn,
-  UserPlus
+  UserPlus,
+  Bell,
+  PlayCircle,
+  CheckCircle,
+  BookMarked
 } from "lucide-react";
+import { MOCK_LESSONS } from "@/lib/mock-data";
 
 interface HeaderProps {
   currentUser: User | null;
@@ -35,6 +40,7 @@ interface HeaderProps {
   onOpenRegister: () => void;
   onOpenProfile: () => void;
   onLogout: () => void;
+  onSelectLesson?: (lesson: any) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -49,9 +55,44 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenRegister,
   onOpenProfile,
   onLogout,
+  onSelectLesson,
 }) => {
   const [showCoursesMenu, setShowCoursesMenu] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: "n1",
+      title: "Duy trì chuỗi học tập!",
+      desc: "Bạn đã duy trì chuỗi 7 ngày học liên tục. Hãy học một bài hôm nay để nhận thêm điểm năng lượng!",
+      time: "10 phút trước",
+      unread: true,
+      type: "streak",
+    },
+    {
+      id: "n2",
+      title: "Bài giảng mới môn Toán 5",
+      desc: "Thầy Nam vừa thêm bài giảng mới: 'Khái niệm phân số & So sánh phân số'.",
+      time: "2 giờ trước",
+      unread: true,
+      type: "lesson",
+    },
+    {
+      id: "n3",
+      title: "Huy hiệu Tinh Thông!",
+      desc: "Chúc mừng bạn đạt danh hiệu 'Học Viên Năng Nổ' (2,500 điểm năng lượng).",
+      time: "Hôm qua",
+      unread: false,
+      type: "badge",
+    },
+  ]);
+
+  const searchResults = searchTerm.trim() === "" ? [] : MOCK_LESSONS.filter(l => 
+    l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (l.description && l.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
@@ -129,14 +170,84 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Search Input */}
-          <div className="hidden md:flex relative w-52 lg:w-64">
+          {/* Search Input with Live Dropdown */}
+          <div className="hidden md:flex relative w-52 lg:w-72">
             <input
               type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowSearchResults(true);
+              }}
+              onFocus={() => setShowSearchResults(true)}
               placeholder="Tìm kiếm môn học, bài giảng..."
-              className="w-full bg-[#F7F8FA] text-slate-800 placeholder-slate-400 text-xs rounded-full pl-9 pr-4 py-2 border border-slate-200 focus:outline-none focus:border-[#1865F2] focus:bg-white transition"
+              className="w-full bg-[#F7F8FA] text-slate-800 placeholder-slate-400 text-xs rounded-full pl-9 pr-8 py-2 border border-slate-200 focus:outline-none focus:border-[#1865F2] focus:bg-white transition"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setShowSearchResults(false);
+                }}
+                className="absolute right-3 top-2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer font-bold"
+              >
+                ✕
+              </button>
+            )}
+
+            {/* Live Search Results Dropdown */}
+            {showSearchResults && searchTerm.trim() !== "" && (
+              <div 
+                className="absolute left-0 top-11 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 text-xs space-y-2 animate-in fade-in zoom-in-95 duration-150"
+                onMouseLeave={() => setShowSearchResults(false)}
+              >
+                <div className="flex items-center justify-between px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span>Kết quả tìm kiếm ({searchResults.length})</span>
+                  <span>Nhấn để học ngay</span>
+                </div>
+
+                {searchResults.length === 0 ? (
+                  <div className="p-4 text-center text-slate-400">
+                    Không tìm thấy bài học nào phù hợp với "{searchTerm}"
+                  </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto space-y-1">
+                    {searchResults.map((lesson) => (
+                      <button
+                        key={lesson.id}
+                        onClick={() => {
+                          if (onSelectLesson) onSelectLesson(lesson);
+                          setShowSearchResults(false);
+                          setSearchTerm("");
+                        }}
+                        className="w-full text-left p-2.5 rounded-xl hover:bg-slate-50 transition flex items-start gap-3 group cursor-pointer"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1865F2] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#1865F2] group-hover:text-white transition">
+                          <PlayCircle className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-slate-900 group-hover:text-[#1865F2] truncate transition">
+                            {lesson.title}
+                          </p>
+                          <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                            {lesson.description || "Bài giảng video lý thuyết và thực hành chuẩn K-12"}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                              {Math.round((lesson.durationSeconds || 600) / 60)} phút
+                            </span>
+                            <span className="text-[10px] text-emerald-600 font-bold">
+                              {lesson.masteryLevel === 'MASTERED' ? 'Đã tinh thông 🏆' : 'Đang học'}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -165,6 +276,59 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right: AI Khanmigo, Gamification, Auth Controls */}
         <div className="flex items-center gap-3">
+          {/* Notification Center */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 rounded-full hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+              title="Trung tâm thông báo"
+            >
+              <Bell className="w-4 h-4" />
+              {notifications.some(n => n.unread) && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-pulse" />
+              )}
+            </button>
+
+            {showNotifications && (
+              <div 
+                className="absolute right-0 mt-2 w-80 md:w-88 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150"
+                onMouseLeave={() => setShowNotifications(false)}
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-slate-900 text-sm">Thông Báo Học Tập</span>
+                    <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                      {notifications.filter(n => n.unread).length} mới
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setNotifications(prev => prev.map(n => ({ ...n, unread: false })))}
+                    className="text-[11px] text-[#1865F2] hover:underline font-semibold cursor-pointer"
+                  >
+                    Đánh dấu đã đọc
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-72 overflow-y-auto">
+                  {notifications.map((n) => (
+                    <div 
+                      key={n.id}
+                      className={`p-3 rounded-xl border transition ${
+                        n.unread ? 'bg-blue-50/50 border-blue-100' : 'bg-slate-50 border-slate-100'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="font-bold text-slate-900">{n.title}</p>
+                        <span className="text-[10px] text-slate-400">{n.time}</span>
+                      </div>
+                      <p className="text-slate-600 text-[11px] mt-1 leading-relaxed">{n.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Khanmigo AI Tutor Quick Button */}
           <button
             onClick={onOpenAiChat}

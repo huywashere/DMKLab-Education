@@ -45,6 +45,97 @@ export interface BackendQuizQuestion {
   displayOrder: number;
 }
 
+export interface BackendProgressResponse {
+  lessonId: string;
+  positionSeconds: number;
+  durationSeconds: number;
+  isCompleted: boolean;
+  lastWatchedAt?: string;
+}
+
+export interface BackendProgressSummary {
+  totalLessonsCompleted: number;
+  totalTimeSpentSeconds: number;
+  currentStreakDays: number;
+  energyPoints: number;
+}
+
+export interface QuizSubmissionResult {
+  lessonId: string;
+  totalQuestions: number;
+  correctAnswers: number;
+  scorePercentage: number;
+  passed: boolean;
+  pointsEarned: number;
+  feedback: string;
+  questionResults: {
+    questionId: string;
+    submittedAnswer: string;
+    correctAnswer: string;
+    correct: boolean;
+    explanation: string;
+  }[];
+}
+
+export interface SocraticChatResponse {
+  sessionId: string;
+  reply: string;
+  dailyQuotaRemaining: number;
+  suggestedAction?: string;
+  socraticHint?: boolean;
+}
+
+export interface AdminOverviewReport {
+  totalUsers: number;
+  totalStudents: number;
+  totalTeachers: number;
+  totalLessons: number;
+  totalQuizzesCompleted: number;
+  totalEnergyPoints: number;
+  activeUsersToday: number;
+  storageUsedBytes: number;
+  cdnCacheHitRate: number;
+  aiMonthlyCostUsd: number;
+  aiMonthlyQuotaUsd: number;
+  jvmMemoryUsedMb: number;
+  jvmMemoryMaxMb: number;
+  postgresStatus: string;
+  flywayStatus: string;
+}
+
+export interface AdminUserItem {
+  id: string;
+  username: string;
+  email: string;
+  fullName: string;
+  role: string;
+  active: boolean;
+  energyPoints: number;
+  streakDays: number;
+  bio?: string;
+  avatarUrl?: string;
+  createdAt: string;
+}
+
+export interface BackendAuditLog {
+  id: string;
+  userId?: string;
+  action: string;
+  resourceType: string;
+  resourceId?: string;
+  details?: string;
+  ipAddress?: string;
+  createdAt: string;
+}
+
+export interface UploadUrlResponse {
+  uploadUrl: string;
+  storageKey: string;
+  expiresInSeconds: number;
+  hlsStreamingUrl: string;
+  message: string;
+}
+
 export const api = {
   // Token Management
   getToken(): string | null {
@@ -315,4 +406,170 @@ export const api = {
     }
     return [];
   },
+
+  // Learning Progress APIs (Mục 8.4 & 6.1 PDF)
+  async updateLessonProgress(
+    lessonId: string,
+    positionSeconds: number,
+    durationSeconds: number,
+    isCompleted: boolean
+  ): Promise<BackendProgressResponse | null> {
+    try {
+      const res = await fetch(`${API_BASE}/lessons/${lessonId}/progress`, {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ positionSeconds, durationSeconds, isCompleted }),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getLessonProgress(lessonId: string): Promise<BackendProgressResponse | null> {
+    try {
+      const res = await fetch(`${API_BASE}/lessons/${lessonId}/progress`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getProgressSummary(): Promise<BackendProgressSummary | null> {
+    try {
+      const res = await fetch(`${API_BASE}/progress/summary`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  // Assessment / Quiz Submission (Mục 5 & 6.1 PDF)
+  async submitQuiz(
+    lessonId: string,
+    answers: { questionId: string; selectedAnswer: string }[]
+  ): Promise<QuizSubmissionResult> {
+    const res = await fetch(`${API_BASE}/lessons/${lessonId}/quiz/submit`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ answers }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Lỗi nộp bài trắc nghiệm');
+    }
+    return json.data;
+  },
+
+  // AI Chatbots (Mục 9 & 9.1 PDF)
+  async sendLearningChat(
+    message: string,
+    lessonId?: string,
+    sessionId?: string
+  ): Promise<SocraticChatResponse> {
+    const res = await fetch(`${API_BASE}/ai/learning/chat`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ message, lessonId, sessionId }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Lỗi kết nối Trợ lý AI Khanmigo');
+    }
+    return json.data;
+  },
+
+  async sendAdminChat(
+    message: string,
+    sessionId?: string
+  ): Promise<SocraticChatResponse> {
+    const res = await fetch(`${API_BASE}/ai/admin/chat`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ message, sessionId }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Lỗi kết nối AI Quản trị');
+    }
+    return json.data;
+  },
+
+  // Admin CMS APIs (Mục 7 & 12 PDF)
+  async getAdminOverview(): Promise<AdminOverviewReport | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/reports/overview`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getAdminUsers(role?: string, q?: string): Promise<AdminUserItem[]> {
+    try {
+      const params = new URLSearchParams();
+      if (role && role !== 'ALL') params.set('role', role);
+      if (q) params.set('q', q);
+      const res = await fetch(`${API_BASE}/admin/users?${params.toString()}`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : [];
+    } catch {
+      return [];
+    }
+  },
+
+  async toggleUserStatus(userId: string, active: boolean): Promise<AdminUserItem> {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}/status`, {
+      method: 'PATCH',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ active }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Cập nhật trạng thái người dùng thất bại');
+    }
+    return json.data;
+  },
+
+  async getAdminAuditLogs(): Promise<BackendAuditLog[]> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/audit-logs`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : [];
+    } catch {
+      return [];
+    }
+  },
+
+  async requestPresignedUploadUrl(
+    filename: string,
+    contentType: string = 'video/mp4',
+    fileSizeBytes: number = 50000000
+  ): Promise<UploadUrlResponse> {
+    const res = await fetch(`${API_BASE}/admin/media/upload-url`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ filename, contentType, fileSizeBytes }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Lỗi cấp URL ký');
+    }
+    return json.data;
+  },
 };
+

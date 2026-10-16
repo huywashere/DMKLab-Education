@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model audit_logs {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String?   @db.Uuid
+  action        String    @db.VarChar(50)
+  resource_type String    @db.VarChar(50)
+  resource_id   String?   @db.VarChar(100)
+  details       String?
+  ip_address    String?   @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  users         users?    @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+}
+
+model chat_messages {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id    String        @db.Uuid
+  sender_role   String        @db.VarChar(20)
+  content       String
+  tokens_used   Int?          @default(0)
+  created_at    DateTime?     @default(now()) @db.Timestamptz(6)
+  chat_sessions chat_sessions @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([session_id], map: "idx_chat_messages_session")
+}
+
+model chat_sessions {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String          @db.Uuid
+  session_type  String          @default("LEARNING") @db.VarChar(20)
+  title         String?         @db.VarChar(150)
+  created_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  chat_messages chat_messages[]
+  users         users           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model flyway_schema_history {
+  installed_rank Int      @id(map: "flyway_schema_history_pk")
+  version        String?  @db.VarChar(50)
+  description    String   @db.VarChar(200)
+  type           String   @db.VarChar(20)
+  script         String   @db.VarChar(1000)
+  checksum       Int?
+  installed_by   String   @db.VarChar(100)
+  installed_on   DateTime @default(now()) @db.Timestamp(6)
+  execution_time Int
+  success        Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+}
+
+model grades {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String     @db.VarChar(50)
+  code          String     @unique @db.VarChar(20)
+  level         String     @db.VarChar(20)
+  display_order Int        @default(1)
+  subjects      subjects[]
+}
+
+model learning_progress {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String    @db.Uuid
+  lesson_id        String    @db.Uuid
+  position_seconds Int       @default(0)
+  is_completed     Boolean   @default(false)
+  mastery_level    String    @default("FAMILIAR") @db.VarChar(20)
+  last_accessed_at DateTime? @default(now()) @db.Timestamptz(6)
+  lessons          lessons   @relation(fields: [lesson_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users            users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, lesson_id])
+  @@index([user_id, lesson_id], map: "idx_progress_user_lesson")
+}
+
+model lessons {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subject_id             String              @db.Uuid
+  title                  String              @db.VarChar(200)
+  description            String?
+  video_url              String?             @db.VarChar(500)
+  video_duration_seconds Int?                @default(0)
+  thumbnail_url          String?             @db.VarChar(500)
+  display_order          Int                 @default(1)
+  is_published           Boolean             @default(true)
+  created_at             DateTime?           @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime?           @default(now()) @db.Timestamptz(6)
+  learning_progress      learning_progress[]
+  subjects               subjects            @relation(fields: [subject_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  quiz_questions         quiz_questions[]
+
+  @@index([subject_id], map: "idx_lessons_subject")
+}
+
+model quiz_questions {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lesson_id      String  @db.Uuid
+  question       String
+  option_a       String  @db.VarChar(500)
+  option_b       String  @db.VarChar(500)
+  option_c       String? @db.VarChar(500)
+  option_d       String? @db.VarChar(500)
+  correct_answer String  @db.VarChar(1)
+  explanation    String?
+  display_order  Int?    @default(1)
+  lessons        lessons @relation(fields: [lesson_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([lesson_id], map: "idx_quiz_lesson")
+}
+
+model subjects {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  grade_id      String    @db.Uuid
+  name          String    @db.VarChar(100)
+  code          String    @db.VarChar(50)
+  color         String?   @default("#1865F2") @db.VarChar(20)
+  icon          String?   @default("book") @db.VarChar(50)
+  display_order Int       @default(1)
+  lessons       lessons[]
+  grades        grades    @relation(fields: [grade_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([grade_id], map: "idx_subjects_grade")
+}
+
+model user_relations {
+  id                                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_id                              String    @db.Uuid
+  student_id                             String    @db.Uuid
+  created_at                             DateTime? @default(now()) @db.Timestamptz(6)
+  users_user_relations_parent_idTousers  users     @relation("user_relations_parent_idTousers", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_user_relations_student_idTousers users     @relation("user_relations_student_idTousers", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([parent_id, student_id])
+}
+
+model users {
+  id                                              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                                        String              @unique @db.VarChar(50)
+  email                                           String              @unique @db.VarChar(100)
+  password_hash                                   String              @db.VarChar(255)
+  full_name                                       String              @db.VarChar(100)
+  role                                            String              @default("STUDENT") @db.VarChar(30)
+  avatar_url                                      String?             @db.VarChar(255)
+  is_active                                       Boolean             @default(true)
+  created_at                                      DateTime?           @default(now()) @db.Timestamptz(6)
+  updated_at                                      DateTime?           @default(now()) @db.Timestamptz(6)
+  bio                                             String?
+  energy_points                                   Int                 @default(1000)
+  streak_days                                     Int                 @default(1)
+  audit_logs                                      audit_logs[]
+  chat_sessions                                   chat_sessions[]
+  learning_progress                               learning_progress[]
+  user_relations_user_relations_parent_idTousers  user_relations[]    @relation("user_relations_parent_idTousers")
+  user_relations_user_relations_student_idTousers user_relations[]    @relation("user_relations_student_idTousers")
+}

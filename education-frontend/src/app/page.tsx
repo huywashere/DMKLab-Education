@@ -132,6 +132,7 @@ export default function HomePage() {
         onOpenRegister={() => setActiveView('register')}
         onOpenProfile={() => setActiveView('profile')}
         onLogout={handleLogout}
+        onSelectLesson={handleOpenLesson}
       />
 
       <main className="flex-1">

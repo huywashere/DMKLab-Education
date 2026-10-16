@@ -13,6 +13,8 @@ import {
   RotateCcw
 } from "lucide-react";
 
+import { api } from "@/lib/api";
+
 interface SocraticChatbotProps {
   currentUser: User;
   isOpen: boolean;
@@ -34,7 +36,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [usedQuota, setUsedQuota] = useState(6);
+  const [usedQuota, setUsedQuota] = useState(1);
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const maxQuota = 30; // Daily quota from PDF specification
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -45,7 +48,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
     if (!text.trim()) return;
 
@@ -59,9 +62,30 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInput("");
     setIsTyping(true);
-    setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
 
-    // Simulate Socratic AI Response based on prompt
+    try {
+      const res = await api.sendLearningChat(text, undefined, sessionId);
+      if (res && res.reply) {
+        if (res.sessionId) setSessionId(res.sessionId);
+        if (typeof res.dailyQuotaRemaining === 'number') {
+          setUsedQuota(Math.max(0, maxQuota - res.dailyQuotaRemaining));
+        }
+
+        const botMsg: ChatMessage = {
+          id: `msg-${Date.now() + 1}`,
+          role: "assistant",
+          content: res.reply,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+        setIsTyping(false);
+        return;
+      }
+    } catch {
+      // Fallback to local Socratic logic
+    }
+
+    // Local fallback
     setTimeout(() => {
       let aiReply = "Câu hỏi rất hay! Để giải quyết vấn đề này, bước đầu tiên em hãy thử nhớ lại: trong hai phân số em đang tính, mẫu số của chúng đã bằng nhau chưa?";
       
@@ -83,7 +107,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
-    }, 1000);
+      setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
+    }, 800);
   };
 
   const samplePrompts = [

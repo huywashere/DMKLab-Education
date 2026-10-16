@@ -15,4 +15,6 @@ public interface LessonRepository extends JpaRepository<Lesson, UUID> {
 
     @Query("SELECT l FROM Lesson l WHERE l.published = true ORDER BY l.createdAt DESC")
     List<Lesson> findRecentPublished();
+
+    long countByPublishedTrue();
 }

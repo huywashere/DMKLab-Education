@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Lesson, Course } from "@/types";
 import { MOCK_COURSE, MOCK_LESSONS } from "@/lib/mock-data";
+import { api } from "@/lib/api";
 import confetti from "canvas-confetti";
 import { 
   ArrowLeft, 
@@ -48,6 +49,26 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
+
+  // Mốc thời gian chương học (Mục 8.3 PDF)
+  const CHAPTERS = [
+    { time: 0, title: "00:00 - Giới thiệu bài học" },
+    { time: 120, title: "02:00 - Khái niệm Tử số và Mẫu số" },
+    { time: 330, title: "05:30 - Ví dụ thực tế: Cắt bánh Pizza" },
+    { time: 480, title: "08:00 - Rút gọn phân số & Tổng kết" },
+  ];
+
+  const jumpToChapter = (seconds: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = seconds;
+      setCurrentTime(seconds);
+      if (!isPlaying) {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
 
   // Quiz States
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -60,13 +81,15 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     const interval = setInterval(() => {
       if (isPlaying && videoRef.current) {
         const pos = Math.floor(videoRef.current.currentTime);
+        const dur = Math.floor(videoRef.current.duration || activeLesson.durationSeconds || 600);
+        api.updateLessonProgress(activeLesson.id, pos, dur, false);
         setSaveStatus(`Đã lưu tiến độ lúc ${formatTime(pos)}`);
         setTimeout(() => setSaveStatus(null), 3000);
       }
     }, 12000);
 
     return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [isPlaying, activeLesson.id, activeLesson.durationSeconds]);
 
   // Handle Play/Pause
   const togglePlay = () => {
@@ -120,7 +143,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     setSelectedOptions((prev) => ({ ...prev, [questionId]: optionId }));
   };
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     if (!activeLesson.quiz) return;
     const newSubmitted: Record<string, boolean> = {};
     let correctCount = 0;
@@ -137,6 +160,19 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     setIsAnswerSubmitted(newSubmitted);
     const score = Math.round((correctCount / activeLesson.quiz.questions.length) * 100);
     setQuizScore(score);
+
+    // Call live backend assessment if authenticated
+    try {
+      const answersPayload = Object.entries(selectedOptions).map(([qId, optId]) => ({
+        questionId: qId,
+        selectedAnswer: optId.replace('opt-', '').toUpperCase(),
+      }));
+      await api.submitQuiz(activeLesson.id, answersPayload);
+      const pos = videoRef.current ? Math.floor(videoRef.current.currentTime) : 0;
+      await api.updateLessonProgress(activeLesson.id, pos, duration, score >= activeLesson.quiz.passingScore);
+    } catch {
+      // Local state already updated
+    }
 
     if (score >= activeLesson.quiz.passingScore) {
       // Bắn pháo hoa ăn mừng chuẩn Khan Academy
@@ -209,10 +245,33 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
               onClick={togglePlay}
             />
 
+            {/* WebVTT Subtitles Overlay (Mục 8.3 PDF) */}
+            {subtitlesEnabled && (
+              <div className="absolute bottom-16 inset-x-4 flex justify-center pointer-events-none">
+                <span className="bg-black/85 text-white px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium text-center shadow-lg border border-white/10 max-w-xl">
+                  {currentTime < 120 
+                    ? "Chào mừng các em! Trong bài học này, chúng ta sẽ cùng khám phá bản chất cốt lõi của Phân số."
+                    : currentTime < 330
+                    ? "Tử số là số phần được lấy ra, còn Mẫu số biểu thị tổng số phần bằng nhau được chia."
+                    : currentTime < 480
+                    ? "Ví dụ: Một chiếc bánh Pizza chia làm 4 phần bằng nhau, nếu ta ăn 1 phần tức là ta đã lấy 1/4 chiếc bánh."
+                    : "Quy tắc: Khi nhân hoặc chia cả tử và mẫu với cùng một số tự nhiên khác 0, ta được một phân số mới bằng phân số đã cho."}
+                </span>
+              </div>
+            )}
+
             {/* Custom Control Overlay */}
             <div className="p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-2 text-white">
               {/* Timeline Scrubber */}
-              <div className="relative w-full h-1.5 bg-white/20 rounded-full cursor-pointer hover:h-2 transition-all">
+              <div 
+                className="relative w-full h-1.5 bg-white/20 rounded-full cursor-pointer hover:h-2 transition-all"
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const clickX = e.clientX - rect.left;
+                  const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+                  skipTime(ratio * duration - currentTime);
+                }}
+              >
                 <div
                   className="h-full bg-[#14BF96] rounded-full relative"
                   style={{ width: `${(currentTime / duration) * 100}%` }}
@@ -226,15 +285,15 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                 <div className="flex items-center gap-3">
                   <button
                     onClick={togglePlay}
-                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition text-white"
+                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition text-white cursor-pointer"
                   >
                     {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
                   </button>
 
-                  <button onClick={() => skipTime(-10)} className="hover:text-[#14BF96] transition" title="Lùi 10 giây">
+                  <button onClick={() => skipTime(-10)} className="hover:text-[#14BF96] transition cursor-pointer" title="Lùi 10 giây">
                     <RotateCcw className="w-4 h-4" />
                   </button>
-                  <button onClick={() => skipTime(10)} className="hover:text-[#14BF96] transition" title="Tiến 10 giây">
+                  <button onClick={() => skipTime(10)} className="hover:text-[#14BF96] transition cursor-pointer" title="Tiến 10 giây">
                     <RotateCw className="w-4 h-4" />
                   </button>
 
@@ -243,15 +302,28 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                   </div>
                 </div>
 
-                {/* Right Controls: Speed, Volume, Fullscreen */}
-                <div className="flex items-center gap-3">
-                  {/* Speed Selector */}
-                  <div className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded text-[11px] font-semibold">
-                    {[0.75, 1, 1.25, 1.5].map((rate) => (
+                {/* Right Controls: CC, Speed, Volume, Fullscreen */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {/* CC Subtitles Toggle Button (Mục 8.3 PDF) */}
+                  <button
+                    onClick={() => setSubtitlesEnabled(!subtitlesEnabled)}
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold border transition cursor-pointer ${
+                      subtitlesEnabled 
+                        ? 'bg-[#14BF96] text-white border-[#14BF96]' 
+                        : 'bg-white/10 text-slate-300 border-white/20 hover:text-white'
+                    }`}
+                    title="Bật/Tắt phụ đề WebVTT"
+                  >
+                    CC
+                  </button>
+
+                  {/* Speed Selector (0.5x - 2x) */}
+                  <div className="flex items-center gap-0.5 bg-white/10 px-1.5 py-0.5 rounded text-[11px] font-semibold">
+                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
                       <button
                         key={rate}
                         onClick={() => handleRateChange(rate)}
-                        className={`px-1 rounded ${playbackRate === rate ? 'text-[#14BF96] font-bold' : 'text-slate-300'}`}
+                        className={`px-1 rounded transition cursor-pointer ${playbackRate === rate ? 'text-[#14BF96] font-bold bg-white/20' : 'text-slate-300 hover:text-white'}`}
                       >
                         {rate}x
                       </button>
@@ -265,7 +337,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                         setIsMuted(!isMuted);
                       }
                     }}
-                    className="hover:text-[#14BF96] transition"
+                    className="hover:text-[#14BF96] transition cursor-pointer"
                   >
                     {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
@@ -280,13 +352,33 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                         }
                       }
                     }}
-                    className="hover:text-[#14BF96] transition"
+                    className="hover:text-[#14BF96] transition cursor-pointer"
                   >
                     <Maximize className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Chapter Timeline Markers Bar (Mục 8.3 PDF) */}
+          <div className="bg-slate-900 text-white p-3 rounded-2xl flex items-center gap-2 overflow-x-auto text-xs no-scrollbar shadow-sm">
+            <span className="text-slate-400 font-bold shrink-0 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-[#14BF96]" /> Chương học:
+            </span>
+            {CHAPTERS.map((ch, idx) => (
+              <button
+                key={idx}
+                onClick={() => jumpToChapter(ch.time)}
+                className={`px-3 py-1 rounded-xl text-[11px] font-medium transition shrink-0 cursor-pointer ${
+                  currentTime >= ch.time && (idx === CHAPTERS.length - 1 || currentTime < CHAPTERS[idx + 1].time)
+                    ? 'bg-[#14BF96] text-white font-bold shadow-xs'
+                    : 'bg-white/10 hover:bg-white/20 text-slate-300'
+                }`}
+              >
+                {ch.title}
+              </button>
+            ))}
           </div>
 
           {/* Interactive Learning Tabs */}

@@ -51,6 +51,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/v1/grades/**", "/api/v1/subjects/**", "/api/v1/courses/**", "/api/v1/lessons/**").permitAll()
                 .requestMatchers("/api/v1/quizzes/**").permitAll()
+                .requestMatchers("/api/v1/progress/**").permitAll()
                 .requestMatchers("/api/v1/ai/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
