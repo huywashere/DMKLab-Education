@@ -163,21 +163,23 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Real-time Backend + DB Status Banner */}
-      <div className="bg-[#0B2138] text-white text-xs py-1.5 px-4 text-center flex items-center justify-between border-b border-slate-700/50">
-        <div className="flex items-center gap-2 mx-auto sm:mx-0">
-          <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-          <span className="font-medium text-slate-200">
-            {isBackendConnected 
-              ? 'DMKLab Education K–12: Spring Boot 3.3 + PostgreSQL 17 + Prisma ORM (Bảo mật JWT HMAC-512)' 
-              : 'Đang kết nối API Backend & Database...'}
-          </span>
-        </div>
-        <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-300">
-          <a href="http://localhost:8080/swagger-ui.html" target="_blank" rel="noreferrer" className="hover:text-emerald-400 underline transition">
-            Swagger API Docs ↗
-          </a>
-          <span>•</span>
-          <span className="bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">DB: learning_db</span>
+      <div className="bg-[#0B2138] text-white text-xs py-1.5 border-b border-slate-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+            <span className="font-medium text-slate-200">
+              {isBackendConnected 
+                ? 'DMKLab Education K–12: Spring Boot 3.3 + PostgreSQL 17 + Prisma ORM (Bảo mật JWT HMAC-512)' 
+                : 'Đang kết nối API Backend & Database...'}
+            </span>
+          </div>
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-300">
+            <a href="http://localhost:8080/swagger-ui.html" target="_blank" rel="noreferrer" className="hover:text-emerald-400 underline transition">
+              Swagger API Docs ↗
+            </a>
+            <span>•</span>
+            <span className="bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">DB: learning_db</span>
+          </div>
         </div>
       </div>
 
