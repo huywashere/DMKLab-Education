@@ -24,10 +24,13 @@ import {
   Bell,
   PlayCircle,
   CheckCircle,
-  BookMarked
+  BookMarked,
+  Sun,
+  Moon
 } from "lucide-react";
 import { MOCK_LESSONS } from "@/lib/mock-data";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useTheme } from "@/lib/theme/ThemeContext";
 
 interface HeaderProps {
   currentUser: User | null;
@@ -65,6 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenContact,
 }) => {
   const { lang, setLang, t } = useLanguage();
+  const { theme, toggleTheme, isDark } = useTheme();
   const [showCoursesMenu, setShowCoursesMenu] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -104,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-50 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
         {/* Left: Courses Dropdown & Search Bar */}
         <div className="flex items-center gap-4 lg:gap-6">
@@ -112,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowCoursesMenu(!showCoursesMenu)}
-              className="flex items-center gap-2 px-3 py-2 text-[#0A2540] hover:text-[#1865F2] font-extrabold text-sm rounded-full transition cursor-pointer"
+              className="flex items-center gap-2 px-3 py-2 text-[#0A2540] dark:text-[#E2E8F0] hover:text-[#1865F2] dark:hover:text-[#60A5FA] font-extrabold text-sm rounded-full transition cursor-pointer"
             >
               <span>{t('nav_courses', 'Môn học')}</span>
               <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showCoursesMenu ? 'rotate-180' : ''}`} />
@@ -418,7 +422,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowLangMenu(!showLangMenu)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 hover:border-blue-400 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 hover:border-blue-400 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-xs font-bold text-slate-700 dark:text-slate-200 transition cursor-pointer shadow-2xs"
               title={t('lang_select_title', 'Chọn ngôn ngữ')}
             >
               <Globe className="w-3.5 h-3.5 text-[#1865F2]" />
@@ -428,7 +432,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {showLangMenu && (
               <div 
-                className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
+                className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#131E35] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
                 onMouseLeave={() => setShowLangMenu(false)}
               >
                 <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -440,14 +444,14 @@ export const Header: React.FC<HeaderProps> = ({
                     setShowLangMenu(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-xl flex items-center justify-between font-semibold transition cursor-pointer ${
-                    lang === 'vi' ? 'bg-blue-50 text-[#1865F2] font-bold' : 'hover:bg-slate-50 text-slate-700'
+                    lang === 'vi' ? 'bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     <span className="text-base">🇻🇳</span>
-                    <span>Tiếng Việt <span className="text-[10px] text-emerald-600 font-bold">(Mặc định)</span></span>
+                    <span>Tiếng Việt <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">(Mặc định)</span></span>
                   </span>
-                  {lang === 'vi' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2]" />}
+                  {lang === 'vi' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />}
                 </button>
 
                 <button
@@ -456,18 +460,33 @@ export const Header: React.FC<HeaderProps> = ({
                     setShowLangMenu(false);
                   }}
                   className={`w-full text-left px-3 py-2 rounded-xl flex items-center justify-between font-semibold transition cursor-pointer ${
-                    lang === 'en' ? 'bg-blue-50 text-[#1865F2] font-bold' : 'hover:bg-slate-50 text-slate-700'
+                    lang === 'en' ? 'bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                   }`}
                 >
                   <span className="flex items-center gap-2">
                     <span className="text-base">🇬🇧</span>
                     <span>English</span>
                   </span>
-                  {lang === 'en' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2]" />}
+                  {lang === 'en' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />}
                 </button>
               </div>
             )}
           </div>
+
+          {/* Theme Switcher Toggle (Dark / Light Mode) */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition cursor-pointer shadow-2xs"
+            title={isDark ? t('theme_light', 'Giao diện Sáng') : t('theme_dark', 'Giao diện Tối')}
+            aria-label={t('theme_toggle', 'Chuyển giao diện sáng/tối')}
+          >
+            {isDark ? (
+              <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-600 fill-slate-100" />
+            )}
+          </button>
 
           {/* If user is logged in */}
           {currentUser ? (

@@ -518,6 +518,20 @@ export const TRANSLATIONS: Record<string, Record<Language, string>> = {
     vi: "English",
     en: "English",
   },
+
+  // Dark Mode Theme
+  theme_toggle: {
+    vi: "Chuyển giao diện sáng/tối",
+    en: "Toggle light/dark theme",
+  },
+  theme_light: {
+    vi: "Giao diện Sáng",
+    en: "Light Mode",
+  },
+  theme_dark: {
+    vi: "Giao diện Tối",
+    en: "Dark Mode",
+  },
 };
 
 export function getTranslation(key: string, lang: Language): string {

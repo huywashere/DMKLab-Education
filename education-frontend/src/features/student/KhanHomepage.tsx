@@ -105,19 +105,19 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       {/* ────────────────────────────────────────────────
           HERO SECTION — exact Khan Academy split layout
       ──────────────────────────────────────────────── */}
-      <section className="bg-[#FEF8E7] border-b border-[#E8E3D0]">
+      <section className="bg-[#FEF8E7] dark:bg-[#0B1324] border-b border-[#E8E3D0] dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left: Headlines + Bullets */}
           <div className="space-y-6">
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#21242C] leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-[#21242C] dark:text-white leading-tight tracking-tight">
               {t("hero_headline_1", "Biến mục tiêu học tập lớn thành")}{" "}
-              <em className="not-italic text-[#1865F2]">{t("hero_headline_2", "kết quả thực sự.")}</em>
+              <em className="not-italic text-[#1865F2] dark:text-blue-400">{t("hero_headline_2", "kết quả thực sự.")}</em>
             </h1>
-            <p className="text-base text-slate-600 leading-relaxed max-w-lg">
+            <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-lg">
               {t("hero_desc", "DMKLab giúp cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh từ lớp 1 đến lớp 12 tiến bộ mỗi ngày.")}
             </p>
 
-            <ul className="space-y-2 text-sm text-slate-700">
+            <ul className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
               {HOW_WORKS_CHECKS.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-[#14BF96] shrink-0 mt-0.5" />
@@ -177,28 +177,28 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
             </div>
 
             {/* "Get started" role selector card — mimics Khan Academy's right column */}
-            <div className="w-full max-w-md mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="w-full max-w-md mt-6 bg-white dark:bg-[#131E35] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
               <div className="px-5 pt-4 pb-2">
-                <p className="text-sm font-bold text-slate-800 mb-3">{t("hero_who_are_you", "Bạn là ai?")}</p>
-                <div className="divide-y divide-slate-100">
+                <p className="text-sm font-bold text-slate-800 dark:text-white mb-3">{t("hero_who_are_you", "Bạn là ai?")}</p>
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                   {WHO_ARE_YOU.map((w, idx) => (
                     <button
                       key={idx}
                       onClick={() => setActiveWho(idx)}
-                      className={`w-full text-left px-2 py-3 flex items-center justify-between hover:bg-slate-50 transition text-sm cursor-pointer ${activeWho === idx ? 'bg-slate-50' : ''}`}
+                      className={`w-full text-left px-2 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition text-sm cursor-pointer ${activeWho === idx ? 'bg-slate-50 dark:bg-slate-800/80' : ''}`}
                     >
                       <div>
-                        <span className={`font-bold ${activeWho === idx ? 'text-[#1865F2]' : 'text-slate-800'}`}>{w.role}</span>
-                        <p className="text-[11px] text-slate-500">{w.desc}</p>
+                        <span className={`font-bold ${activeWho === idx ? 'text-[#1865F2] dark:text-blue-400' : 'text-slate-800 dark:text-slate-200'}`}>{w.role}</span>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{w.desc}</p>
                       </div>
-                      <ChevronRight className={`w-4 h-4 shrink-0 ${activeWho === idx ? 'text-[#1865F2]' : 'text-slate-300'}`} />
+                      <ChevronRight className={`w-4 h-4 shrink-0 ${activeWho === idx ? 'text-[#1865F2] dark:text-blue-400' : 'text-slate-300 dark:text-slate-600'}`} />
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-500">
+              <div className="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
                 {t("hero_has_account", "Đã có tài khoản?")}{" "}
-                <button className="text-[#1865F2] font-bold hover:underline cursor-pointer">{t("hero_login_link", "Đăng nhập")}</button>
+                <button className="text-[#1865F2] dark:text-blue-400 font-bold hover:underline cursor-pointer">{t("hero_login_link", "Đăng nhập")}</button>
               </div>
             </div>
           </div>
@@ -208,12 +208,12 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       {/* ────────────────────────────────────────────────
           STATS BAR — 180M+, 63B+, Free, 15+ years
       ──────────────────────────────────────────────── */}
-      <section className="border-b border-slate-200 bg-white py-8">
+      <section className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0B1120] py-8 transition-colors duration-200">
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
           {STATS.map((s, i) => (
             <div key={i} className="space-y-1">
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#21242C]">{s.value}</p>
-              <p className="text-xs text-slate-500 font-medium">{s.label}</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-[#21242C] dark:text-white">{s.value}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{s.label}</p>
             </div>
           ))}
         </div>
@@ -223,9 +223,9 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           COURSES SECTION — "Explore our courses"
           Exact Khan Academy pill-badge layout
       ──────────────────────────────────────────────── */}
-      <section className="bg-white py-16 border-b border-slate-100">
+      <section className="bg-white dark:bg-[#080E1A] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-5xl mx-auto px-4 text-center space-y-8">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#21242C]">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#21242C] dark:text-white">
             {t("courses_heading", "Khám phá các môn học")}
           </h2>
 
@@ -234,7 +234,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               <button
                 key={idx}
                 onClick={() => onOpenLesson(MOCK_LESSONS[idx % MOCK_LESSONS.length])}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border border-slate-200 hover:border-slate-300 hover:shadow-sm bg-white transition cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm bg-white dark:bg-slate-800/90 transition cursor-pointer"
                 style={{ color: item.color }}
               >
                 <span
@@ -243,7 +243,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 >
                   {item.icon}
                 </span>
-                <span className="text-[#21242C]">{t(item.labelKey, item.fallback)}</span>
+                <span className="text-[#21242C] dark:text-slate-100">{t(item.labelKey, item.fallback)}</span>
               </button>
             ))}
           </div>
@@ -253,24 +253,24 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       {/* ────────────────────────────────────────────────
           HOW KHAN ACADEMY WORKS — split with real graphic
       ──────────────────────────────────────────────── */}
-      <section className="bg-white py-16 border-b border-slate-100">
+      <section className="bg-white dark:bg-[#0B1120] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left text */}
           <div className="space-y-5">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#1865F2]">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#1865F2] dark:text-blue-400">
               {t("how_badge", "Cách DMKLab hoạt động")}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] dark:text-white leading-tight">
               {t("how_title_1", "Tiến bộ thực sự bắt đầu từ")}{" "}
-              <em className="not-italic text-[#1865F2]">{t("how_title_emphasis", "cách")}</em>{" "}
+              <em className="not-italic text-[#1865F2] dark:text-blue-400">{t("how_title_emphasis", "cách")}</em>{" "}
               {t("how_title_2", "học sinh học.")}
             </h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {t("how_desc", "Học sinh học tốt nhất khi thực hành đều đặn, nhận phản hồi ngay và được hỗ trợ kịp thời. DMKLab giúp điều đó khả thi để học sinh luôn tiến về phía trước, dù ở đâu trong hành trình học tập.")}
             </p>
             <ul className="space-y-3">
               {HOW_WORKS_CHECKS.map((c, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                <li key={i} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
                   <CheckCircle className="w-4 h-4 text-[#14BF96] shrink-0 mt-0.5" />
                   {c}
                 </li>
@@ -279,7 +279,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           </div>
 
           {/* Right: Mastery Growth graphic from img-web */}
-          <div className="relative flex justify-center items-center bg-slate-50/80 rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm">
+          <div className="relative flex justify-center items-center bg-slate-50/80 dark:bg-slate-800/60 rounded-3xl p-6 sm:p-8 border border-slate-100 dark:border-slate-700 shadow-sm">
             <img
               src="/img-web/v2_growing_asset.svg"
               alt="4 cấp độ tinh thông kỹ năng: Chưa học - Làm quen - Thành thạo - Tinh thông"
@@ -294,7 +294,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       {/* ────────────────────────────────────────────────
           LEARNER RESULTS — "Every skill counts"
       ──────────────────────────────────────────────── */}
-      <section className="bg-[#F7F8FA] py-16 border-b border-slate-100">
+      <section className="bg-[#F7F8FA] dark:bg-[#080D1A] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left image */}
           <div className="flex justify-center">
@@ -308,7 +308,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 decoding="async"
               />
               {/* Floating progress chart overlay */}
-              <div className="absolute -bottom-5 -right-5 bg-white rounded-2xl shadow-xl border border-slate-100 p-3">
+              <div className="absolute -bottom-5 -right-5 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 p-3">
                 <img
                   src="/img-web/ebae4d32de6a73eb-real_progress_graphic.svg"
                   alt="Biểu đồ kỹ năng"
@@ -325,15 +325,15 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
             <p className="text-xs font-bold uppercase tracking-widest text-[#14BF96]">
               {t("results_badge", "Kết quả học sinh")}
             </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#21242C] dark:text-white leading-tight">
               {t("results_title", "Mỗi kỹ năng đều có giá trị.")}
             </h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
               {t("results_desc", "Mỗi kỹ năng học sinh làm chủ đều xây dựng lên kỹ năng tiếp theo, giúp lấp đầy lỗ hổng kiến thức, tạo tự tin và tiến lên. Tiến bộ là có thể đo lường – và nó cộng dồn theo thời gian.")}
             </p>
             <ul className="space-y-3">
               {LEARNER_CHECKS.map((c, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                <li key={i} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
                   <CheckCircle className="w-4 h-4 text-[#14BF96] shrink-0 mt-0.5" />
                   {c}
                 </li>
@@ -350,10 +350,10 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       {/* ────────────────────────────────────────────────
           AUDIENCE TABS — Schools / Teachers / Students / Families
       ──────────────────────────────────────────────── */}
-      <section className="bg-white py-16 border-b border-slate-100">
+      <section className="bg-white dark:bg-[#0B1120] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           {/* Tab Nav */}
-          <div className="flex gap-6 border-b border-slate-200 overflow-x-auto">
+          <div className="flex gap-6 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
             {[
               { key: 'schools', label: t('audience_tab_schools', 'Trường học & Sở GD') },
               { key: 'teachers', label: t('audience_tab_teachers', 'Giáo viên') },
@@ -365,8 +365,8 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
                 onClick={() => setActiveAudienceTab(tItem.key as any)}
                 className={`pb-3 text-sm font-bold whitespace-nowrap border-b-2 transition cursor-pointer ${
                   activeAudienceTab === tItem.key
-                    ? 'border-[#1865F2] text-[#1865F2]'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                    ? 'border-[#1865F2] dark:border-blue-400 text-[#1865F2] dark:text-blue-400'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
               >
                 {tItem.label}
@@ -377,13 +377,13 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
           {/* Tab Content */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-5">
-              <h2 className="text-3xl font-extrabold text-[#21242C] leading-tight">
+              <h2 className="text-3xl font-extrabold text-[#21242C] dark:text-white leading-tight">
                 {activeAudienceTab === 'schools' && t('audience_schools_title', "Thúc đẩy tiến bộ trên mọi lớp học.")}
                 {activeAudienceTab === 'teachers' && t('audience_teachers_title', "Cung cấp cho mỗi học sinh sự hỗ trợ cần thiết.")}
                 {activeAudienceTab === 'students' && t('audience_students_title', "Tự học theo tốc độ của bản thân, miễn phí.")}
                 {activeAudienceTab === 'families' && t('audience_families_title', "Xem con bạn học thật sự hiệu quả.")}
               </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {activeAudienceTab === 'schools' && t('audience_schools_desc', "DMKLab được giáo viên tin dùng mỗi ngày. Các quan hệ đối tác cấp trường xây dựng trên nền tảng đó, mang lại sự nhất quán và học tập sâu hơn trên toàn trường.")}
                 {activeAudienceTab === 'teachers' && t('audience_teachers_desc', "Hiểu chính xác mỗi học sinh cần gì, tiết kiệm thời gian chuẩn bị bài và tập trung vào những khoảnh khắc dạy học quan trọng nhất.")}
                 {activeAudienceTab === 'students' && t('audience_students_desc', "Hàng nghìn video bài giảng, bài tập và giải thích. Học mọi thứ từ toán cơ bản đến đại số nâng cao, khoa học, lịch sử và nhiều hơn nữa.")}
@@ -401,7 +401,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
 
             {/* Right side image depending on tab */}
             <div className="flex justify-center">
-              <div className="w-full max-w-md rounded-2xl overflow-hidden bg-[#E8F5FF] border border-blue-100 shadow-md">
+              <div className="w-full max-w-md rounded-2xl overflow-hidden bg-[#E8F5FF] dark:bg-slate-800/80 border border-blue-100 dark:border-slate-700 shadow-md">
                 <img
                   src={activeAudienceTab === 'schools' || activeAudienceTab === 'teachers'
                     ? "/img-web/Healthcare-Market-Access-Banner-2-AdobeStock_829907754-1.png"

@@ -87,14 +87,14 @@ export const Footer: React.FC<FooterProps> = ({
       {/* ────────────────────────────────────────────────────────
           MAIN FOOTER (matching company reference specifications)
       ──────────────────────────────────────────────────────── */}
-      <footer className="bg-[#EDF6F9] text-[#285366] border-t-2 border-[#1E6782] pt-12 pb-8">
+      <footer className="bg-[#EDF6F9] dark:bg-[#070D18] text-[#285366] dark:text-slate-300 border-t-2 border-[#1E6782] dark:border-slate-800 pt-12 pb-8 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main 4-Column Grid matching the user's reference image */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-[#D2E7EF]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-[#D2E7EF] dark:border-slate-800">
             
             {/* Column 1: VỀ CHÚNG TÔI (5 cols on lg) */}
             <div className="lg:col-span-5 space-y-4">
-              <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-[#0A4358] dark:text-slate-100 uppercase tracking-wider">
                 {t("footer_about_heading", "VỀ CHÚNG TÔI")}
               </h3>
               
@@ -200,16 +200,16 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* Column 2: LIÊN HỆ (3.5 cols on lg) */}
             <div className="lg:col-span-3 space-y-4">
-              <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-[#0A4358] dark:text-slate-100 uppercase tracking-wider">
                 {t("footer_contact_heading", "LIÊN HỆ")}
               </h3>
 
-              <div className="space-y-3.5 text-xs text-[#285366]">
+              <div className="space-y-3.5 text-xs text-[#285366] dark:text-slate-300">
                 {/* Address */}
                 <div className="flex items-start gap-2.5">
                   <span className="font-extrabold text-[#0B65C2] text-sm shrink-0 mt-0.5">A</span>
                   <p className="leading-relaxed">
-                    <strong className="text-[#0A4358]">{t("footer_headquarters_label", "Trụ sở:")}</strong>{" "}
+                    <strong className="text-[#0A4358] dark:text-slate-100">{t("footer_headquarters_label", "Trụ sở:")}</strong>{" "}
                     {t("footer_headquarters_val", "702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam")}
                   </p>
                 </div>
@@ -219,7 +219,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <Phone className="w-4 h-4 text-[#0B65C2] shrink-0" />
                   <a 
                     href="tel:0909907861" 
-                    className="font-bold text-[#0A4358] hover:text-[#0B65C2] transition"
+                    className="font-bold text-[#0A4358] dark:text-slate-100 hover:text-[#0B65C2] dark:hover:text-blue-400 transition"
                   >
                     0909907861
                   </a>
@@ -230,7 +230,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <Mail className="w-4 h-4 text-[#0B65C2] shrink-0" />
                   <a 
                     href="mailto:info@dmklab.vn" 
-                    className="font-medium text-[#0A4358] hover:text-[#0B65C2] transition"
+                    className="font-medium text-[#0A4358] dark:text-slate-100 hover:text-[#0B65C2] dark:hover:text-blue-400 transition"
                   >
                     info@dmklab.vn
                   </a>
@@ -241,7 +241,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     type="button"
                     onClick={onOpenContact}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#B8D7E3] text-[#0A4358] font-bold text-xs hover:bg-blue-50/50 hover:border-[#0B65C2] transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-[#B8D7E3] dark:border-slate-700 text-[#0A4358] dark:text-slate-100 font-bold text-xs hover:bg-blue-50/50 dark:hover:bg-slate-700 hover:border-[#0B65C2] transition cursor-pointer"
                   >
                     <span>{t("footer_send_message_btn", "Gửi tin nhắn tư vấn")}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -252,38 +252,38 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* Column 3: THÔNG TIN (2 cols on lg) */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-[#0A4358] dark:text-slate-100 uppercase tracking-wider">
                 {t("footer_info_heading", "THÔNG TIN")}
               </h3>
 
-              <ul className="space-y-2 text-xs text-[#285366]">
+              <ul className="space-y-2 text-xs text-[#285366] dark:text-slate-300">
                 <li>
-                  <a href="#payment-guide" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <a href="#payment-guide" className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_payment_guide", "Hướng Dẫn Thanh Toán")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#warranty" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <a href="#warranty" className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_warranty", "Quy Định Bảo Hành")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#returns" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <a href="#returns" className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_return", "Quy định đổi trả sản phẩm")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#shipping" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <a href="#shipping" className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_shipping", "Quy Định Vận Chuyển")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#privacy" className="hover:text-[#0B65C2] transition flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                  <a href="#privacy" className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_privacy", "Chính Sách Bảo Mật")}</span>
                   </a>
                 </li>
@@ -292,18 +292,18 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* Column 4: GIÁO DỤC K–12 (1.5 cols on lg) */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-sm font-bold text-[#0A4358] uppercase tracking-wider">
+              <h3 className="text-sm font-bold text-[#0A4358] dark:text-slate-100 uppercase tracking-wider">
                 {t("footer_k12_heading", "GIÁO DỤC K–12")}
               </h3>
 
-              <ul className="space-y-2 text-xs text-[#285366]">
+              <ul className="space-y-2 text-xs text-[#285366] dark:text-slate-300">
                 <li>
                   <button
                     type="button"
                     onClick={onOpenAbout}
-                    className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition text-left cursor-pointer flex items-center gap-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_about_dmklab", "Giới thiệu DMKLab")}</span>
                   </button>
                 </li>
@@ -311,9 +311,9 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     type="button"
                     onClick={onOpenAbout}
-                    className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition text-left cursor-pointer flex items-center gap-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_socratic_method", "Phương Pháp Socratic")}</span>
                   </button>
                 </li>
@@ -321,9 +321,9 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     type="button"
                     onClick={onOpenArticles}
-                    className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition text-left cursor-pointer flex items-center gap-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_articles_link", "Bài viết & Cẩm nang")}</span>
                   </button>
                 </li>
@@ -331,9 +331,9 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     type="button"
                     onClick={onOpenContact}
-                    className="hover:text-[#0B65C2] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="hover:text-[#0B65C2] dark:hover:text-blue-400 transition text-left cursor-pointer flex items-center gap-1.5"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#285366] dark:bg-slate-500" />
                     <span>{t("footer_hotline_label", "Tổng đài: 1900 6868")}</span>
                   </button>
                 </li>
@@ -343,16 +343,16 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Bottom Bar: Copyright & Safety */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A7285]">
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#4A7285] dark:text-slate-400">
             <p>
               {t("footer_copyright")}
             </p>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 text-[#285366]">
+              <div className="flex items-center gap-1 text-[#285366] dark:text-slate-300">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{t("footer_coppa", "Chuẩn an toàn dữ liệu học sinh & COPPA")}</span>
               </div>
-              <div className="flex items-center gap-1 text-[#285366]">
+              <div className="flex items-center gap-1 text-[#285366] dark:text-slate-300">
                 <span>{t("footer_partner_vn", "Đồng hành cùng học sinh Việt Nam")}</span>
                 <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
               </div>

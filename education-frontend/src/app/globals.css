@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #FFFFFF;
   --foreground: #21242C;
@@ -17,6 +19,17 @@
 
   --border: #E2E8F0;
   --card: #FFFFFF;
+}
+
+.dark {
+  --background: #0B1120;
+  --foreground: #F1F5F9;
+
+  /* Dark mode overrides */
+  --khan-warm-bg: #0F1A30;
+  --khan-slate-bg: #0E172B;
+  --border: #1E2D4A;
+  --card: #131E35;
 }
 
 body {
@@ -37,13 +50,25 @@ body {
   background: #F1F5F9;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
   border-radius: 9999px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 /* Khan Academy CTA Buttons */
@@ -101,6 +126,16 @@ body {
   background-color: #F0F5FF;
 }
 
+.dark .khan-btn-secondary {
+  background-color: transparent;
+  color: #60A5FA;
+  border-color: #3B82F6;
+}
+
+.dark .khan-btn-secondary:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
 .khan-btn-outline {
   background-color: #FFFFFF;
   color: #21242C;
@@ -116,6 +151,17 @@ body {
   background-color: #F7F8FA;
 }
 
+.dark .khan-btn-outline {
+  background-color: #1E293B;
+  color: #E2E8F0;
+  border-color: #334155;
+}
+
+.dark .khan-btn-outline:hover {
+  border-color: #64748B;
+  background-color: #334155;
+}
+
 /* Khan card style */
 .khan-card {
   background-color: #FFFFFF;
@@ -128,4 +174,15 @@ body {
 .khan-card:hover {
   border-color: #CBD5E1;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dark .khan-card {
+  background-color: #131E35;
+  border-color: #223254;
+  color: #F1F5F9;
+}
+
+.dark .khan-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import { ThemeProvider } from "@/lib/theme/ThemeContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin", "vietnamese"],
@@ -140,18 +141,26 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="vi" className={`h-full antialiased ${plusJakartaSans.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`h-full antialiased ${plusJakartaSans.variable}`}>
       <head>
+        {/* Anti-flicker instant theme initialization */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('dmklab_theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();`,
+          }}
+        />
         {/* JSON-LD Structured Data Schema for Google & Search Engines */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`min-h-full flex flex-col bg-[#F8FAFC] text-[#0F172A] ${plusJakartaSans.className}`}>
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+      <body className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${plusJakartaSans.className}`}>
+        <ThemeProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
