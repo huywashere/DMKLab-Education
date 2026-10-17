@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, UserRole } from "@/types";
 import { api } from "@/lib/api";
 import { 
@@ -15,7 +15,9 @@ import {
   GraduationCap,
   Briefcase,
   Heart,
-  Check
+  Check,
+  Clock,
+  ShieldAlert
 } from "lucide-react";
 
 interface RegisterPageProps {
@@ -35,9 +37,21 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [cooldownSec, setCooldownSec] = useState<number>(0);
+  const [submitAttempts, setSubmitAttempts] = useState<number>(0);
+
+  // Rate-limiting countdown timer
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const interval = setInterval(() => {
+      setCooldownSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownSec]);
 
   // Password strength calculation
   const getPasswordStrength = () => {
@@ -56,6 +70,18 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
     e.preventDefault();
     setErrorMessage(null);
 
+    // 1. Kiểm tra Cooldown
+    if (cooldownSec > 0) {
+      setErrorMessage(`Hệ thống đang tạm khóa tạo tài khoản để chống spam. Vui lòng đợi ${cooldownSec} giây.`);
+      return;
+    }
+
+    // 2. Kiểm tra Honeypot Bot Trap
+    if (honeypot.trim().length > 0) {
+      setErrorMessage("Yêu cầu bị từ chối do phát hiện hành vi tự động (Anti-bot honeypot).");
+      return;
+    }
+
     if (password.length < 6) {
       setErrorMessage("Mật khẩu phải có độ dài tối thiểu 6 ký tự để bảo đảm an toàn.");
       return;
@@ -72,7 +98,18 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
       });
       onSuccess(user);
     } catch (err: any) {
-      setErrorMessage(err.message || "Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.");
+      const newAttempts = submitAttempts + 1;
+      setSubmitAttempts(newAttempts);
+
+      if (err.message && err.message.includes("429")) {
+        setCooldownSec(180); // 3 phút nếu backend trả 429
+        setErrorMessage(err.message);
+      } else if (newAttempts >= 3) {
+        setCooldownSec(60); // 1 phút cooldown sau 3 lần thử
+        setErrorMessage("Bạn đã gửi yêu cầu quá nhiều lần. Vui lòng đợi 60 giây trước khi thử lại.");
+      } else {
+        setErrorMessage(err.message || "Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -309,6 +346,29 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
             )}
           </div>
 
+          {/* Anti-spam Honeypot Bot Trap */}
+          <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+            <label htmlFor="reg_hp_field">Bot Check</label>
+            <input
+              id="reg_hp_field"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
+
+          {/* Rate Limit Cooldown Notice */}
+          {cooldownSec > 0 && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>
+                Hệ thống tạm khóa đăng ký chống bot: Vui lòng đợi <strong>{cooldownSec} giây</strong> trước khi thử lại.
+              </span>
+            </div>
+          )}
+
           <div className="pt-2 text-[11px] text-slate-500 leading-relaxed">
             Bằng cách đăng ký, bạn đồng ý với <a href="#" className="text-[#1865F2] hover:underline">Điều khoản dịch vụ</a> và <a href="#" className="text-[#1865F2] hover:underline">Chính sách quyền riêng tư</a> của DMKLab Education.
           </div>
@@ -316,15 +376,26 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({
           {/* Submit */}
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || cooldownSec > 0}
             className="w-full py-3 px-4 bg-[#1865F2] hover:bg-[#1557D0] active:scale-[0.99] text-white font-extrabold text-sm rounded-full shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {isLoading ? (
               <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : cooldownSec > 0 ? (
+              <>
+                <Clock className="w-4 h-4 text-amber-300" />
+                <span>Vui lòng đợi ({cooldownSec}s)...</span>
+              </>
             ) : (
               <span>Tạo tài khoản và bắt đầu học</span>
             )}
           </button>
+
+          {/* Anti-Bot Badge */}
+          <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-500 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Anti-Bot & Rate Limit kích hoạt (Tối đa 3 tài khoản / 30 phút)</span>
+          </div>
         </form>
 
         {/* Footer switch to Login */}

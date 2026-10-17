@@ -233,7 +233,13 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         setIsTyping(false);
         return;
       }
-    } catch {
+    } catch (err: any) {
+      if (err?.message && (err.message.includes("429") || err.message.toLowerCase().includes("rate limit") || err.message.includes("quá nhanh"))) {
+        setRateLimitAlert(err.message || "Giới hạn tốc độ: Bạn đang gửi câu hỏi quá nhanh. Vui lòng đợi 15 giây trước khi hỏi tiếp.");
+        setCooldownSec(15);
+        setIsTyping(false);
+        return;
+      }
       // Dịch vụ Cloud lỗi -> Chuyển sang Graceful Offline Socratic Engine
       setFallbackActiveToast("⚡ Cloud AI API gặp sự cố. Hệ thống tự động chuyển sang Động cơ Gia sư Socratic Offline dự phòng!");
       setTimeout(() => setFallbackActiveToast(null), 4000);

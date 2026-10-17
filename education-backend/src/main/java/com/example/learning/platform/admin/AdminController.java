@@ -9,6 +9,7 @@ import com.example.learning.identity.repository.UserRepository;
 import com.example.learning.platform.api.ApiResponse;
 import com.example.learning.platform.security.UserPrincipal;
 import com.example.learning.progress.repository.LearningProgressRepository;
+import com.example.learning.platform.ratelimit.RateLimiterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +33,7 @@ public class AdminController {
     private final LessonRepository lessonRepository;
     private final LearningProgressRepository learningProgressRepository;
     private final AuditService auditService;
+    private final RateLimiterService rateLimiterService;
 
     @GetMapping("/reports/overview")
     @Operation(summary = "Lấy báo cáo tổng quan KPI hệ thống và hạ tầng", security = @SecurityRequirement(name = "bearerAuth"))
@@ -187,5 +189,21 @@ public class AdminController {
                 .build();
 
         return ResponseEntity.ok(ApiResponse.success("Presigned URL đã sẵn sàng", response));
+    }
+
+    @GetMapping("/security/ratelimit-stats")
+    @Operation(summary = "Lấy thống kê hệ thống chống spam và giám sát Rate Limiting thời gian thực", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<RateLimiterService.RateLimitStats>> getRateLimitStats() {
+        return ResponseEntity.ok(ApiResponse.success(rateLimiterService.getStats()));
+    }
+
+    @PostMapping("/security/ratelimit/unblock")
+    @Operation(summary = "Mở khóa thủ công IP hoặc Key bị chặn Rate Limit", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<String>> unblockRateLimitKey(@RequestParam String key) {
+        boolean unblocked = rateLimiterService.unblockKey(key);
+        if (unblocked) {
+            return ResponseEntity.ok(ApiResponse.success("Đã mở khóa thành công cho key: " + key));
+        }
+        return ResponseEntity.ok(ApiResponse.success("Key không bị khóa hoặc đã hết hạn: " + key));
     }
 }

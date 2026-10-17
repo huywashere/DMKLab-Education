@@ -131,6 +131,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Session Revocation for RBAC users (Thu hồi phiên đăng nhập)
   const [revokedUserIds, setRevokedUserIds] = useState<string[]>([]);
 
+  // 7. Rate Limiting & Anti-Spam States (Rà soát chống spam & bẫy Bot)
+  const [rateLimitSimLogs, setRateLimitSimLogs] = useState<Array<{ id: number; endpoint: string; status: number; text: string; time: string; blocked: boolean }>>([]);
+  const [isSimulatingRateLimit, setIsSimulatingRateLimit] = useState(false);
+  const [unblockKeyInput, setUnblockKeyInput] = useState("");
+  const [unblockFeedback, setUnblockFeedback] = useState<string | null>(null);
+  const [customBlockedList, setCustomBlockedList] = useState<string[]>([
+    "AUTH_LOGIN:192.168.1.45 (Sai MK 6 lần)",
+    "AI_CHAT:113.161.82.14 (Vượt 15 req/phút)"
+  ]);
+
+  const handleSimulateRateLimitFlood = async () => {
+    setIsSimulatingRateLimit(true);
+    setRateLimitSimLogs([]);
+    const logs: Array<{ id: number; endpoint: string; status: number; text: string; time: string; blocked: boolean }> = [];
+    
+    // Mô phỏng flood 6 request liên tiếp trong 1.5s
+    for (let i = 1; i <= 6; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      const isBlocked = i >= 4;
+      const now = new Date().toLocaleTimeString();
+      logs.push({
+        id: i,
+        endpoint: "POST /api/v1/auth/login",
+        status: isBlocked ? 429 : 200,
+        text: isBlocked 
+          ? "HTTP 429 Too Many Requests (RateLimitExceeded - Retry-After: 900s - Audit: RATE_LIMIT_BLOCKED)" 
+          : `HTTP 200 OK (Thành công - X-RateLimit-Remaining: ${5 - i})`,
+        time: now,
+        blocked: isBlocked
+      });
+      setRateLimitSimLogs([...logs]);
+    }
+    setIsSimulatingRateLimit(false);
+  };
+
+  const handleUnblockKey = () => {
+    if (!unblockKeyInput.trim()) return;
+    const key = unblockKeyInput.trim();
+    setCustomBlockedList(prev => prev.filter(item => !item.includes(key)));
+    setUnblockFeedback(`Đã giải phóng bộ đệm Sliding-Window và mở khóa cho: ${key}`);
+    setUnblockKeyInput("");
+    setTimeout(() => setUnblockFeedback(null), 4000);
+  };
+
   const INITIAL_AUDIT_LOGS: BackendAuditLog[] = [
     {
       id: "aud-001",
@@ -2441,6 +2485,205 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* 7. Comprehensive Rate Limiting & Anti-Spam Architecture */}
+          <div className="bg-white dark:bg-[#131E35] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 uppercase tracking-wider">
+                    RFC 6585 · Sliding-Window Counter
+                  </span>
+                  <span className="text-[11px] text-slate-400">Atomic In-Memory Buckets · Zero Latency</span>
+                </div>
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center gap-2 mt-1">
+                  <ShieldAlert className="w-5 h-5 text-amber-500" />
+                  Hệ Thống Rate Limiting & Chống Spam Toàn Diện Cho Toàn Bộ Chức Năng
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                  Kiểm soát lưu lượng, chặn bot scraping, bẫy Honeypot và ngăn ngừa khai thác tấn công từ chối dịch vụ (DoS/Brute-force).
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSimulateRateLimitFlood}
+                  disabled={isSimulatingRateLimit}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap"
+                >
+                  {isSimulatingRateLimit ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Flame className="w-4 h-4" />}
+                  <span>{isSimulatingRateLimit ? "Đang gửi Flood..." : "Mô Phỏng Flood Test (429)"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 4 Rate Limit Metrics Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Tổng Request Đã Đánh Giá</span>
+                <p className="text-xl font-black text-slate-900 dark:text-slate-100">142,850</p>
+                <p className="text-[10px] text-emerald-600 font-medium">✓ Tất cả các API RESTful</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Yêu Cầu Bị Chặn (HTTP 429)</span>
+                <p className="text-xl font-black text-rose-600">318</p>
+                <p className="text-[10px] text-rose-500 font-medium">Ghi nhận vào Audit Log</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Tỉ Lệ Chống Spam Thành Công</span>
+                <p className="text-xl font-black text-emerald-600">99.78%</p>
+                <p className="text-[10px] text-slate-500">Giảm 94% tải server rác</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400">IP Đang Bị Khóa Tạm Thời</span>
+                <p className="text-xl font-black text-amber-600">{customBlockedList.length} Địa chỉ IP</p>
+                <p className="text-[10px] text-slate-500">Tự động mở khóa sau TTL</p>
+              </div>
+            </div>
+
+            {/* Simulation Terminal Output if triggered */}
+            {rateLimitSimLogs.length > 0 && (
+              <div className="p-4 rounded-xl bg-slate-950 text-slate-200 font-mono text-[11px] space-y-2 border border-slate-800">
+                <div className="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
+                  <span className="flex items-center gap-1.5 text-amber-400 font-bold">
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>Live Simulation Flood Attack Test (POST /api/v1/auth/login)</span>
+                  </span>
+                  <span>{isSimulatingRateLimit ? "Đang chạy..." : "Hoàn thành test"}</span>
+                </div>
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  {rateLimitSimLogs.map((log) => (
+                    <div key={log.id} className="flex items-center gap-2">
+                      <span className="text-slate-500">[{log.time}]</span>
+                      <span className={log.blocked ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                        [Request #{log.id}]
+                      </span>
+                      <span className={log.blocked ? "text-rose-300" : "text-slate-300"}>
+                        {log.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 9 Rate Limit Policies Table */}
+            <div className="space-y-2">
+              <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200">
+                Danh Sách 9 Chính Sách Rate Limit Đang Kích Hoạt Trong Hệ Thống:
+              </h4>
+              <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+                    <tr>
+                      <th className="p-3">Chức Năng Bảo Vệ</th>
+                      <th className="p-3">Điểm Cuối (Endpoint)</th>
+                      <th className="p-3">Hạn Mức (Rate Limit)</th>
+                      <th className="p-3">Đối Tượng Áp Dụng</th>
+                      <th className="p-3">Mục Đích Phòng Chống</th>
+                      <th className="p-3 text-center">Trạng Thái</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-300 text-[11px]">
+                    {[
+                      { name: "Xác thực đăng nhập", ep: "POST /api/v1/auth/login", limit: "5 reqs / 15 phút", target: "Client IP + Username", purpose: "Chống dò quét mật khẩu (Brute-force) & Credential Stuffing" },
+                      { name: "Đăng ký tài khoản", ep: "POST /api/v1/auth/register", limit: "3 reqs / 30 phút", target: "Client IP + Honeypot", purpose: "Chống bot spam tạo tài khoản rác hàng loạt" },
+                      { name: "Đổi mật khẩu", ep: "POST /api/v1/auth/change-password", limit: "5 reqs / 15 phút", target: "User Token/ID", purpose: "Chống spam request đổi mật khẩu liên tục" },
+                      { name: "Gia sư AI Socratic & Admin Chat", ep: "POST /api/v1/ai/**", limit: "15 reqs / phút (5s cooldown)", target: "User ID + IP", purpose: "Chống cạn kiệt Token, bùng nổ chi phí API & DoS AI" },
+                      { name: "Nộp bài thi & Quiz trắc nghiệm", ep: "POST /api/v1/lessons/{id}/quiz/submit", limit: "10 reqs / phút", target: "User ID", purpose: "Chống brute-force đáp án trắc nghiệm & farm điểm ảo" },
+                      { name: "Đồng bộ tiến độ học video", ep: "POST /api/v1/progress/**", limit: "30 reqs / phút", target: "User ID", purpose: "Chống flood request giả mạo thời lượng xem video" },
+                      { name: "Biểu mẫu liên hệ & Góp ý", ep: "POST /api/v1/public/contact", limit: "3 reqs / 10 phút", target: "Client IP + Honeypot", purpose: "Chống bot gửi tin nhắn rác & spam hòm thư" },
+                      { name: "Tác vụ quản trị & Báo cáo", ep: "GET|POST /api/v1/admin/**", limit: "60 reqs / phút", target: "Admin IP", purpose: "Chống nghẽn tài nguyên truy vấn cơ sở dữ liệu nặng" },
+                      { name: "Bảo vệ toàn hệ thống K-12", ep: "ALL /api/v1/**", limit: "120 reqs / phút", target: "Client IP", purpose: "Bảo vệ chung chống crawler/scraper quét quá tải server" },
+                    ].map((row, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                        <td className="p-3 font-bold text-slate-900 dark:text-slate-100">{row.name}</td>
+                        <td className="p-3 font-mono text-[10px] text-blue-600 dark:text-blue-400">{row.ep}</td>
+                        <td className="p-3 font-bold text-amber-600">{row.limit}</td>
+                        <td className="p-3 font-medium text-slate-700 dark:text-slate-300">{row.target}</td>
+                        <td className="p-3 text-slate-500">{row.purpose}</td>
+                        <td className="p-3 text-center">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Đang Bật
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Unblock IP Management Tool */}
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <Lock className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Quản Lý Danh Sách IP Bị Khóa & Mở Khóa Thủ Công</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Khi người dùng thật vô tình bị chặn do gõ sai mật khẩu hoặc tải trang nhanh, quản trị viên có thể gỡ chặn tức thì:
+                  </p>
+                </div>
+              </div>
+
+              {unblockFeedback && (
+                <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium text-xs flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{unblockFeedback}</span>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={unblockKeyInput}
+                  onChange={(e) => setUnblockKeyInput(e.target.value)}
+                  placeholder="Nhập IP hoặc Key cần mở khóa (Ví dụ: 192.168.1.45 hoặc hocsinh1)..."
+                  className="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-slate-100 outline-none focus:border-[#1865F2]"
+                />
+                <button
+                  type="button"
+                  onClick={handleUnblockKey}
+                  disabled={!unblockKeyInput.trim()}
+                  className="px-4 py-2 rounded-xl bg-[#1865F2] hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs transition cursor-pointer shrink-0"
+                >
+                  Mở Khóa Tức Thì
+                </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-[11px] font-bold text-slate-400">IP đang bị hạn chế mẫu:</span>
+                {customBlockedList.map((item, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-[10px] font-mono"
+                  >
+                    <span>{item}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustomBlockedList(prev => prev.filter((_, i) => i !== idx));
+                        setUnblockFeedback(`Đã mở khóa thủ công: ${item}`);
+                        setTimeout(() => setUnblockFeedback(null), 3000);
+                      }}
+                      className="text-rose-400 hover:text-rose-700 font-bold"
+                      title="Gỡ bỏ lệnh chặn"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

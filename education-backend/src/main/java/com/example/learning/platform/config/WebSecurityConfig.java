@@ -22,6 +22,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.learning.platform.ratelimit.RateLimitingFilter;
+
 import java.util.List;
 
 @Configuration
@@ -29,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
+    private final RateLimitingFilter rateLimitingFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -59,6 +62,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/v1/auth/me", "/api/v1/auth/profile", "/api/v1/auth/change-password").authenticated()
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(rateLimitingFilter, JwtAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

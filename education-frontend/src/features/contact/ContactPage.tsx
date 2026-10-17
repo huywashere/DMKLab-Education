@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mail,
   Phone,
@@ -15,11 +15,14 @@ import {
   Sparkles,
   ChevronDown,
   User,
-  GraduationCap
+  GraduationCap,
+  ShieldCheck,
+  ShieldAlert
 } from "lucide-react";
 import { FaPhoneVolume, FaEnvelopeOpenText, FaLocationDot } from "react-icons/fa6";
 import { RiCustomerService2Fill, RiMailSendFill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
 import { TbHeadset, TbClockHour4 } from "react-icons/tb";
+import { api } from "@/lib/api";
 
 interface ContactPageProps {
   onBackToHome: () => void;
@@ -42,19 +45,55 @@ export const ContactPage: React.FC<ContactPageProps> = ({
     message: "",
   });
 
+  const [honeypot, setHoneypot] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [cooldownSec, setCooldownSec] = useState<number>(0);
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Rate-limiting countdown timer
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownSec]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setRateLimitError(null);
+
+    // 1. Kiểm tra Cooldown chống spam
+    if (cooldownSec > 0) {
+      setRateLimitError(`Chống spam: Vui lòng đợi ${cooldownSec} giây trước khi gửi tiếp.`);
+      return;
+    }
+
     setIsSubmitting(true);
-    
-    // Simulate API dispatch
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await api.submitContact({
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        role: formData.role,
+        grade: formData.grade,
+        subject: formData.subject,
+        message: formData.message.trim(),
+        honeypot: honeypot.trim(),
+      });
+
       setIsSubmitted(true);
-    }, 800);
+      setCooldownSec(120); // 2 phút cooldown giữa các lần gửi
+    } catch (err: any) {
+      setRateLimitError(err.message || "Gửi tin nhắn không thành công do vi phạm tốc độ (Rate Limit). Vui lòng thử lại sau.");
+      if (err.message && err.message.includes("429")) {
+        setCooldownSec(60);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const FAQS = [
@@ -370,16 +409,48 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     />
                   </div>
 
+                  {/* Anti-spam Honeypot Bot Trap */}
+                  <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+                    <label htmlFor="hp_contact_check">Bot Field</label>
+                    <input
+                      id="hp_contact_check"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Rate Limit Warning Banner */}
+                  {(rateLimitError || cooldownSec > 0) && (
+                    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+                      <div className="flex-1">
+                        {rateLimitError || (
+                          <span>
+                            Hệ thống bảo vệ chống spam đang hoạt động: Vui lòng đợi <strong>{cooldownSec} giây</strong> trước khi gửi yêu cầu tiếp theo.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3.5 px-6 rounded-xl bg-[#1865F2] text-white text-base font-bold hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={isSubmitting || cooldownSec > 0}
+                    className="w-full py-3.5 px-6 rounded-xl bg-[#1865F2] text-white text-base font-bold hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         <span>Đang gửi thông tin...</span>
+                      </>
+                    ) : cooldownSec > 0 ? (
+                      <>
+                        <Clock className="w-5 h-5 text-amber-300" />
+                        <span>Vui lòng chờ ({cooldownSec}s)...</span>
                       </>
                     ) : (
                       <>
@@ -388,6 +459,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       </>
                     )}
                   </button>
+
+                  {/* Anti-Spam Security Trust Badge */}
+                  <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium pt-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Hệ thống bảo vệ Rate Limiting chống spam (Tối đa 3 tin nhắn / 10 phút)</span>
+                  </div>
                 </form>
               )}
             </div>

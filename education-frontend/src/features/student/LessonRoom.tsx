@@ -50,13 +50,31 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const { isBookmarked, toggleBookmark, addNote, getNotesForLesson, deleteNote } = useBookmarks();
   const { subtitlesDefault } = useAccessibility();
   const [newNoteText, setNewNoteText] = useState("");
+  const [noteCooldownSec, setNoteCooldownSec] = useState<number>(0);
+  const [noteRateLimitAlert, setNoteRateLimitAlert] = useState<string | null>(null);
   const lessonNotes = getNotesForLesson(activeLesson.id);
+
+  useEffect(() => {
+    if (noteCooldownSec <= 0) return;
+    const interval = setInterval(() => {
+      setNoteCooldownSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [noteCooldownSec]);
 
   const handleSaveNote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNoteText.trim()) return;
+
+    if (noteCooldownSec > 0) {
+      setNoteRateLimitAlert(`Chống spam: Vui lòng đợi ${noteCooldownSec}s trước khi tạo ghi chú tiếp theo.`);
+      return;
+    }
+
     addNote(activeLesson.id, activeLesson.title, newNoteText.trim(), Math.floor(currentTime));
     setNewNoteText("");
+    setNoteCooldownSec(3); // 3s cooldown between notes
+    setNoteRateLimitAlert(null);
   };
 
   // Mốc thời gian chương học (Mục 8.3 PDF)
@@ -446,14 +464,24 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                         rows={2}
                         className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none focus:border-[#1865F2]"
                       />
-                      <div className="flex justify-end">
+                      {noteRateLimitAlert && (
+                        <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                          {noteRateLimitAlert}
+                        </p>
+                      )}
+                      <div className="flex justify-end items-center gap-2">
+                        {noteCooldownSec > 0 && (
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Chống spam: {noteCooldownSec}s
+                          </span>
+                        )}
                         <button
                           type="submit"
-                          disabled={!newNoteText.trim()}
+                          disabled={!newNoteText.trim() || noteCooldownSec > 0}
                           className="px-4 py-1.5 rounded-lg bg-[#1865F2] hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          <span>Lưu ghi chú này</span>
+                          <span>{noteCooldownSec > 0 ? `Chờ (${noteCooldownSec}s)` : "Lưu ghi chú này"}</span>
                         </button>
                       </div>
                     </form>

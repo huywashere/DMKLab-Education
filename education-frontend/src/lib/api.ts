@@ -160,6 +160,30 @@ export interface UploadUrlResponse {
   message: string;
 }
 
+export interface BackendRateLimitStats {
+  totalChecked: number;
+  totalThrottled: number;
+  currentlyTrackedBuckets: number;
+  activeBlockedCount: number;
+  activeBlockedDetails: {
+    key: string;
+    attempts: number;
+    limit: number;
+    remainingSeconds: number;
+  }[];
+}
+
+export interface ContactFormData {
+  fullName: string;
+  email: string;
+  phone?: string;
+  role?: string;
+  grade?: string;
+  subject?: string;
+  message: string;
+  honeypot?: string;
+}
+
 const apiCache = {
   grades: null as Grade[] | null,
   subjects: new Map<string, Subject[]>(),
@@ -200,7 +224,10 @@ export const api = {
       body: JSON.stringify({ usernameOrEmail, password }),
     });
 
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
+    if (res.status === 429) {
+      throw new Error(json.message || 'Hệ thống phát hiện quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút (HTTP 429).');
+    }
     if (!res.ok || !json.success) {
       throw new Error(json.message || 'Đăng nhập không thành công');
     }
@@ -237,7 +264,10 @@ export const api = {
       body: JSON.stringify(data),
     });
 
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
+    if (res.status === 429) {
+      throw new Error(json.message || 'Đã vượt quá giới hạn đăng ký tài khoản (Tối đa 3 tài khoản/30 phút). Vui lòng thử lại sau (HTTP 429).');
+    }
     if (!res.ok || !json.success) {
       throw new Error(json.message || 'Đăng ký không thành công');
     }
@@ -626,6 +656,46 @@ export const api = {
       throw new Error(json.message || 'Lỗi cấp URL ký');
     }
     return json.data;
+  },
+
+  async submitContact(data: ContactFormData): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/public/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (res.status === 429) {
+      throw new Error(json.message || 'Bạn đang gửi tin nhắn quá nhanh. Vui lòng thử lại sau vài phút (HTTP 429).');
+    }
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Gửi tin nhắn không thành công.');
+    }
+    return { success: true, message: json.data || json.message };
+  },
+
+  async getRateLimitStats(): Promise<BackendRateLimitStats | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/security/ratelimit-stats`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async unblockRateLimitKey(key: string): Promise<string> {
+    const res = await fetch(`${API_BASE}/admin/security/ratelimit/unblock?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Không thể mở khóa key');
+    }
+    return json.data || 'Đã mở khóa thành công';
   },
 };
 
