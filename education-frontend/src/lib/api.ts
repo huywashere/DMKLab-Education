@@ -77,12 +77,36 @@ export interface QuizSubmissionResult {
   }[];
 }
 
+export interface InteractiveQuizData {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+  points: number;
+}
+
+export interface CitationData {
+  title: string;
+  chapter: string;
+  sourceBook: string;
+  videoTime: string;
+  targetUrl?: string;
+}
+
 export interface SocraticChatResponse {
   sessionId: string;
   reply: string;
   dailyQuotaRemaining: number;
   suggestedAction?: string;
-  socraticHint?: boolean;
+  isSocraticHint?: boolean;
+  mode?: string;
+  gradeLevel?: number;
+  stepByStepHints?: string[];
+  interactiveQuiz?: InteractiveQuizData;
+  citations?: CitationData[];
+  misconceptionReason?: string;
+  safetyWarning?: string;
 }
 
 export interface AdminOverviewReport {
@@ -483,16 +507,33 @@ export const api = {
     return json.data;
   },
 
-  // AI Chatbots (Mục 9 & 9.1 PDF)
+  // AI Chatbots (Mục 9 & 9.1 PDF - Nâng cấp Gia sư AI đa chế độ)
   async sendLearningChat(
     message: string,
     lessonId?: string,
-    sessionId?: string
+    sessionId?: string,
+    options?: {
+      mode?: string;
+      gradeLevel?: number;
+      studentAnswer?: string;
+      contextLessonTitle?: string;
+      contextSubject?: string;
+    }
   ): Promise<SocraticChatResponse> {
+    const payload = {
+      message,
+      lessonId,
+      sessionId,
+      mode: options?.mode,
+      gradeLevel: options?.gradeLevel,
+      studentAnswer: options?.studentAnswer,
+      contextLessonTitle: options?.contextLessonTitle,
+      contextSubject: options?.contextSubject,
+    };
     const res = await fetch(`${API_BASE}/ai/learning/chat`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
-      body: JSON.stringify({ message, lessonId, sessionId }),
+      body: JSON.stringify(payload),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {

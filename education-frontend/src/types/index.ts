@@ -95,6 +95,26 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   isSocraticHint?: boolean;
+  mode?: 'SOCRATIC' | 'GRADE_ADAPTED' | 'PRACTICE' | 'ERROR_DIAGNOSIS' | 'CITE_LESSON';
+  gradeLevel?: number;
+  stepByStepHints?: string[];
+  interactiveQuiz?: {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+    points: number;
+  };
+  citations?: {
+    title: string;
+    chapter: string;
+    sourceBook: string;
+    videoTime: string;
+    targetUrl?: string;
+  }[];
+  misconceptionReason?: string;
+  safetyWarning?: string;
 }
 
 export interface MediaAsset {
