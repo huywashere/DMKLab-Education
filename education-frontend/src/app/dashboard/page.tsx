@@ -8,7 +8,6 @@ import { api } from "@/lib/api";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StudentDashboard } from "@/features/student/StudentDashboard";
-import { AdminDashboard } from "@/features/admin/AdminDashboard";
 import { SocraticChatbot } from "@/features/student/SocraticChatbot";
 import { 
   GraduationCap, 
@@ -67,7 +66,7 @@ export default function DedicatedDashboardPage() {
         activeView="dashboard"
         onChangeView={(v) => {
           if (v === 'student') window.location.href = '/';
-          else if (v === 'admin') setActiveRoleTab('ADMIN');
+          else if (v === 'admin') window.location.href = '/admin';
           else if (v === 'profile') window.location.href = '/';
         }}
         selectedGrade={selectedGrade}
@@ -152,36 +151,25 @@ export default function DedicatedDashboardPage() {
 
             <button
               onClick={() => {
-                setActiveRoleTab('ADMIN');
-                setCurrentUser(MOCK_USERS.admin);
+                window.location.href = '/admin';
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                activeRoleTab === 'ADMIN'
-                  ? 'bg-white text-[#1865F2] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+              title="Mở Cổng Quản Trị Hệ Thống Riêng Biệt (/admin)"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
-              <span>Quản Trị</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+              <span>Cổng Quản Trị (/admin) ↗</span>
             </button>
           </div>
         </div>
       </div>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeRoleTab === 'STUDENT' ? (
-          <StudentDashboard
-            currentUser={currentUser}
-            selectedGrade={selectedGrade}
-            onOpenLesson={handleOpenLesson}
-            onOpenAiChat={() => setIsAiChatOpen(true)}
-          />
-        ) : (
-          <AdminDashboard
-            currentUser={currentUser}
-            onExitAdmin={() => window.location.href = '/'}
-          />
-        )}
+        <StudentDashboard
+          currentUser={currentUser}
+          selectedGrade={selectedGrade}
+          onOpenLesson={handleOpenLesson}
+          onOpenAiChat={() => setIsAiChatOpen(true)}
+        />
       </main>
 
       <SocraticChatbot

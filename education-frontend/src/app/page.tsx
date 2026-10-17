@@ -35,10 +35,6 @@ const StudentDashboard = dynamic(
   () => import("@/features/student/StudentDashboard").then((m) => m.StudentDashboard),
   { loading: () => <ViewSkeleton /> }
 );
-const AdminDashboard = dynamic(
-  () => import("@/features/admin/AdminDashboard").then((m) => m.AdminDashboard),
-  { loading: () => <ViewSkeleton /> }
-);
 const LoginPage = dynamic(
   () => import("@/features/auth/LoginPage").then((m) => m.LoginPage),
   { loading: () => <ViewSkeleton /> }
@@ -206,7 +202,9 @@ export default function HomePage() {
             : 'student'
         }
         onChangeView={(v) => {
-          if (v === 'admin') setActiveView('admin');
+          if (v === 'admin') {
+            window.location.href = '/admin';
+          }
           else if (v === 'dashboard') setActiveView('dashboard');
           else if (v === 'login') setActiveView('login');
           else if (v === 'register') setActiveView('register');
@@ -325,14 +323,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {activeView === 'admin' && currentUser && (
-          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-            <AdminDashboard
-              currentUser={currentUser}
-              onExitAdmin={() => setActiveView('home')}
-            />
-          </div>
-        )}
       </main>
 
       <SocraticChatbot

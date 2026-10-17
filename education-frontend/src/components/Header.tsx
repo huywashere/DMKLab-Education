@@ -520,32 +520,28 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Dashboard Navigation Button - Subtle outline, not a harsh pill */}
               <button
                 onClick={() => {
-                  if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'TEACHER') {
-                    onChangeView(activeView === 'admin' ? 'student' : 'admin');
+                  if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') {
+                    window.location.href = '/admin';
                   } else {
                     onChangeView(activeView === 'dashboard' ? 'student' : 'dashboard');
                   }
                 }}
-                className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition border cursor-pointer whitespace-nowrap ${
-                  activeView === 'dashboard' || activeView === 'admin'
-                    ? 'bg-[#1865F2] text-white border-transparent'
-                    : 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
-                }`}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition border cursor-pointer whitespace-nowrap bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
                 title={
-                  activeView === 'dashboard' || activeView === 'admin'
-                    ? "Về Trang Chủ"
+                  currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                    ? "Mở Cổng Quản Trị Riêng Biệt (/admin)"
                     : currentUser.role === 'STUDENT'
                     ? "Bảng Điều Khiển"
-                    : "Cổng Quản Trị"
+                    : "Không Gian Giáo Viên"
                 }
               >
                 <RiDashboardFill className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span className="hidden xl:inline">
-                  {activeView === 'dashboard' || activeView === 'admin'
-                    ? "Trang Chủ"
+                  {currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                    ? "Cổng Quản Trị ↗"
                     : currentUser.role === 'STUDENT'
                     ? "Bảng Điều Khiển"
-                    : "Cổng Quản Trị"}
+                    : "Bảng Giáo Viên"}
                 </span>
               </button>
 
@@ -579,10 +575,10 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="py-1 space-y-0.5">
                       <button
                         onClick={() => {
-                          if (currentUser.role === 'STUDENT') {
-                            onChangeView('dashboard');
+                          if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') {
+                            window.location.href = '/admin';
                           } else {
-                            onChangeView('admin');
+                            onChangeView('dashboard');
                           }
                           setShowUserDropdown(false);
                         }}
@@ -590,7 +586,9 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <RiDashboardFill className="w-4 h-4 text-[#1865F2] dark:text-blue-400" />
                         <span>
-                          {currentUser.role === 'STUDENT' ? "Bảng Điều Khiển Cá Nhân" : "Bảng Quản Trị Hệ Thống"}
+                          {currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                            ? "Cổng Quản Trị Hệ Thống (/admin) ↗"
+                            : "Bảng Điều Khiển Cá Nhân"}
                         </span>
                       </button>
 

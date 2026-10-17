@@ -36,16 +36,29 @@ import {
   Check
 } from "lucide-react";
 
+export type AdminTabType = 'overview' | 'media' | 'curriculum' | 'rbac' | 'teacher' | 'parent' | 'audit' | 'ai';
+
 interface AdminDashboardProps {
   currentUser: User;
   onExitAdmin: () => void;
+  currentTab?: AdminTabType;
+  onTabChange?: (tab: AdminTabType) => void;
+  hideHeaderBanner?: boolean;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   currentUser,
   onExitAdmin,
+  currentTab,
+  onTabChange,
+  hideHeaderBanner = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'media' | 'curriculum' | 'rbac' | 'teacher' | 'parent' | 'audit' | 'ai'>('overview');
+  const [internalTab, setInternalTab] = useState<AdminTabType>('overview');
+  const activeTab = currentTab !== undefined ? currentTab : internalTab;
+  const setActiveTab = (t: AdminTabType) => {
+    setInternalTab(t);
+    if (onTabChange) onTabChange(t);
+  };
   
   // Live Backend Data States
   const [overview, setOverview] = useState<AdminOverviewReport | null>(null);
@@ -248,70 +261,73 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   return (
     <div className="space-y-6 pb-16">
-      {/* Top Banner Header */}
-      <div className="bg-[#0B2147] text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold bg-[#14BF96] text-white uppercase tracking-wider">
-              Cổng Quản Trị Hệ Thống (CMS)
-            </span>
-            <span className="text-xs text-slate-300">Modular Monolith Architecture · Spring Boot 3.3.4</span>
+      {/* Top Banner Header & Nav Tabs (Only show if not in standalone admin portal) */}
+      {!hideHeaderBanner && (
+        <>
+          <div className="bg-[#0B2147] text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-extrabold bg-[#14BF96] text-white uppercase tracking-wider">
+                  Cổng Quản Trị Hệ Thống (CMS)
+                </span>
+                <span className="text-xs text-slate-300">Modular Monolith Architecture · Spring Boot 3.3.4</span>
+              </div>
+              <h1 className="text-2xl font-extrabold tracking-tight mt-1">
+                Trung Tâm Vận Hành & Quản Lý K–12
+              </h1>
+              <p className="text-xs text-slate-300 mt-1">
+                Quản trị nội dung, media streaming HLS, phân quyền RBAC và kiểm soát chi phí AI.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start md:self-auto">
+              <button
+                onClick={loadDashboardData}
+                title="Làm mới dữ liệu từ Database"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
+              <button
+                onClick={onExitAdmin}
+                className="khan-btn-secondary text-xs cursor-pointer"
+              >
+                Quay lại giao diện Học sinh
+              </button>
+            </div>
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight mt-1">
-            Trung Tâm Vận Hành & Quản Lý K–12
-          </h1>
-          <p className="text-xs text-slate-300 mt-1">
-            Quản trị nội dung, media streaming HLS, phân quyền RBAC và kiểm soát chi phí AI.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2 self-start md:self-auto">
-          <button
-            onClick={loadDashboardData}
-            title="Làm mới dữ liệu từ Database"
-            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </button>
-          <button
-            onClick={onExitAdmin}
-            className="khan-btn-secondary text-xs cursor-pointer"
-          >
-            Quay lại giao diện Học sinh
-          </button>
-        </div>
-      </div>
-
-      {/* Admin Nav Tabs */}
-      <div className="flex overflow-x-auto gap-2 border-b border-slate-200 pb-2 no-scrollbar text-xs font-bold">
-        {[
-          { key: 'overview', label: 'Tổng Quan Hệ Thống', icon: Activity },
-          { key: 'media', label: 'Quản Lý Media & Video HLS', icon: Video },
-          { key: 'curriculum', label: 'Quản Lý Bài Học & Khóa Học', icon: BookOpen },
-          { key: 'rbac', label: 'Người Dùng & Phân Quyền', icon: Users },
-          { key: 'teacher', label: 'Không Gian Giáo Viên', icon: GraduationCap },
-          { key: 'parent', label: 'Cổng Phụ Huynh', icon: UserCheck },
-          { key: 'audit', label: 'Nhật Ký Kiểm Toán (Audit)', icon: ShieldCheck },
-          { key: 'ai', label: 'Trợ Lý AI Quản Trị', icon: Bot },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition cursor-pointer ${
-                isActive
-                  ? 'bg-[#0B2147] text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-              }`}
-            >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-[#14BF96]' : 'text-slate-400'}`} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+          <div className="flex overflow-x-auto gap-2 border-b border-slate-200 pb-2 no-scrollbar text-xs font-bold">
+            {[
+              { key: 'overview', label: 'Tổng Quan Hệ Thống', icon: Activity },
+              { key: 'media', label: 'Quản Lý Media & Video HLS', icon: Video },
+              { key: 'curriculum', label: 'Quản Lý Bài Học & Khóa Học', icon: BookOpen },
+              { key: 'rbac', label: 'Người Dùng & Phân Quyền', icon: Users },
+              { key: 'teacher', label: 'Không Gian Giáo Viên', icon: GraduationCap },
+              { key: 'parent', label: 'Cổng Phụ Huynh', icon: UserCheck },
+              { key: 'audit', label: 'Nhật Ký Kiểm Toán (Audit)', icon: ShieldCheck },
+              { key: 'ai', label: 'Trợ Lý AI Quản Trị', icon: Bot },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key as any)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition cursor-pointer ${
+                    isActive
+                      ? 'bg-[#0B2147] text-white shadow-sm'
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#14BF96]' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* 1. Tab Tổng Quan (Overview KPIs) */}
       {activeTab === 'overview' && (
