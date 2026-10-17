@@ -1,4 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
+
+.font-editorial {
+  font-family: "Newsreader", "Playfair Display", Georgia, Cambria, "Times New Roman", Times, serif;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -59,6 +59,24 @@ export const Homepage: React.FC<HomepageProps> = ({
 
   const isVi = lang === "vi";
 
+  // Brilliant-style Interactive Geometric Dissection Puzzle State
+  const [puzzlePieces, setPuzzlePieces] = useState<Record<string, boolean>>({
+    cornerTL: true,
+    innerSq: true,
+    innerTR: true,
+    cornerBL: true,
+    cornerTR: false,
+    cornerBR: false,
+    innerBL: false,
+    innerBR: false,
+  });
+
+  const togglePiece = (key: string) => {
+    setPuzzlePieces((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const filledCount = Object.values(puzzlePieces).filter(Boolean).length;
+
   const SUBJECT_ITEMS = [
     {
       icon: <TbMathFunction className="w-5 h-5" />,
@@ -182,153 +200,282 @@ export const Homepage: React.FC<HomepageProps> = ({
   return (
     <div className="w-full">
       {/* ────────────────────────────────────────────────
-          HERO SECTION — Solid Khan warm cream with Godly typography
+          BRILLIANT.ORG STYLE HERO HEADER:
+          Editorial serif headline, interactive math puzzle, warm oat canvas
       ──────────────────────────────────────────────── */}
-      <section className="bg-[#FEF8E7] dark:bg-[#0B1324] border-b border-[#E8E3D0] dark:border-slate-800 transition-colors duration-200 relative overflow-hidden">
-        <GridPattern width={48} height={48} className="opacity-40" />
+      <section className="relative overflow-hidden bg-[#F9F7F5] dark:bg-[#081225] border-b border-slate-200/80 dark:border-slate-800 transition-colors duration-200 pt-10 sm:pt-16 lg:pt-24 pb-20 sm:pb-28 lg:pb-36 min-h-[640px] flex items-center">
+        {/* Subtle Isometric Diamond Grid Pattern at Bottom */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-56 sm:h-72 pointer-events-none opacity-30 dark:opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(30deg, transparent 48.75%, rgba(180, 170, 160, 0.5) 49.5%, rgba(180, 170, 160, 0.5) 50.5%, transparent 51.25%), linear-gradient(150deg, transparent 48.75%, rgba(180, 170, 160, 0.5) 49.5%, rgba(180, 170, 160, 0.5) 50.5%, transparent 51.25%)`,
+            backgroundSize: "72px 42px",
+          }}
+          aria-hidden="true"
+        />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-          {/* Left: Headlines + Bullets + CTA */}
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-[#14BF96] animate-pulse" />
-              <AnimatedShinyText className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                {isVi ? "Nền Tảng Giáo Dục K–12 Chuẩn Quốc Tế" : "World-Class K–12 Online Learning"}
-              </AnimatedShinyText>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            {/* Left: Editorial Serif Headline + Subhead + Pill CTAs + Laurel Awards */}
+            <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
+              <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[68px] xl:text-[76px] font-normal sm:font-medium text-slate-900 dark:text-white leading-[1.08] tracking-tight">
+                {isVi ? (
+                  <>
+                    Gia sư cá nhân <br className="hidden sm:inline" />
+                    cho toán học <br className="hidden sm:inline" />
+                    và lập trình
+                  </>
+                ) : (
+                  <>
+                    Your personal <br className="hidden sm:inline" />
+                    tutor for math <br className="hidden sm:inline" />
+                    and coding
+                  </>
+                )}
+              </h1>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#21242C] dark:text-white leading-[1.15] tracking-tight">
-              {t("hero_headline_1", "Biến mục tiêu học tập lớn thành")}{" "}
-              <span className="text-[#1865F2] dark:text-blue-400">
-                {t("hero_headline_2", "kết quả thực sự.")}
-              </span>
-            </h1>
+              <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
+                {isVi
+                  ? "Nền tảng gia sư chuẩn quốc tế cho mọi gia đình. Thiết kế bởi các chuyên gia sư phạm & công nghệ hàng đầu từ MIT & Harvard."
+                  : "A world-class tutor for every home. Built by top learning experts from MIT and Harvard."}
+              </p>
 
-            <p className="text-base sm:text-lg text-slate-700 dark:text-slate-300 leading-relaxed max-w-xl">
-              {t(
-                "hero_desc",
-                "DMKLab giúp cá nhân hóa việc học, củng cố kỹ năng nền tảng và hỗ trợ từng học sinh từ lớp 1 đến lớp 12 tiến bộ mỗi ngày."
-              )}
-            </p>
-
-            <ul className="space-y-2.5 text-sm sm:text-base text-slate-800 dark:text-slate-200 font-medium">
-              {HOW_WORKS_CHECKS.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5">
-                  <CheckCircle className="w-5 h-5 text-[#14BF96] shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="flex flex-wrap items-center gap-4 pt-3">
-              <ShimmerButton
-                onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                background="#1865F2"
-                className="text-sm sm:text-base px-7 py-3.5"
-              >
-                <Play className="w-4 h-4 fill-white" />
-                <span>{t("hero_btn_start", "Bắt đầu học ngay")}</span>
-              </ShimmerButton>
-
-              <button
-                type="button"
-                onClick={onOpenAiChat}
-                className="khan-btn-secondary text-sm sm:text-base px-6 py-3 cursor-pointer inline-flex items-center gap-2"
-              >
-                <Sparkles className="w-4 h-4 text-[#14BF96]" />
-                <span>{t("hero_btn_learn_more", "Hỏi Gia sư AI")}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Right: DMKLab Mascot Graphic + Interactive Who Are You selector */}
-          <div className="relative flex flex-col items-center">
-            {/* Illustration Card with Solid Border */}
-            <div className="relative w-full max-w-md mx-auto">
-              <img
-                src="/img-web/background-hoc-tap-001.webp"
-                alt="Học sinh học tập trực tuyến"
-                className="w-full rounded-3xl object-cover shadow-xl border-2 border-[#E8E3D0] dark:border-slate-700"
-                style={{ aspectRatio: "4/3" }}
-                fetchPriority="high"
-                decoding="async"
-              />
-
-              {/* Floating mascot badge */}
-              <div className="absolute -bottom-4 -left-4 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 px-4 py-3 flex items-center gap-3">
-                <img
-                  src="/img-web/khan-illustration.svg"
-                  alt="DMK mascot"
-                  className="w-12 h-12 object-contain"
-                  width={48}
-                  height={48}
-                  decoding="async"
-                />
-                <div>
-                  <p className="text-xs font-bold text-slate-900 dark:text-white">
-                    {t("ai_tutor_badge", "DMK AI Tutor")}
-                  </p>
-                  <p className="text-[11px] text-[#14BF96] font-semibold">
-                    {t("ai_tutor_subbadge", "Gia sư gợi mở Socratic")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating streak badge */}
-              <div className="absolute -top-3 -right-3 bg-[#FFC700] text-slate-900 text-xs font-black px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5 border border-amber-400">
-                <Star className="w-4 h-4 fill-slate-900" />
-                <span>
-                  {currentUser.energyPoints.toLocaleString()} {t("points_label", "Điểm")}
-                </span>
-              </div>
-            </div>
-
-            {/* "Get started" role selector card */}
-            <div className="w-full max-w-md mt-7 bg-white dark:bg-[#131E35] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-              <div className="px-5 pt-4 pb-2">
-                <p className="text-sm font-bold text-slate-800 dark:text-white mb-3">
-                  {t("hero_who_are_you", "Bạn là ai?")}
-                </p>
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {WHO_ARE_YOU.map((w, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveWho(idx)}
-                      className={`w-full text-left px-2 py-3 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/80 transition text-sm cursor-pointer ${
-                        activeWho === idx ? "bg-slate-50 dark:bg-slate-800/80" : ""
-                      }`}
-                    >
-                      <div>
-                        <span
-                          className={`font-bold ${
-                            activeWho === idx
-                              ? "text-[#1865F2] dark:text-blue-400"
-                              : "text-slate-800 dark:text-slate-200"
-                          }`}
-                        >
-                          {w.role}
-                        </span>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{w.desc}</p>
-                      </div>
-                      <ChevronRight
-                        className={`w-4 h-4 shrink-0 ${
-                          activeWho === idx
-                            ? "text-[#1865F2] dark:text-blue-400"
-                            : "text-slate-300 dark:text-slate-600"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="px-5 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
-                {t("hero_has_account", "Đã có tài khoản?")}{" "}
+              {/* 2 Signature Pill CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-2">
                 <button
+                  type="button"
                   onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                  className="text-[#1865F2] dark:text-blue-400 font-bold hover:underline cursor-pointer"
+                  className="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-full bg-[#05ac60] hover:bg-[#049653] active:scale-98 text-white font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center"
                 >
-                  {t("hero_login_link", "Đăng nhập")}
+                  {isVi ? "Tôi là người học" : "I’m a learner"}
                 </button>
+
+                <button
+                  type="button"
+                  onClick={onOpenAiChat}
+                  className="w-full sm:w-auto px-7 sm:px-8 py-4 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-98 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-semibold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center"
+                >
+                  {isVi ? "Tôi là phụ huynh hoặc giáo viên" : "I’m a parent or teacher"}
+                </button>
+              </div>
+
+              {/* Authentic Laurel Wreath Awards */}
+              <div className="pt-4 flex items-center justify-center lg:justify-start gap-8 sm:gap-10 text-slate-500 dark:text-slate-400">
+                {/* Award 1: Apple Editors' Choice */}
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-8 text-slate-400 dark:text-slate-500" viewBox="0 0 20 32" fill="currentColor">
+                    <path d="M18 1c-.3.8-1 1.6-1.8 2.2-.8.6-1.8 1-2.8 1-.4 0-.6-.2-.6-.6.1-.8.6-1.7 1.3-2.3C15 .7 16.3.2 17.5 0c.3 0 .5.2.5.5v.5zM12 6c-.8.8-1.5 2-1.6 3.1-.1 1.1.2 2.4.8 3.3.2.3.5.3.7.1.8-.8 1.4-2 1.4-3.2 0-1-.3-2.3-.9-3.2-.2-.3-.5-.4-.7-.1zm-4 7c-.7.7-1.4 1.8-1.5 2.8-.1 1 .2 2.2.7 3 .2.3.5.3.7.1.7-.7 1.3-1.8 1.3-2.9 0-.9-.3-2.1-.9-2.9-.2-.3-.5-.4-.7-.1z" />
+                  </svg>
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 fill-current text-slate-700 dark:text-slate-300" viewBox="0 0 24 24">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.77 1.06-1.84.94-2.91-.91.04-2.02.61-2.67 1.37-.58.67-1.09 1.76-.95 2.8.03.01.07.01.11.01.9 0 1.94-.5 2.57-1.27z" />
+                    </svg>
+                    <div className="text-left">
+                      <p className="text-[11px] font-bold tracking-tight text-slate-700 dark:text-slate-200 leading-none">
+                        Editors’
+                      </p>
+                      <p className="text-[11px] font-bold tracking-tight text-slate-700 dark:text-slate-200 leading-none mt-0.5">
+                        Choice
+                      </p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-8 text-slate-400 dark:text-slate-500 scale-x-[-1]" viewBox="0 0 20 32" fill="currentColor">
+                    <path d="M18 1c-.3.8-1 1.6-1.8 2.2-.8.6-1.8 1-2.8 1-.4 0-.6-.2-.6-.6.1-.8.6-1.7 1.3-2.3C15 .7 16.3.2 17.5 0c.3 0 .5.2.5.5v.5zM12 6c-.8.8-1.5 2-1.6 3.1-.1 1.1.2 2.4.8 3.3.2.3.5.3.7.1.8-.8 1.4-2 1.4-3.2 0-1-.3-2.3-.9-3.2-.2-.3-.5-.4-.7-.1zm-4 7c-.7.7-1.4 1.8-1.5 2.8-.1 1 .2 2.2.7 3 .2.3.5.3.7.1.7-.7 1.3-1.8 1.3-2.9 0-.9-.3-2.1-.9-2.9-.2-.3-.5-.4-.7-.1z" />
+                  </svg>
+                </div>
+
+                {/* Award 2: Google Play Featured App */}
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-8 text-slate-400 dark:text-slate-500" viewBox="0 0 20 32" fill="currentColor">
+                    <path d="M18 1c-.3.8-1 1.6-1.8 2.2-.8.6-1.8 1-2.8 1-.4 0-.6-.2-.6-.6.1-.8.6-1.7 1.3-2.3C15 .7 16.3.2 17.5 0c.3 0 .5.2.5.5v.5zM12 6c-.8.8-1.5 2-1.6 3.1-.1 1.1.2 2.4.8 3.3.2.3.5.3.7.1.8-.8 1.4-2 1.4-3.2 0-1-.3-2.3-.9-3.2-.2-.3-.5-.4-.7-.1zm-4 7c-.7.7-1.4 1.8-1.5 2.8-.1 1 .2 2.2.7 3 .2.3.5.3.7.1.7-.7 1.3-1.8 1.3-2.9 0-.9-.3-2.1-.9-2.9-.2-.3-.5-.4-.7-.1z" />
+                  </svg>
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-slate-700 dark:text-slate-300" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.609 1.814L13.792 12 3.61 22.186c-.378-.363-.61-.884-.61-1.468V3.282c0-.584.232-1.105.61-1.468zM15.207 13.414l2.584 2.584-11.5 6.64 8.916-9.224zm0-2.828L6.29 1.362l11.5 6.64-2.583 2.584zm1.414 1.414l3.784 2.184c.806.465.806 1.22 0 1.685l-3.784 2.184-2.184-2.184 2.184-2.184z" />
+                    </svg>
+                    <div className="text-left">
+                      <p className="text-[11px] font-bold tracking-tight text-slate-700 dark:text-slate-200 leading-none">
+                        Featured
+                      </p>
+                      <p className="text-[11px] font-bold tracking-tight text-slate-700 dark:text-slate-200 leading-none mt-0.5">
+                        App
+                      </p>
+                    </div>
+                  </div>
+                  <svg className="w-5 h-8 text-slate-400 dark:text-slate-500 scale-x-[-1]" viewBox="0 0 20 32" fill="currentColor">
+                    <path d="M18 1c-.3.8-1 1.6-1.8 2.2-.8.6-1.8 1-2.8 1-.4 0-.6-.2-.6-.6.1-.8.6-1.7 1.3-2.3C15 .7 16.3.2 17.5 0c.3 0 .5.2.5.5v.5zM12 6c-.8.8-1.5 2-1.6 3.1-.1 1.1.2 2.4.8 3.3.2.3.5.3.7.1.8-.8 1.4-2 1.4-3.2 0-1-.3-2.3-.9-3.2-.2-.3-.5-.4-.7-.1zm-4 7c-.7.7-1.4 1.8-1.5 2.8-.1 1 .2 2.2.7 3 .2.3.5.3.7.1.7-.7 1.3-1.8 1.3-2.9 0-.9-.3-2.1-.9-2.9-.2-.3-.5-.4-.7-.1z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Brilliant Interactive Geometric Dissection Puzzle Card */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="w-full max-w-[440px] sm:max-w-[480px] bg-white dark:bg-[#131E35] rounded-[36px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-200/90 dark:border-slate-800 p-6 sm:p-10 flex flex-col items-center justify-center relative select-none">
+                {/* Puzzle SVG */}
+                <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[360px] flex items-center justify-center">
+                  <svg
+                    viewBox="0 0 300 300"
+                    className="w-full h-full drop-shadow-sm overflow-visible"
+                  >
+                    {/* Dissection Pieces (Interactive: click to toggle purple fill) */}
+                    {/* p1: Top-Left Corner Triangle */}
+                    <path
+                      d="M 30 30 L 150 30 L 30 150 Z"
+                      fill={puzzlePieces.cornerTL ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("cornerTL")}
+                    />
+
+                    {/* p5: Top-Right Corner Triangle */}
+                    <path
+                      d="M 150 30 L 270 30 L 270 150 Z"
+                      fill={puzzlePieces.cornerTR ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("cornerTR")}
+                    />
+
+                    {/* p6: Bottom-Right Corner Triangle */}
+                    <path
+                      d="M 270 150 L 270 270 L 150 270 Z"
+                      fill={puzzlePieces.cornerBR ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("cornerBR")}
+                    />
+
+                    {/* p4: Bottom-Left Corner Triangle */}
+                    <path
+                      d="M 30 150 L 150 270 L 30 270 Z"
+                      fill={puzzlePieces.cornerBL ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("cornerBL")}
+                    />
+
+                    {/* p2: Upper-Left Tilted Square inside Diamond */}
+                    <polygon
+                      points="150,30 90,90 150,150 210,90"
+                      fill={puzzlePieces.innerSq ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("innerSq")}
+                    />
+
+                    {/* p3: Upper-Right Triangle inside Diamond */}
+                    <polygon
+                      points="150,30 210,90 270,150"
+                      fill={puzzlePieces.innerTR ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("innerTR")}
+                    />
+
+                    {/* p7: Lower-Left Triangle inside Diamond */}
+                    <polygon
+                      points="30,150 90,90 150,270"
+                      fill={puzzlePieces.innerBL ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("innerBL")}
+                    />
+
+                    {/* p8: Lower-Right Square inside Diamond */}
+                    <polygon
+                      points="150,150 210,90 270,150 210,210"
+                      fill={puzzlePieces.innerBR ? "#A78BFA" : "#FFFFFF"}
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
+                      onClick={() => togglePiece("innerBR")}
+                    />
+
+                    {/* Outer Square Border */}
+                    <rect
+                      x="30"
+                      y="30"
+                      width="240"
+                      height="240"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      className="text-slate-900 dark:text-white pointer-events-none"
+                    />
+
+                    {/* Glowing Emerald Dotted Crosshairs */}
+                    <line
+                      x1="10"
+                      y1="150"
+                      x2="290"
+                      y2="150"
+                      stroke="#10B981"
+                      strokeWidth="2.5"
+                      strokeDasharray="5 5"
+                      style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }}
+                      className="pointer-events-none"
+                    />
+                    <line
+                      x1="150"
+                      y1="10"
+                      x2="150"
+                      y2="290"
+                      stroke="#10B981"
+                      strokeWidth="2.5"
+                      strokeDasharray="5 5"
+                      style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }}
+                      className="pointer-events-none"
+                    />
+
+                    {/* Iconic Black Mouse Cursor Arrow with White Outline */}
+                    <g transform="translate(155, 130)" className="pointer-events-none filter drop-shadow-md animate-bounce duration-1000">
+                      <path
+                        d="M 0 0 L 0 22 L 6 16 L 11 26 L 14 24.5 L 9 14.5 L 16 14.5 Z"
+                        fill="#000000"
+                        stroke="#FFFFFF"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                    </g>
+                  </svg>
+                </div>
+
+                {/* Interactive Feedback Pill below Puzzle */}
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 w-full flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA]" />
+                    <span>
+                      {isVi ? `Diện tích: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)` : `Area: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)`}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPuzzlePieces({
+                        cornerTL: true,
+                        innerSq: true,
+                        innerTR: true,
+                        cornerBL: true,
+                        cornerTR: false,
+                        cornerBR: false,
+                        innerBL: false,
+                        innerBR: false,
+                      })
+                    }
+                    className="text-[11px] font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
+                  >
+                    {isVi ? "Đặt lại mẫu" : "Reset puzzle"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

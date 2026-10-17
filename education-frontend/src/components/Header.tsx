@@ -211,22 +211,22 @@ export const Header: React.FC<HeaderProps> = ({
         );
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 shadow-2xs transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        {/* Left: Shadcnblocks Brand Logo + Nav Links & Rich Dropdowns */}
+    <header className="sticky top-2 sm:top-3.5 z-50 px-3 sm:px-6 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto rounded-full bg-white/95 dark:bg-[#0B172E]/95 border border-slate-200/90 dark:border-slate-800 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.06)] px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
+        {/* Left: Brand Logo + Nav Links & Rich Dropdowns */}
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
           {/* Mobile Drawer Trigger (Only on < lg screens) */}
           <button
             type="button"
             onClick={() => setMobileDrawerOpen(true)}
-            className="lg:hidden p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="lg:hidden p-1.5 rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title="Mở menu"
             aria-label="Mở menu điều hướng"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Shadcnblocks Brand Identity: Isometric 3D Block + Text */}
+          {/* Brilliant-style Minimalist Brand Identity */}
           <button
             type="button"
             onClick={() => {
@@ -236,30 +236,15 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2.5 group cursor-pointer shrink-0"
             title="DMKLab Education - Về Trang Chủ"
           >
-            {/* Signature Isometric 3D Cube Icon with Striped Face */}
-            <div className="w-8 h-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center transition-transform group-hover:scale-105 shadow-xs">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2L21 7.2V16.8L12 22L3 16.8V7.2L12 2Z"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                />
-                <path d="M12 22V12" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M21 7.2L12 12L3 7.2" stroke="currentColor" strokeWidth="1.8" />
-                <line x1="6.5" y1="10" x2="6.5" y2="14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                <line x1="9.5" y1="11.5" x2="9.5" y2="16.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            <div className="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center transition-transform group-hover:scale-105 shadow-xs">
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
 
-            <div className="flex flex-col text-left">
-              <div className="flex items-center gap-1 leading-none">
-                <span className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
-                  DMKLab<span className="text-[#1865F2]">blocks</span>.edu
-                </span>
-              </div>
-              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider uppercase mt-0.5">
-                K–12 Education Platform
+            <div className="flex items-center">
+              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                DMK<span className="text-[#05ac60]">Lab</span>
               </span>
             </div>
           </button>
@@ -1092,17 +1077,15 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={onOpenLogin}
-                className="px-3.5 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 bg-slate-100 hover:bg-slate-200 dark:bg-[#1E293B] dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg shadow-2xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
+                className="px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-full shadow-2xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
               >
-                <LogIn className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
-                <span>{t("nav_login", "Đăng nhập")}</span>
+                <span>{lang === "en" ? "Sign in" : "Đăng nhập"}</span>
               </button>
               <button
                 onClick={onOpenRegister}
-                className="px-3.5 py-1.5 text-xs font-bold bg-[#1865F2] hover:bg-[#0B4ED7] text-white border border-[#1865F2] rounded-lg shadow-xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
+                className="px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold bg-[#05ac60] hover:bg-[#049653] text-white rounded-full shadow-xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
               >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>{t("nav_register", "Đăng ký")}</span>
+                <span>{lang === "en" ? "Get started" : "Bắt đầu"}</span>
               </button>
             </div>
           )}
