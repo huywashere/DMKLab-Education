@@ -7,11 +7,11 @@ import {
   Send, 
   Sparkles, 
   Lightbulb, 
-  Bot, 
   User as UserIcon,
-  ShieldCheck,
-  RotateCcw
+  Minus
 } from "lucide-react";
+import { RiSparklingFill, RiRobot2Fill } from "react-icons/ri";
+import { FaShieldHalved } from "react-icons/fa6";
 
 import { api } from "@/lib/api";
 
@@ -19,12 +19,14 @@ interface SocraticChatbotProps {
   currentUser: User;
   isOpen: boolean;
   onClose: () => void;
+  onOpen?: () => void;
 }
 
 export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   currentUser,
   isOpen,
   onClose,
+  onOpen,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -45,8 +47,6 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
-
-  if (!isOpen) return null;
 
   const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
@@ -117,44 +117,75 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     "Mẫu số chung nhỏ nhất của 3 và 4 là gì?",
   ];
 
+  // If chatbot is closed, render floating trigger button at bottom-right corner
+  if (!isOpen) {
+    if (!onOpen) return null;
+    return (
+      <button
+        onClick={onOpen}
+        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1865F2] to-[#14BF96] text-white shadow-2xl hover:shadow-[#1865F2]/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-white/20"
+        title="Trò chuyện với Gia Sư AI Socratic"
+        aria-label="Mở gia sư AI DMKLab"
+      >
+        <div className="relative">
+          <RiSparklingFill className="w-5 h-5 text-white animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-300 rounded-full ring-2 ring-white animate-ping" />
+        </div>
+        <span className="font-extrabold text-xs sm:text-sm tracking-wide">DMK AI Tutor</span>
+        <span className="hidden sm:inline-block text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-bold">24/7</span>
+      </button>
+    );
+  }
+
+  // If chatbot is open, render floating chatbox at bottom-right corner
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-96 md:w-[420px] bg-white shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-300">
+    <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[410px] md:w-[440px] h-[600px] max-h-[calc(100vh-5rem)] bg-white dark:bg-[#0F172A] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
       {/* Header */}
-      <div className="bg-[#0B2147] text-white p-4 flex items-center justify-between shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#14BF96] flex items-center justify-center text-white shadow-inner">
-            <Sparkles className="w-4 h-4" />
+      <div className="bg-gradient-to-r from-[#0B2147] via-[#102A54] to-[#0D3B66] text-white p-3.5 sm:p-4 flex items-center justify-between shadow-md shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shadow-sm shrink-0">
+            <RiSparklingFill className="w-4 h-4 text-white" />
           </div>
           <div>
             <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
               <span>Gia Sư AI Học Tập</span>
-              <span className="text-[10px] bg-[#14BF96] px-1.5 py-0.5 rounded font-extrabold">Socratic</span>
+              <span className="text-[10px] bg-[#14BF96] px-1.5 py-0.5 rounded-full font-black text-white">Socratic</span>
             </h3>
-            <p className="text-[11px] text-slate-300 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>Bảo vệ trẻ em · Gợi mở tư duy</span>
+            <p className="text-[10px] sm:text-[11px] text-slate-300 flex items-center gap-1 mt-0.5">
+              <FaShieldHalved className="w-2.5 h-2.5 text-emerald-400" />
+              <span>Bảo vệ học sinh K-12 · Gợi mở tư duy</span>
             </p>
           </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            title="Thu nhỏ"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            title="Đóng chatbox"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Quota Banner (Mục 9.1 & 9.3 trong PDF) */}
-      <div className="bg-slate-100 px-4 py-2 text-xs text-slate-600 flex items-center justify-between border-b border-slate-200">
+      {/* Quota Banner */}
+      <div className="bg-slate-100 dark:bg-slate-800/80 px-4 py-2 text-xs text-slate-600 dark:text-slate-300 flex items-center justify-between border-b border-slate-200 dark:border-slate-700 shrink-0">
         <span className="font-medium">Hạn mức AI hôm nay:</span>
-        <span className="font-bold text-slate-800">
+        <span className="font-bold text-[#1865F2] dark:text-blue-400">
           {usedQuota}/{maxQuota} câu hỏi ({maxQuota - usedQuota} câu còn lại)
         </span>
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+      <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3.5 bg-slate-50/60 dark:bg-[#070D18]/60">
         {messages.map((m) => {
           const isBot = m.role === "assistant";
           return (
@@ -163,27 +194,27 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               className={`flex gap-2.5 ${isBot ? "items-start" : "items-end justify-end"}`}
             >
               {isBot && (
-                <div className="w-7 h-7 rounded-full bg-[#14BF96] flex items-center justify-center text-white shrink-0 mt-0.5">
-                  <Bot className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-xs">
+                  <RiRobot2Fill className="w-4 h-4" />
                 </div>
               )}
 
               <div
-                className={`max-w-[82%] p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
+                className={`max-w-[85%] p-3 sm:p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   isBot
-                    ? "bg-white border border-slate-200 text-slate-800 shadow-sm rounded-tl-sm"
-                    : "bg-[#14BF96] text-white font-medium rounded-tr-sm shadow-sm"
+                    ? "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-xs rounded-tl-xs"
+                    : "bg-[#1865F2] text-white font-medium rounded-tr-xs shadow-xs"
                 }`}
               >
                 <p>{m.content}</p>
-                <span className={`block text-[10px] mt-1 text-right ${isBot ? "text-slate-400" : "text-emerald-100"}`}>
+                <span className={`block text-[10px] mt-1 text-right ${isBot ? "text-slate-400 dark:text-slate-500" : "text-blue-100"}`}>
                   {m.timestamp}
                 </span>
               </div>
 
               {!isBot && (
-                <div className="w-7 h-7 rounded-full bg-[#0B2147] flex items-center justify-center text-white shrink-0 mb-0.5">
-                  <UserIcon className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full bg-[#0B2147] dark:bg-slate-700 flex items-center justify-center text-white shrink-0 mb-0.5 shadow-xs">
+                  <UserIcon className="w-3.5 h-3.5" />
                 </div>
               )}
             </div>
@@ -192,13 +223,13 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
         {isTyping && (
           <div className="flex gap-2.5 items-start">
-            <div className="w-7 h-7 rounded-full bg-[#14BF96] flex items-center justify-center text-white shrink-0">
-              <Bot className="w-4 h-4" />
+            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 shadow-xs">
+              <RiRobot2Fill className="w-4 h-4" />
             </div>
-            <div className="bg-white border border-slate-200 p-3 rounded-2xl text-xs text-slate-500 shadow-sm flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#14BF96] animate-bounce" />
-              <span className="w-2 h-2 rounded-full bg-[#14BF96] animate-bounce [animation-delay:0.2s]" />
-              <span className="w-2 h-2 rounded-full bg-[#14BF96] animate-bounce [animation-delay:0.4s]" />
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce" />
+              <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.2s]" />
+              <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.4s]" />
               <span className="ml-1 text-[11px]">Gia sư AI đang suy nghĩ gợi ý...</span>
             </div>
           </div>
@@ -207,12 +238,12 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       </div>
 
       {/* Suggested Prompt Pills */}
-      <div className="p-2.5 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="p-2.5 bg-white dark:bg-[#0F172A] border-t border-slate-100 dark:border-slate-800 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
         {samplePrompts.map((p, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(p)}
-            className="text-[11px] whitespace-nowrap bg-slate-100 hover:bg-[#14BF96]/15 hover:text-[#0B2147] text-slate-600 px-2.5 py-1 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0"
+            className="text-[11px] whitespace-nowrap bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-[#1865F2] dark:hover:text-blue-400 px-3 py-1 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0 border border-slate-200/60 dark:border-slate-700"
           >
             <Lightbulb className="w-3 h-3 text-amber-500" />
             <span>{p}</span>
@@ -221,7 +252,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       </div>
 
       {/* Input Form */}
-      <div className="p-3 bg-white border-t border-slate-200">
+      <div className="p-3 bg-white dark:bg-[#0F172A] border-t border-slate-200 dark:border-slate-800 shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -234,17 +265,18 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Hỏi gia sư AI về bài học..."
-            className="flex-1 bg-slate-100 text-slate-900 placeholder-slate-400 text-xs sm:text-sm rounded-xl px-3.5 py-2.5 border border-transparent focus:bg-white focus:border-[#14BF96] focus:outline-none transition"
+            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm rounded-xl px-3.5 py-2.5 border border-transparent focus:bg-white dark:focus:bg-slate-750 focus:border-[#1865F2] focus:outline-none transition"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="w-10 h-10 rounded-xl bg-[#14BF96] hover:bg-[#12AB86] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0"
+            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1557D0] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0"
+            title="Gửi câu hỏi"
           >
             <Send className="w-4 h-4" />
           </button>
         </form>
-        <p className="text-[10px] text-slate-400 text-center mt-1.5">
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-1.5">
           AI được kiểm duyệt an toàn K-12. Không chia sẻ thông tin cá nhân.
         </p>
       </div>

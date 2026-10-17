@@ -188,6 +188,7 @@ export default function DedicatedDashboardPage() {
         currentUser={currentUser}
         isOpen={isAiChatOpen}
         onClose={() => setIsAiChatOpen(false)}
+        onOpen={() => setIsAiChatOpen(true)}
       />
 
       <Footer />

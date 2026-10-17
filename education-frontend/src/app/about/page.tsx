@@ -58,6 +58,7 @@ export default function DedicatedAboutPage() {
         currentUser={currentUser || MOCK_USERS.student}
         isOpen={isAiChatOpen}
         onClose={() => setIsAiChatOpen(false)}
+        onOpen={() => setIsAiChatOpen(true)}
       />
 
       <Footer
