@@ -3,21 +3,21 @@
 import React from "react";
 import {
   Sparkles,
-  Target,
-  Lightbulb,
-  ShieldCheck,
-  Users,
-  GraduationCap,
   BookOpen,
-  Cpu,
   Award,
   CheckCircle2,
-  ArrowRight,
-  Heart,
+  Users,
 } from "lucide-react";
 import { FaLightbulb, FaShieldHalved } from "react-icons/fa6";
 import { TbTargetArrow } from "react-icons/tb";
 import { RiRobot2Fill } from "react-icons/ri";
+import {
+  NumberTicker,
+  SpotlightCard,
+  ShimmerButton,
+  GridPattern,
+  AnimatedShinyText,
+} from "@/components/ui";
 
 interface AboutPageProps {
   onBackToHome: () => void;
@@ -35,33 +35,26 @@ export const AboutPage: React.FC<AboutPageProps> = ({
       icon: <FaLightbulb className="w-6 h-6 text-[#1865F2]" />,
       title: "Phương Pháp Gợi Mở (Socratic)",
       desc: "Không đưa ra đáp án có sẵn để học sinh sao chép. DMKLab đặt câu hỏi định hướng, kích hoạt tư duy phản biện và giúp học sinh tự tìm ra câu trả lời.",
-      bg: "bg-blue-50/80",
+      spotlight: "rgba(24, 101, 242, 0.15)",
     },
     {
       icon: <TbTargetArrow className="w-6 h-6 text-emerald-600" />,
       title: "Tinh Thông Từng Kỹ Năng (Mastery Learning)",
       desc: "Học sinh tiến bộ theo nhịp độ riêng. Mỗi kỹ năng đều được luyện tập qua 4 cấp độ: Chưa học → Làm quen → Thành thạo → Tinh thông.",
-      bg: "bg-emerald-50/80",
+      spotlight: "rgba(20, 191, 150, 0.15)",
     },
     {
       icon: <RiRobot2Fill className="w-6 h-6 text-purple-600" />,
       title: "Công Nghệ Trí Tuệ Nhân Tạo",
       desc: "Trợ lý DMK AI Tutor đồng hành 24/7 với hạn mức 30 lượt/ngày có kiểm soát, bảo vệ học sinh và hỗ trợ giáo viên theo dõi tiến độ chính xác.",
-      bg: "bg-purple-50/80",
+      spotlight: "rgba(116, 51, 255, 0.15)",
     },
     {
       icon: <FaShieldHalved className="w-6 h-6 text-amber-600" />,
       title: "An Toàn & Bảo Mật Tuyệt Đối",
       desc: "Tuân thủ nghiêm ngặt chuẩn bảo vệ quyền riêng tư trẻ em (COPPA). Mọi dữ liệu học tập đều được mã hóa bằng thuật toán HMAC-SHA512.",
-      bg: "bg-amber-50/80",
+      spotlight: "rgba(245, 158, 11, 0.15)",
     },
-  ];
-
-  const STATS = [
-    { value: "12 Khối Lớp", label: "Chương trình chuẩn hóa K–12 Việt Nam" },
-    { value: "100+", label: "Chuyên đề bài giảng video & trắc nghiệm" },
-    { value: "24/7", label: "Gia sư AI Socratic hỗ trợ giải đáp" },
-    { value: "98.5%", label: "Học sinh cải thiện điểm số sau 4 tuần" },
   ];
 
   const TEAM = [
@@ -88,10 +81,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({
   return (
     <div className="w-full bg-white space-y-16 pb-20">
       {/* 1. Hero Banner */}
-      <section className="bg-gradient-to-b from-[#FEF8E7] via-white to-white border-b border-[#E8E3D0]/60 pt-12 pb-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      <section className="bg-gradient-to-b from-[#FEF8E7] via-white to-white border-b border-[#E8E3D0]/60 pt-14 pb-20 relative overflow-hidden">
+        <GridPattern width={44} height={44} className="opacity-30" />
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
           <div className="flex justify-center mb-1">
-            <div className="px-5 py-2.5 bg-white rounded-2xl shadow-sm border border-slate-100 inline-flex items-center justify-center">
+            <div className="px-5 py-2.5 bg-white rounded-2xl shadow-sm border border-slate-200 inline-flex items-center justify-center">
               <img
                 src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
                 alt="DMKLab"
@@ -102,10 +97,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({
 
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-[#1865F2] text-xs font-bold shadow-2xs">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Về Hệ Thống Giáo Dục DMKLab</span>
+            <AnimatedShinyText>Về Hệ Thống Giáo Dục DMKLab</AnimatedShinyText>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-[#0A2540] tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-[#0A2540] tracking-tight leading-tight">
             Vì một thế hệ học sinh Việt Nam{" "}
             <span className="text-[#1865F2]">tự tin làm chủ tri thức</span>.
           </h1>
@@ -117,15 +112,18 @@ export const AboutPage: React.FC<AboutPageProps> = ({
           </p>
 
           <div className="pt-2 flex flex-wrap justify-center gap-3">
-            <button
+            <ShimmerButton
               onClick={onBackToHome}
-              className="khan-btn-primary text-sm px-6 py-3 cursor-pointer gap-2"
+              background="#1865F2"
+              className="text-sm px-7 py-3.5"
             >
               <BookOpen className="w-4 h-4" />
               <span>Khám Phá Các Khóa Học</span>
-            </button>
+            </ShimmerButton>
+
             {onOpenContact && (
               <button
+                type="button"
                 onClick={onOpenContact}
                 className="khan-btn-secondary text-sm px-6 py-3 cursor-pointer"
               >
@@ -136,18 +134,46 @@ export const AboutPage: React.FC<AboutPageProps> = ({
         </div>
       </section>
 
-      {/* 2. Key Stats */}
+      {/* 2. Key Stats with NumberTicker */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#0A2540] text-white rounded-3xl p-8 sm:p-12 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative overflow-hidden">
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-5 bg-[radial-gradient(#14BF96_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-          {STATS.map((s, idx) => (
-            <div key={idx} className="space-y-2 relative z-10">
-              <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">{s.value}</p>
-              <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
-                {s.label}
-              </p>
-            </div>
-          ))}
+        <div className="bg-[#0A2540] text-white rounded-3xl p-8 sm:p-12 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative overflow-hidden border border-slate-800">
+          <GridPattern width={32} height={32} className="opacity-15" />
+
+          <div className="space-y-2 relative z-10">
+            <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">
+              <NumberTicker value={12} suffix=" Khối Lớp" />
+            </p>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
+              Chương trình chuẩn hóa K–12 Việt Nam
+            </p>
+          </div>
+
+          <div className="space-y-2 relative z-10">
+            <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">
+              <NumberTicker value={100} suffix="+" />
+            </p>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
+              Chuyên đề bài giảng video & trắc nghiệm
+            </p>
+          </div>
+
+          <div className="space-y-2 relative z-10">
+            <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">
+              <NumberTicker value={24} suffix="/7" />
+            </p>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
+              Gia sư AI Socratic hỗ trợ giải đáp
+            </p>
+          </div>
+
+          <div className="space-y-2 relative z-10">
+            <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">
+              <NumberTicker value={98.5} decimalPlaces={1} suffix="%" />
+            </p>
+            <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
+              Học sinh cải thiện điểm số sau 4 tuần
+            </p>
+          </div>
         </div>
       </section>
 
@@ -158,7 +184,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
             <span>Sứ Mệnh Của Chúng Tôi</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540] leading-snug">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0A2540] leading-snug">
             Chuyển dịch từ "Học để thi" sang "Học để thấu hiểu và ứng dụng"
           </h2>
 
@@ -211,35 +237,33 @@ export const AboutPage: React.FC<AboutPageProps> = ({
         </div>
       </section>
 
-      {/* 4. 4 Giá Trị Cốt Lõi */}
-      <section className="bg-slate-50 py-16 border-y border-slate-200">
+      {/* 4. 4 Trụ Cột — SpotlightCard Effect */}
+      <section className="bg-slate-50 py-16 sm:py-24 border-y border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2540]">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0A2540]">
               4 Trụ Cột Tạo Nên Sự Khác Biệt
             </h2>
-            <p className="text-sm text-slate-500">
-              Kiến trúc hệ thống được xây dựng để phục vụ trực tiếp cho hiệu quả tiếp thu kiến thức
-              của học viên
+            <p className="text-sm sm:text-base text-slate-500">
+              Kiến trúc hệ thống được xây dựng để phục vụ trực tiếp cho hiệu quả tiếp thu kiến thức của học viên
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {CORE_VALUES.map((val, idx) => (
-              <div
+              <SpotlightCard
                 key={idx}
-                className="bg-white p-7 rounded-3xl border border-slate-200 shadow-xs space-y-4 hover:border-[#1865F2]/40 transition group"
+                spotlightColor={val.spotlight}
+                className="space-y-4 border border-slate-200 hover:border-blue-400/60"
               >
-                <div
-                  className={`w-12 h-12 rounded-2xl ${val.bg} flex items-center justify-center transition-transform group-hover:scale-105`}
-                >
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
                   {val.icon}
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#1865F2] transition">
+                <h3 className="text-lg font-bold text-slate-900">
                   {val.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{val.desc}</p>
-              </div>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -283,27 +307,32 @@ export const AboutPage: React.FC<AboutPageProps> = ({
 
       {/* 6. CTA Cuối Trang */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-[#1865F2] to-[#0A2540] text-white rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-xl">
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
-            Sẵn sàng trải nghiệm phương pháp học tập tương lai?
-          </h2>
-          <p className="text-sm sm:text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
-            Đăng ký tài khoản hoàn toàn miễn phí và bắt đầu bài học đầu tiên ngay hôm nay cùng DMK
-            AI Tutor!
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 pt-2">
-            <button
-              onClick={onOpenRegister || onBackToHome}
-              className="bg-white hover:bg-slate-50 text-[#1865F2] font-black text-sm px-8 py-3.5 rounded-full shadow-lg hover:shadow-xl transition cursor-pointer"
-            >
-              Tạo Tài Khoản Học Viên Ngay
-            </button>
-            <button
-              onClick={onBackToHome}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm px-6 py-3.5 rounded-full transition cursor-pointer"
-            >
-              Về Trang Chủ
-            </button>
+        <div className="bg-[#0A2540] text-white rounded-3xl p-8 sm:p-12 text-center space-y-6 shadow-xl relative overflow-hidden border border-slate-800">
+          <GridPattern width={32} height={32} className="opacity-20" />
+
+          <div className="relative z-10 space-y-4">
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight">
+              Sẵn sàng trải nghiệm phương pháp học tập tương lai?
+            </h2>
+            <p className="text-sm sm:text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              Đăng ký tài khoản hoàn toàn miễn phí và bắt đầu bài học đầu tiên ngay hôm nay cùng DMK AI Tutor!
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 pt-3">
+              <ShimmerButton
+                onClick={onOpenRegister || onBackToHome}
+                background="#1865F2"
+                className="text-sm px-8 py-3.5"
+              >
+                <span>Tạo Tài Khoản Học Viên Ngay</span>
+              </ShimmerButton>
+              <button
+                type="button"
+                onClick={onBackToHome}
+                className="khan-btn-secondary text-sm px-6 py-3 cursor-pointer"
+              >
+                <span>Về Trang Chủ</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
