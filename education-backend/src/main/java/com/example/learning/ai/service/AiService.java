@@ -29,10 +29,10 @@ public class AiService {
     @Value("${app.ai.openai.student-daily-quota:30}")
     private int dailyQuota;
 
-    // Pattern nhận diện thông tin cá nhân (PII) bảo vệ dữ liệu học sinh
     private static final Pattern PHONE_PATTERN = Pattern.compile("(\\+84|0)(3|5|7|8|9)[0-9]{8}");
     private static final Pattern ID_CARD_PATTERN = Pattern.compile("\\b[0-9]{9,12}\\b");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+    private static final Pattern INJECTION_PATTERN = Pattern.compile("(?i)(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter)");
 
     @Transactional
     public AiChatDto.ChatResponse processLearningChat(UUID userId, AiChatDto.ChatRequest req) {
@@ -162,6 +162,9 @@ public class AiService {
         }
         if (EMAIL_PATTERN.matcher(message).find()) {
             return "Hệ thống bảo mật: Vui lòng không gửi địa chỉ email cá nhân vào khung trò chuyện.";
+        }
+        if (INJECTION_PATTERN.matcher(message).find()) {
+            return "Cảnh báo an toàn AI: Phát hiện câu lệnh bất thường (Prompt Injection/Jailbreak). Gia sư AI tuân thủ nghiêm ngặt chuẩn sư phạm K-12 và không bỏ qua nguyên tắc giảng dạy!";
         }
         return null;
     }

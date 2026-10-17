@@ -19,6 +19,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private final java.util.concurrent.ConcurrentHashMap<String, FailedLoginRecord> failedLogins = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static class FailedLoginRecord {
+        int attempts;
+        long lastAttemptTime;
+
+        FailedLoginRecord(int attempts, long lastAttemptTime) {
+            this.attempts = attempts;
+            this.lastAttemptTime = lastAttemptTime;
+        }
+    }
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -69,6 +81,22 @@ public class UserService {
     }
 
     public User authenticate(String usernameOrEmail, String password) {
+        String key = usernameOrEmail.toLowerCase().trim();
+        long now = System.currentTimeMillis();
+        long lockoutDurationMs = 15 * 60 * 1000; // 15 phút
+
+        FailedLoginRecord record = failedLogins.get(key);
+        if (record != null) {
+            if (now - record.lastAttemptTime < lockoutDurationMs) {
+                if (record.attempts >= 5) {
+                    long remainingMins = Math.max(1, (lockoutDurationMs - (now - record.lastAttemptTime)) / 60000);
+                    throw new RuntimeException("Tài khoản đã bị tạm khóa " + remainingMins + " phút do nhập sai mật khẩu quá 5 lần liên tiếp (Chống Brute-force/Credential Stuffing).");
+                }
+            } else {
+                record.attempts = 0;
+            }
+        }
+
         User user = userRepository.findByEmail(usernameOrEmail)
                 .orElseGet(() -> userRepository.findByUsername(usernameOrEmail)
                         .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại")));
@@ -77,8 +105,17 @@ public class UserService {
             throw new RuntimeException("Tài khoản đã bị vô hiệu hóa");
         }
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new RuntimeException("Mật khẩu không đúng");
+            int currentAttempts = (record != null && (now - record.lastAttemptTime < lockoutDurationMs)) ? record.attempts + 1 : 1;
+            failedLogins.put(key, new FailedLoginRecord(currentAttempts, now));
+            int remainingAttempts = Math.max(0, 5 - currentAttempts);
+            if (remainingAttempts == 0) {
+                throw new RuntimeException("Mật khẩu không đúng. Tài khoản của bạn đã bị tạm khóa bảo vệ 15 phút!");
+            } else {
+                throw new RuntimeException("Mật khẩu không đúng. Bạn còn " + remainingAttempts + " lần thử trước khi tài khoản bị khóa 15 phút.");
+            }
         }
+
+        failedLogins.remove(key);
         return user;
     }
 

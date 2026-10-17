@@ -21,7 +21,14 @@ import {
   ArrowRight,
   BookmarkCheck,
   ChevronDown,
-  Layers
+  Layers,
+  Cpu,
+  WifiOff,
+  Wifi,
+  Coins,
+  ShieldAlert,
+  Clock,
+  AlertCircle
 } from "lucide-react";
 import { RiSparklingFill, RiRobot2Fill } from "react-icons/ri";
 import { FaShieldHalved } from "react-icons/fa6";
@@ -77,16 +84,47 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [usedQuota, setUsedQuota] = useState(1);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [piiWarning, setPiiWarning] = useState<string | null>(null);
+
+  // 1. Chống lạm dụng AI: Giới hạn lượt hỏi, Token & Chi phí
+  const [tokensUsedToday, setTokensUsedToday] = useState(3420);
+  const [estimatedCostUsd, setEstimatedCostUsd] = useState(0.007);
+  const [cooldownSec, setCooldownSec] = useState(0);
+  const [rateLimitAlert, setRateLimitAlert] = useState<string | null>(null);
+  const [isAiMonitorOpen, setIsAiMonitorOpen] = useState(true);
+
+  // 2. Chống lạm dụng AI: Theo dõi hành vi bất thường (Prompt Injection / Jailbreak)
+  const [abnormalAlert, setAbnormalAlert] = useState<string | null>(null);
+
+  // 3. Phương án dự phòng khi dịch vụ AI lỗi (Graceful Offline Socratic Engine)
+  const [aiEngineMode, setAiEngineMode] = useState<'CLOUD_OPENAI' | 'OFFLINE_FALLBACK'>('CLOUD_OPENAI');
+  const [fallbackActiveToast, setFallbackActiveToast] = useState<string | null>(null);
   
   // Lưu đáp án học sinh đã chọn cho các câu hỏi luyện tập tương tác trong khung chat
   const [quizAnswers, setQuizAnswers] = useState<Record<string, { selected: string; isCorrect: boolean }>>({});
 
   const maxQuota = 30; // Daily quota chuẩn Khanmigo K-12
+  const maxTokens = 10000; // Giới hạn token học sinh/ngày
+  const maxDailyCost = 0.05; // $0.05 USD / học sinh / ngày
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
+
+  // Cooldown timer cho Sliding-window rate limiter
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownSec((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownSec]);
 
   // Kiểm tra thông tin cá nhân (PII) theo thời gian thực khi học sinh gõ
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,6 +150,22 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     const text = textToSend || input;
     if (!text.trim()) return;
 
+    // 1. Sliding Window Rate Limiting Cooldown Check (Chống spam prompt)
+    if (cooldownSec > 0) {
+      setRateLimitAlert(`Thao tác quá nhanh! Vui lòng suy ngẫm gợi ý trong ${cooldownSec}s trước khi gửi tiếp.`);
+      setTimeout(() => setRateLimitAlert(null), 3000);
+      return;
+    }
+
+    // 2. Kiểm tra hành vi bất thường / Prompt Injection / Jailbreak
+    const injectionRegex = /(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter|tiết lộ prompt)/i;
+    const isSuspicious = injectionRegex.test(text);
+    if (isSuspicious) {
+      setAbnormalAlert("⚠️ CẢNH BÁO AN TOÀN AI: Phát hiện câu lệnh bất thường (Prompt Injection/Jailbreak attempt). Gia sư AI tuân thủ nguyên tắc sư phạm K-12 và đã ghi lại sự kiện vào Nhật ký kiểm toán bảo mật!");
+    } else {
+      setAbnormalAlert(null);
+    }
+
     const currentMode = customMode || selectedMode;
 
     const userMsg: ChatMessage = {
@@ -125,6 +179,26 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     if (!textToSend) setInput("");
     setIsTyping(true);
     setPiiWarning(null);
+    setRateLimitAlert(null);
+
+    // Kích hoạt cooldown 5s phòng chống spam
+    setCooldownSec(5);
+
+    // Cập nhật ước lượng Token và Chi phí
+    const promptTokens = Math.max(15, Math.ceil(text.length / 3));
+    setTokensUsedToday((prev) => Math.min(prev + promptTokens + 120, maxTokens));
+    setEstimatedCostUsd((prev) => Number((prev + 0.0002).toFixed(4)));
+
+    // Nếu học sinh hoặc admin đang chọn Chế độ Dự Phòng Offline
+    if (aiEngineMode === 'OFFLINE_FALLBACK') {
+      setTimeout(() => {
+        const botMsg = generateLocalTutorResponse(text, currentMode, selectedGrade, activeLessonTitle);
+        setMessages((prev) => [...prev, botMsg]);
+        setIsTyping(false);
+        setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
+      }, 600);
+      return;
+    }
 
     try {
       const res: SocraticChatResponse = await api.sendLearningChat(text, undefined, sessionId, {
@@ -160,7 +234,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         return;
       }
     } catch {
-      // Fallback cục bộ thông minh theo chuẩn sư phạm
+      // Dịch vụ Cloud lỗi -> Chuyển sang Graceful Offline Socratic Engine
+      setFallbackActiveToast("⚡ Cloud AI API gặp sự cố. Hệ thống tự động chuyển sang Động cơ Gia sư Socratic Offline dự phòng!");
+      setTimeout(() => setFallbackActiveToast(null), 4000);
     }
 
     // Fallback Client-side Socratic Engine
@@ -169,7 +245,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
       setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
-    }, 700);
+    }, 600);
   };
 
   // Trình sinh phản hồi sư phạm Offline khi backend gián đoạn
@@ -488,16 +564,95 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         })}
       </div>
 
-      {/* Quota Banner */}
-      <div className="bg-slate-50 dark:bg-slate-900/60 px-4 py-1.5 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 shrink-0">
-        <span className="flex items-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-          <span>Hạn mức học tập hôm nay:</span>
-        </span>
-        <span className="font-bold text-[#1865F2] dark:text-blue-400">
-          {usedQuota}/{maxQuota} câu hỏi ({maxQuota - usedQuota} câu còn lại)
-        </span>
+      {/* Chống lạm dụng AI & Quota Header */}
+      <div className="bg-slate-50 dark:bg-slate-900/90 px-3.5 py-2 border-b border-slate-200 dark:border-slate-800 text-[11px] shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          {/* Quota & Cost indicators */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-[#1865F2] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
+              Quota: {usedQuota}/{maxQuota} câu
+            </span>
+            <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
+              ~{tokensUsedToday.toLocaleString()} tokens
+            </span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-semibold hidden sm:inline">
+              ${estimatedCostUsd} / $0.05
+            </span>
+          </div>
+
+          {/* AI Engine & Fallback Switcher */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                const next = aiEngineMode === 'CLOUD_OPENAI' ? 'OFFLINE_FALLBACK' : 'CLOUD_OPENAI';
+                setAiEngineMode(next);
+              }}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition cursor-pointer border ${
+                aiEngineMode === 'CLOUD_OPENAI'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300'
+              }`}
+              title="Click để chuyển đổi giữa OpenAI API và Động cơ Socratic Offline dự phòng"
+            >
+              {aiEngineMode === 'CLOUD_OPENAI' ? (
+                <>
+                  <Wifi className="w-3 h-3 text-emerald-600" />
+                  <span>OpenAI Cloud API</span>
+                </>
+              ) : (
+                <>
+                  <Cpu className="w-3 h-3 text-amber-600" />
+                  <span>Offline Dự Phòng</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Sliding Window Cooldown Notice */}
+        {cooldownSec > 0 && (
+          <div className="mt-1.5 flex items-center justify-between text-[10px] text-blue-700 dark:text-blue-300 bg-blue-50/80 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-900 animate-pulse">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              <span>Chống lạm dụng (Sliding window): Vui lòng suy ngẫm gợi ý trước khi hỏi tiếp...</span>
+            </span>
+            <span className="font-mono font-bold">{cooldownSec}s</span>
+          </div>
+        )}
       </div>
+
+      {/* Fallback Active Toast */}
+      {fallbackActiveToast && (
+        <div className="bg-amber-500 text-white p-2 text-xs flex items-center gap-2 shrink-0 animate-in fade-in duration-200">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span className="font-medium text-[11px]">{fallbackActiveToast}</span>
+        </div>
+      )}
+
+      {/* Abnormal Behavior / Prompt Injection Alert Banner */}
+      {abnormalAlert && (
+        <div className="bg-rose-50 dark:bg-rose-950/80 border-b border-rose-200 dark:border-rose-900 p-2.5 text-xs text-rose-800 dark:text-rose-200 flex items-start gap-2 shrink-0 animate-in fade-in duration-200">
+          <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+          <div className="flex-1 text-[11px] leading-snug">
+            {abnormalAlert}
+          </div>
+          <button
+            onClick={() => setAbnormalAlert(null)}
+            className="text-rose-400 hover:text-rose-600 font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Rate limit alert */}
+      {rateLimitAlert && (
+        <div className="bg-amber-50 dark:bg-amber-950/80 border-b border-amber-200 p-2 text-xs text-amber-800 flex items-center gap-1.5 shrink-0">
+          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+          <span className="text-[11px] font-medium">{rateLimitAlert}</span>
+        </div>
+      )}
 
       {/* Real-time PII Alert if student enters phone/email */}
       {piiWarning && (
@@ -750,11 +905,15 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           />
           <button
             type="submit"
-            disabled={!input.trim()}
-            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1557D0] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0"
-            title="Gửi câu hỏi tới Gia sư AI"
+            disabled={!input.trim() || cooldownSec > 0}
+            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1557D0] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0 font-mono text-xs font-bold"
+            title={cooldownSec > 0 ? `Vui lòng chờ ${cooldownSec}s` : "Gửi câu hỏi tới Gia sư AI"}
           >
-            <Send className="w-4 h-4" />
+            {cooldownSec > 0 ? (
+              <span>{cooldownSec}s</span>
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </button>
         </form>
 

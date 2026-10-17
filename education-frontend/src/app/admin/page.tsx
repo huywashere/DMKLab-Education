@@ -28,7 +28,9 @@ import {
   Search,
   ChevronRight,
   Sparkles,
-  LayoutDashboard
+  LayoutDashboard,
+  Lock,
+  RotateCcw
 } from "lucide-react";
 
 export default function StandaloneAdminPortalPage() {
@@ -57,6 +59,15 @@ export default function StandaloneAdminPortalPage() {
       items: [
         { key: "overview" as AdminTabType, label: "Tổng Quan Hệ Thống", icon: Activity, badge: "Live" },
         { key: "audit" as AdminTabType, label: "Nhật Ký Kiểm Toán (Audit)", icon: ShieldCheck },
+        { key: "security" as AdminTabType, label: "Bảo Vệ Dữ Liệu (COPPA)", icon: Lock, badge: "AES" },
+        { key: "reliability" as AdminTabType, label: "Độ Tin Cậy & Phục Hồi", icon: RotateCcw, badge: "DR" },
+      ]
+    },
+    {
+      group: "TRÍ TUỆ NHÂN TẠO & CHẤT LƯỢNG",
+      items: [
+        { key: "ai_quality" as AdminTabType, label: "Kiểm Định Chất Lượng AI", icon: Sparkles, badge: "K-12" },
+        { key: "ai" as AdminTabType, label: "Trợ Lý AI Quản Trị", icon: Bot, badge: "AI" },
       ]
     },
     {
@@ -69,15 +80,9 @@ export default function StandaloneAdminPortalPage() {
     {
       group: "NGƯỜI DÙNG & PHÂN QUYỀN",
       items: [
-        { key: "rbac" as AdminTabType, label: "Quản Lý Người Dùng (RBAC)", icon: Users },
+        { key: "rbac" as AdminTabType, label: "Quản Lý Người Dùng & Phiên", icon: Users },
         { key: "teacher" as AdminTabType, label: "Không Gian Giáo Viên", icon: GraduationCap },
         { key: "parent" as AdminTabType, label: "Cổng Phụ Huynh K-12", icon: UserCheck },
-      ]
-    },
-    {
-      group: "CÔNG CỤ THÔNG MINH",
-      items: [
-        { key: "ai" as AdminTabType, label: "Trợ Lý AI Quản Trị", icon: Bot, badge: "AI" },
       ]
     }
   ];

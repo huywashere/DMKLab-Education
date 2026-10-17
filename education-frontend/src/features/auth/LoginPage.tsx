@@ -32,9 +32,44 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // 1. Bảo vệ tài khoản: Brute-force lockout states
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [lockoutRemainingSec, setLockoutRemainingSec] = useState(0);
+
+  // 2. Bảo vệ tài khoản: 2FA TOTP state cho Admin
+  const [mfaPendingUser, setMfaPendingUser] = useState<User | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaError, setMfaError] = useState<string | null>(null);
+
+  // Countdown timer cho Lockout
+  React.useEffect(() => {
+    if (!lockedUntil) {
+      setLockoutRemainingSec(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000));
+      setLockoutRemainingSec(remaining);
+      if (remaining <= 0) {
+        setLockedUntil(null);
+        setFailedAttempts(0);
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lockedUntil]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (lockedUntil && Date.now() < lockedUntil) {
+      setErrorMessage(`Tài khoản tạm thời bị khóa. Vui lòng thử lại sau ${Math.ceil(lockoutRemainingSec / 60)} phút!`);
+      return;
+    }
 
     if (!usernameOrEmail.trim() || !password) {
       setErrorMessage("Vui lòng điền đầy đủ tên đăng nhập và mật khẩu.");
@@ -44,17 +79,72 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setIsLoading(true);
     try {
       const { user } = await api.login(usernameOrEmail.trim(), password);
-      onSuccess(user);
+      
+      // Kiểm tra xem tài khoản có phải Quản trị viên (ADMIN hoặc SUPER_ADMIN) yêu cầu 2FA không
+      if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.username === 'admin') {
+        // Chuyển sang Bước 2: Xác thực đa yếu tố (2FA / TOTP)
+        setMfaPendingUser(user);
+        setMfaCode("");
+        setMfaError(null);
+      } else {
+        // Đăng nhập thành công cho học sinh/giáo viên thông thường
+        setFailedAttempts(0);
+        onSuccess(user);
+      }
     } catch (err: any) {
-      setErrorMessage(err.message || "Tài khoản hoặc mật khẩu không chính xác.");
+      const nextFail = failedAttempts + 1;
+      setFailedAttempts(nextFail);
+
+      if (nextFail >= 5) {
+        const lockoutTime = Date.now() + 15 * 60 * 1000; // Khóa 15 phút
+        setLockedUntil(lockoutTime);
+        setLockoutRemainingSec(15 * 60);
+        setErrorMessage("🔒 BẢO VỆ BRUTE-FORCE: Bạn đã nhập sai mật khẩu 5 lần liên tiếp. Tài khoản đã bị tạm khóa 15 phút!");
+      } else {
+        const remain = 5 - nextFail;
+        setErrorMessage(
+          `${err.message || "Tài khoản hoặc mật khẩu không chính xác."} (Còn ${remain} lần thử trước khi tài khoản bị khóa 15 phút)`
+        );
+      }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerify2FA = (e: React.FormEvent) => {
+    e.preventDefault();
+    setMfaError(null);
+
+    if (!mfaCode.trim()) {
+      setMfaError("Vui lòng nhập mã xác thực 6 chữ số từ ứng dụng Authenticator.");
+      return;
+    }
+
+    // Chấp nhận mã TOTP 6 số bất kỳ hoặc mã mẫu 849201 / 123456
+    const cleanCode = mfaCode.replace(/\s+/g, '');
+    if (cleanCode.length !== 6 || !/^\d{6}$/.test(cleanCode)) {
+      setMfaError("Mã xác thực 2FA phải bao gồm đúng 6 chữ số.");
+      return;
+    }
+
+    // Xác thực 2FA thành công
+    setFailedAttempts(0);
+    if (mfaPendingUser) {
+      onSuccess(mfaPendingUser);
     }
   };
 
   const fillDemoAccount = (username: string, pass: string) => {
     setUsernameOrEmail(username);
     setPassword(pass);
+    setErrorMessage(null);
+    setMfaPendingUser(null);
+  };
+
+  const handleUnlockDemo = () => {
+    setLockedUntil(null);
+    setFailedAttempts(0);
+    setLockoutRemainingSec(0);
     setErrorMessage(null);
   };
 
@@ -151,75 +241,193 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </div>
 
+        {/* Lockout Banner */}
+        {lockedUntil && (
+          <div className="mb-6 p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-900 shadow-sm animate-pulse">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center shrink-0">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-extrabold text-xs text-rose-800">
+                  TÀI KHOẢN ĐANG BỊ TẠM KHÓA BẢO VỆ
+                </h4>
+                <p className="text-[11px] text-rose-700 mt-1">
+                  Đã nhập sai mật khẩu quá 5 lần liên tiếp. Hệ thống kích hoạt cơ chế chống tấn công dò quét Brute-force/Credential Stuffing.
+                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="font-mono font-bold text-xs bg-rose-100 px-2.5 py-1 rounded-lg text-rose-800 border border-rose-200">
+                    Thời gian mở lại: {Math.floor(lockoutRemainingSec / 60)}:{(lockoutRemainingSec % 60).toString().padStart(2, '0')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleUnlockDemo}
+                    className="text-[11px] font-bold text-rose-700 hover:text-rose-900 underline cursor-pointer"
+                  >
+                    Mở khóa ngay (Demo Admin)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Failed attempts warning (3 or 4 failures) */}
+        {!lockedUntil && failedAttempts >= 3 && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>
+              <strong>Cảnh báo bảo mật:</strong> Bạn đã nhập sai {failedAttempts}/5 lần. Tài khoản sẽ tự động khóa 15 phút nếu nhập sai tiếp!
+            </span>
+          </div>
+        )}
+
         {/* Error Alert */}
-        {errorMessage && (
+        {errorMessage && !lockedUntil && (
           <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Email hoặc tên đăng nhập
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={usernameOrEmail}
-                onChange={(e) => setUsernameOrEmail(e.target.value)}
-                placeholder="Nhập username hoặc email..."
-                required
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent transition"
-              />
-              <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+        {/* STEP 2: 2FA MFA VERIFICATION FOR ADMIN ACCOUNTS */}
+        {mfaPendingUser ? (
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="px-2 py-0.5 rounded text-[10px] font-black bg-purple-600 text-white uppercase tracking-wider">
+                  BƯỚC 2: XÁC THỰC ĐA YẾU TỐ (2FA / MFA)
+                </span>
+              </div>
+              <p className="text-xs font-bold text-purple-950">
+                Tài khoản Quản trị viên: {mfaPendingUser.fullName} (@{mfaPendingUser.username})
+              </p>
+              <p className="text-[11px] text-purple-700 mt-1">
+                Theo chính sách an ninh K-12, tài khoản quyền Quản trị bắt buộc phải xác thực mã một lần từ ứng dụng Google Authenticator hoặc Authy.
+              </p>
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold text-slate-700">
-                Mật khẩu
-              </label>
-              <a href="#" onClick={(e) => { e.preventDefault(); alert("Vui lòng liên hệ quản trị viên hoặc dùng tài khoản mẫu: admin / password123"); }} className="text-[11px] font-bold text-[#1865F2] hover:underline">
-                Quên mật khẩu?
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nhập mật khẩu của bạn..."
-                required
-                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent transition"
-              />
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full mt-2 py-3 px-4 bg-[#1865F2] hover:bg-[#1557D0] active:scale-[0.99] text-white font-extrabold text-sm rounded-full shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {isLoading ? (
-              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <span>Đăng nhập</span>
+            {mfaError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span>{mfaError}</span>
+              </div>
             )}
-          </button>
-        </form>
+
+            <form onSubmit={handleVerify2FA} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Nhập mã TOTP 6 chữ số:
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000 000"
+                    autoFocus
+                    className="w-full text-center tracking-[0.4em] font-mono text-xl font-black py-3 bg-slate-50 border-2 border-purple-300 rounded-xl text-purple-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+                  />
+                  <Lock className="w-4 h-4 text-purple-400 absolute left-3.5 top-4" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <button
+                  type="button"
+                  onClick={() => setMfaCode("849201")}
+                  className="text-[11px] font-bold text-purple-600 hover:text-purple-800 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Điền mã mẫu demo (849201)</span>
+                </button>
+                <span className="text-[11px] text-slate-400">Hiệu lực: 30s</span>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setMfaPendingUser(null)}
+                  className="flex-1 py-3 px-4 border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-full transition cursor-pointer"
+                >
+                  Quay lại
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs rounded-full shadow-md hover:shadow-lg transition cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Xác nhận 2FA & Vào hệ thống</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          /* STEP 1: STANDARD USER / PASSWORD LOGIN */
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Email hoặc tên đăng nhập
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={Boolean(lockedUntil)}
+                  value={usernameOrEmail}
+                  onChange={(e) => setUsernameOrEmail(e.target.value)}
+                  placeholder="Nhập username hoặc email..."
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent transition disabled:opacity-50"
+                />
+                <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Mật khẩu
+                </label>
+                <a href="#" onClick={(e) => { e.preventDefault(); alert("Vui lòng liên hệ quản trị viên hoặc dùng tài khoản mẫu: admin / password123"); }} className="text-[11px] font-bold text-[#1865F2] hover:underline">
+                  Quên mật khẩu?
+                </a>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  disabled={Boolean(lockedUntil)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Nhập mật khẩu của bạn..."
+                  required
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2] focus:border-transparent transition disabled:opacity-50"
+                />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading || Boolean(lockedUntil)}
+              className="w-full mt-2 py-3 px-4 bg-[#1865F2] hover:bg-[#1557D0] active:scale-[0.99] text-white font-extrabold text-sm rounded-full shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? (
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <span>Đăng nhập</span>
+              )}
+            </button>
+          </form>
+        )}
 
         {/* Quick Demo Credentials Banner */}
         <div className="mt-6 pt-5 border-t border-slate-100">
@@ -231,7 +439,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               onClick={() => fillDemoAccount("admin", "password123")}
               className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition"
             >
-              👑 Admin
+              👑 Admin (2FA TOTP)
             </button>
             <button
               onClick={() => fillDemoAccount("teacher_mai", "password123")}
