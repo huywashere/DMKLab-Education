@@ -216,8 +216,8 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             onClick={() => toggleBookmark({ id: activeLesson.id, title: activeLesson.title })}
             className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-xs font-bold cursor-pointer border ${
               isBookmarked(activeLesson.id)
-                ? "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
-                : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                ? "bg-amber-500 text-slate-950 border-amber-500 shadow-2xs font-bold"
+                : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200 dark:bg-[#1E293B] dark:hover:bg-slate-700 dark:text-slate-100 dark:border-slate-700 font-bold"
             }`}
             title={
               isBookmarked(activeLesson.id) ? "Bỏ lưu bài học" : "Lưu vào danh sách cần xem lại"

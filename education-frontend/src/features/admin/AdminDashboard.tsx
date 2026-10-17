@@ -1993,7 +1993,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Audit Log Diff / Snapshot Modal */}
           {selectedAuditLog && (
-            <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
               <div className="bg-white dark:bg-[#131E35] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-in fade-in zoom-in-95 text-slate-800 dark:text-slate-100">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
@@ -2387,7 +2387,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* Modal Thêm Bài Giảng Mới */}
           {showAddLessonModal && (
-            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <h4 className="font-extrabold text-slate-900 text-base">

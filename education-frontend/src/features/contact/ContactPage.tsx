@@ -125,7 +125,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#1865F2_1px,transparent_1px)] [background-size:24px_24px]" />
         <div className="relative max-w-5xl mx-auto text-center space-y-4">
           <div className="flex justify-center mb-1">
-            <div className="px-4 py-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-md inline-flex items-center justify-center">
+            <div className="px-4 py-2 bg-white rounded-2xl shadow-md inline-flex items-center justify-center border border-slate-200">
               <img
                 src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
                 alt="DMKLab"
@@ -133,7 +133,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
               />
             </div>
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-200">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#132A55] border border-blue-400/40 text-xs font-bold text-blue-200 shadow-xs">
             <Sparkles className="w-4 h-4 text-amber-300" />
             Đồng Hành Cùng 100.000+ Học Sinh & Phụ Huynh Việt Nam
           </div>

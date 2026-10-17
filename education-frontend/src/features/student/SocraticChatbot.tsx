@@ -509,7 +509,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     return (
       <div className="fixed bottom-6 right-6 z-40 group flex items-center">
         {/* Subtle tooltip on hover */}
-        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 dark:bg-slate-800/95 text-white text-xs font-semibold whitespace-nowrap shadow-xl border border-white/10 hidden sm:flex items-center gap-1.5 backdrop-blur-xs">
+        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-[#1E293B] text-white text-xs font-bold whitespace-nowrap shadow-xl border border-slate-700 hidden sm:flex items-center gap-1.5">
           <span>Gia sư AI Socratic 24/7</span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         </div>

@@ -122,7 +122,7 @@ export default function StandaloneAdminPortalPage() {
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs"
+          className="fixed inset-0 bg-black/70 z-40 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -298,12 +298,12 @@ export default function StandaloneAdminPortalPage() {
         }`}
       >
         {/* Dedicated Admin Topbar */}
-        <header className="sticky top-0 z-30 h-16 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between gap-4 transition-colors">
+        <header className="sticky top-0 z-30 h-16 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between gap-4 transition-colors">
           {/* Left: Mobile hamburger & Breadcrumb */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              className="lg:hidden p-2 rounded-lg text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -313,7 +313,7 @@ export default function StandaloneAdminPortalPage() {
                 Cổng Quản Trị
               </span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
-              <span className="font-bold text-[#0A2540] dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+              <span className="font-bold text-[#0A2540] dark:text-slate-100 bg-slate-100 dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-lg">
                 {currentTabLabel}
               </span>
             </div>
@@ -324,10 +324,10 @@ export default function StandaloneAdminPortalPage() {
             {/* Refresh DB Data Button */}
             <button
               onClick={() => setRefreshKey((prev) => prev + 1)}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 bg-slate-100 hover:bg-slate-200 dark:bg-[#1E293B] dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg shadow-2xs transition cursor-pointer"
               title="Làm mới dữ liệu từ Database"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-blue-500" />
+              <RefreshCw className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
               <span>Đồng bộ DB</span>
             </button>
 
@@ -335,7 +335,7 @@ export default function StandaloneAdminPortalPage() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-[#1E293B] dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
               title={isDark ? "Giao diện Sáng" : "Giao diện Tối"}
             >
               {isDark ? (
@@ -350,7 +350,7 @@ export default function StandaloneAdminPortalPage() {
             {/* Direct Switch to Public Student Web */}
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#1865F2] hover:bg-[#1557D0] text-white transition shadow-xs whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#1865F2] hover:bg-[#0B4ED7] text-white border border-[#1865F2] transition shadow-xs whitespace-nowrap active:scale-95"
               title="Mở giao diện học viên công khai"
             >
               <ExternalLink className="w-3.5 h-3.5" />

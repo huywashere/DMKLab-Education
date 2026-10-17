@@ -288,7 +288,7 @@ export const ArticlesPage: React.FC<ArticlesPageProps> = ({
                     className="w-full object-cover transition duration-300 group-hover:scale-105"
                     style={{ aspectRatio: "16/9" }}
                   />
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-full text-[10px] font-extrabold text-[#1865F2] shadow-2xs">
+                  <div className="absolute top-3 left-3 bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-full text-[10px] font-extrabold text-[#1865F2] dark:text-blue-400 shadow-2xs">
                     {art.categoryLabel}
                   </div>
                 </div>
@@ -350,7 +350,7 @@ export const ArticlesPage: React.FC<ArticlesPageProps> = ({
 
       {/* 2. Read Article Modal / Drawer */}
       {selectedArticle && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-white max-w-3xl w-full rounded-3xl shadow-2xl overflow-hidden my-8 max-h-[90vh] flex flex-col border border-slate-200">
             {/* Modal Header */}
             <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">

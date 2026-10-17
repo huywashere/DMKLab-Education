@@ -369,7 +369,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               </div>
               <button
                 onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                className="mt-6 w-full py-2.5 rounded-xl bg-[#EBF2FF] hover:bg-[#1865F2] text-[#1865F2] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#EBF2FF] dark:bg-[#1E293B] hover:bg-[#1865F2] dark:hover:bg-[#1865F2] text-[#1865F2] dark:text-blue-300 hover:text-white dark:hover:text-white font-bold text-xs border border-blue-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Học môn Toán</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -412,7 +412,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               </div>
               <button
                 onClick={() => onOpenLesson(MOCK_LESSONS[2] || MOCK_LESSONS[0])}
-                className="mt-6 w-full py-2.5 rounded-xl bg-[#E6FAF6] hover:bg-[#14BF96] text-[#008272] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#E6FAF6] dark:bg-[#1E293B] hover:bg-[#14BF96] dark:hover:bg-[#14BF96] text-[#008272] dark:text-emerald-300 hover:text-white dark:hover:text-white font-bold text-xs border border-emerald-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Học Khoa học</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -455,7 +455,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               </div>
               <button
                 onClick={() => onOpenLesson(MOCK_LESSONS[1] || MOCK_LESSONS[0])}
-                className="mt-6 w-full py-2.5 rounded-xl bg-[#F3F0FF] hover:bg-[#7433FF] text-[#7433FF] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#F3F0FF] dark:bg-[#1E293B] hover:bg-[#7433FF] dark:hover:bg-[#7433FF] text-[#7433FF] dark:text-purple-300 hover:text-white dark:hover:text-white font-bold text-xs border border-purple-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Học Lập trình & AI</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -498,7 +498,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               </div>
               <button
                 onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                className="mt-6 w-full py-2.5 rounded-xl bg-[#FFF7ED] hover:bg-[#EA580C] text-[#EA580C] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#FFF7ED] dark:bg-[#1E293B] hover:bg-[#EA580C] dark:hover:bg-[#EA580C] text-[#EA580C] dark:text-orange-300 hover:text-white dark:hover:text-white font-bold text-xs border border-orange-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Học Nhân văn</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -512,7 +512,7 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
               <button
                 key={idx}
                 onClick={() => onOpenLesson(MOCK_LESSONS[idx % MOCK_LESSONS.length])}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border border-[#E4E7EB] dark:border-slate-700 hover:border-[#1865F2] hover:shadow-xs bg-[#F7F8FA] dark:bg-slate-800/80 transition-all cursor-pointer"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold border border-[#E4E7EB] dark:border-slate-700 hover:border-[#1865F2] hover:shadow-xs bg-[#F7F8FA] dark:bg-[#1E293B] transition-all cursor-pointer"
               >
                 <span
                   className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs"

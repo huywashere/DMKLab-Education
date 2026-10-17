@@ -87,13 +87,15 @@ body {
   background: #475569;
 }
 
-/* Khan Academy CTA Buttons */
-.khan-btn-primary {
+/* Khan Academy & DMKLab CTA Buttons - 100% Solid Surfaces, No Glass/Blur */
+.khan-btn-primary,
+.dmk-btn-primary {
   background-color: #1865f2;
   color: #ffffff;
   font-weight: 700;
   padding: 0.625rem 1.5rem;
   border-radius: 9999px;
+  border: 1px solid #1865f2;
   transition: all 0.15s ease-in-out;
   box-shadow: 0 2px 4px rgba(24, 101, 242, 0.2);
   display: inline-flex;
@@ -101,8 +103,10 @@ body {
   justify-content: center;
 }
 
-.khan-btn-primary:hover {
+.khan-btn-primary:hover,
+.dmk-btn-primary:hover {
   background-color: #0b4ed7;
+  border-color: #0b4ed7;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(24, 101, 242, 0.3);
 }
@@ -113,6 +117,7 @@ body {
   font-weight: 700;
   padding: 0.625rem 1.5rem;
   border-radius: 9999px;
+  border: 1px solid #14bf96;
   transition: all 0.15s ease-in-out;
   box-shadow: 0 2px 4px rgba(20, 191, 150, 0.25);
   display: inline-flex;
@@ -122,13 +127,15 @@ body {
 
 .khan-btn-green:hover {
   background-color: #10a380;
+  border-color: #10a380;
   transform: translateY(-1px);
 }
 
-.khan-btn-secondary {
-  background-color: #ffffff;
-  color: #1865f2;
-  border: 2px solid #1865f2;
+.khan-btn-secondary,
+.dmk-btn-secondary {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
   font-weight: 700;
   padding: 0.5rem 1.5rem;
   border-radius: 9999px;
@@ -138,24 +145,30 @@ body {
   justify-content: center;
 }
 
-.khan-btn-secondary:hover {
-  background-color: #f0f5ff;
+.khan-btn-secondary:hover,
+.dmk-btn-secondary:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
 }
 
-.dark .khan-btn-secondary {
-  background-color: transparent;
+.dark .khan-btn-secondary,
+.dark .dmk-btn-secondary {
+  background-color: #1e293b;
   color: #60a5fa;
-  border-color: #3b82f6;
+  border: 1px solid #334155;
 }
 
-.dark .khan-btn-secondary:hover {
-  background-color: rgba(59, 130, 246, 0.15);
+.dark .khan-btn-secondary:hover,
+.dark .dmk-btn-secondary:hover {
+  background-color: #27354f;
+  border-color: #3b82f6;
+  color: #93c5fd;
 }
 
 .khan-btn-outline {
-  background-color: #ffffff;
+  background-color: #f8fafc;
   color: #21242c;
-  border: 1px solid #d5d9e2;
+  border: 1px solid #cbd5e1;
   font-weight: 600;
   padding: 0.5rem 1.25rem;
   border-radius: 9999px;
@@ -163,19 +176,48 @@ body {
 }
 
 .khan-btn-outline:hover {
-  border-color: #21242c;
-  background-color: #f7f8fa;
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
 }
 
 .dark .khan-btn-outline {
   background-color: #1e293b;
-  color: #e2e8f0;
-  border-color: #334155;
+  color: #f1f5f9;
+  border: 1px solid #334155;
 }
 
 .dark .khan-btn-outline:hover {
-  border-color: #64748b;
+  border-color: #475569;
   background-color: #334155;
+}
+
+/* Solid Utility Icon Button */
+.dmk-btn-icon {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 0.375rem;
+  transition: all 0.15s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dmk-btn-icon:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.dark .dmk-btn-icon {
+  background-color: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+}
+
+.dark .dmk-btn-icon:hover {
+  background-color: #334155;
+  color: #f8fafc;
 }
 
 /* Khan card style */
