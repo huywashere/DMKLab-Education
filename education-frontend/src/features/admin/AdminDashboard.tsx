@@ -117,7 +117,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     {
       role: 'assistant',
       text: 'Xin chào Quản trị viên! Tôi là Trợ lý AI Quản trị K-12. Tôi có thể hỗ trợ giải thích quy trình vận hành, chính sách bảo mật RBAC, hoặc hướng dẫn kiểm tra hiệu năng hệ thống.',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: '09:00',
     }
   ]);
   const [adminAiInput, setAdminAiInput] = useState("");
