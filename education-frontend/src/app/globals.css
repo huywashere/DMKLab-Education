@@ -342,3 +342,75 @@ html.text-size-large {
 html.text-size-xlarge {
   font-size: 20px;
 }
+
+/* ==========================================================================
+   Modern UI Animations (Magic UI / React Bits / Godly Style)
+   High performance, zero-glass-blur, GPU accelerated transforms
+   ========================================================================== */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap, 1rem)));
+  }
+}
+
+@keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width, 100px)) 0;
+  }
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width, 100px)) 0;
+  }
+}
+
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+@keyframes spin-around {
+  0% {
+    transform: translateZ(0) rotate(0);
+  }
+  15%, 35% {
+    transform: translateZ(0) rotate(90deg);
+  }
+  65%, 85% {
+    transform: translateZ(0) rotate(270deg);
+  }
+  100% {
+    transform: translateZ(0) rotate(360deg);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration, 25s) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 25s) linear infinite;
+}
+
+.animate-shiny-text {
+  animation: shiny-text 6s infinite;
+}
+
+.animate-spin-around {
+  animation: spin-around calc(var(--speed, 2s) * 2) infinite linear;
+}
+
+.pause-hover:hover {
+  animation-play-state: paused;
+}
