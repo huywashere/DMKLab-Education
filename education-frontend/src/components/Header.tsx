@@ -39,6 +39,7 @@ import {
   Smartphone,
   Sun,
   Moon,
+  Building2,
 } from "lucide-react";
 import {
   FaFireFlameCurved,
@@ -56,6 +57,8 @@ import {
   RiSearchLine,
   RiAtomLine,
   RiBookOpenLine,
+  RiRobot2Fill,
+  RiBookOpenFill,
 } from "react-icons/ri";
 import { TbMathFunction } from "react-icons/tb";
 import { MOCK_LESSONS } from "@/lib/mock-data";
@@ -123,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { lang, setLang, t } = useLanguage();
   const { theme, toggleTheme, isDark } = useTheme();
-  const [showCoursesMenu, setShowCoursesMenu] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<"products" | "resources" | null>(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -210,10 +213,11 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 shadow-2xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        {/* Left: Official DMKLab Brand Logo + Courses Dropdown + Nav Links */}
-        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
+        {/* Left: Shadcnblocks Brand Logo + Nav Links & Rich Dropdowns */}
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
           {/* Mobile Drawer Trigger (Only on < lg screens) */}
           <button
+            type="button"
             onClick={() => setMobileDrawerOpen(true)}
             className="lg:hidden p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title="Mở menu"
@@ -222,178 +226,374 @@ export const Header: React.FC<HeaderProps> = ({
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* DMKLab + Khan Academy Brand Logo (Click to Home) */}
+          {/* Shadcnblocks Brand Identity: Isometric 3D Block + Text */}
           <button
-            onClick={() => onChangeView("student")}
+            type="button"
+            onClick={() => {
+              setActiveDropdown(null);
+              onChangeView("student");
+            }}
             className="flex items-center gap-2.5 group cursor-pointer shrink-0"
-            title="DMKLab Khan Academy - Về Trang Chủ"
+            title="DMKLab Education - Về Trang Chủ"
           >
-            {/* Authentic Khan Academy Green Sprout Icon */}
-            <div className="w-8 h-8 rounded-lg bg-[#14BF96]/15 flex items-center justify-center text-[#14BF96] group-hover:scale-105 transition-transform shadow-xs">
-              <svg className="w-5 h-5 text-[#14BF96]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.5 2 5.5 4.5 4.5 8c2.5-.5 5.5.5 7.5 2.5 2-2 5-3 7.5-2.5C18.5 4.5 15.5 2 12 2zm0 8.5c-2-2-5-3-7.5-2.5C4.2 9.5 4 11.5 4 14c0 4.5 4 8 8 8s8-3.5 8-8c0-2.5-.2-4.5-.5-6-2.5-.5-5.5.5-7.5 2.5z" />
+            {/* Signature Isometric 3D Cube Icon with Striped Face */}
+            <div className="w-8 h-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center transition-transform group-hover:scale-105 shadow-xs">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2L21 7.2V16.8L12 22L3 16.8V7.2L12 2Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinejoin="round"
+                />
+                <path d="M12 22V12" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M21 7.2L12 12L3 7.2" stroke="currentColor" strokeWidth="1.8" />
+                <line x1="6.5" y1="10" x2="6.5" y2="14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <line x1="9.5" y1="11.5" x2="9.5" y2="16.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
               </svg>
             </div>
 
             <div className="flex flex-col text-left">
-              <div className="flex items-center gap-1.5 leading-none">
-                <span className="text-base font-extrabold text-[#0B2149] dark:text-white tracking-tight">
-                  DMKLab
-                </span>
-                <span className="text-sm font-bold text-[#1865F2] dark:text-blue-400">
-                  Khan Academy
+              <div className="flex items-center gap-1 leading-none">
+                <span className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
+                  DMKLab<span className="text-[#1865F2]">blocks</span>.edu
                 </span>
               </div>
-              <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-wider font-semibold uppercase mt-0.5">
-                K–12 Việt Nam
+              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-wider uppercase mt-0.5">
+                K–12 Education Platform
               </span>
             </div>
           </button>
 
-          {/* Courses Dropdown Trigger */}
-          <div className="relative shrink-0">
+          {/* Shadcnblocks Navigation Links with Rich Flyout Dropdowns */}
+          <nav className="hidden lg:flex items-center gap-1 shrink-0 relative">
+            {/* 1. Home */}
             <button
-              onClick={() => setShowCoursesMenu(!showCoursesMenu)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-[#1865F2] dark:hover:text-white rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition cursor-pointer whitespace-nowrap"
+              type="button"
+              onClick={() => {
+                setActiveDropdown(null);
+                onChangeView("student");
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                activeView === "student" && !activeDropdown
+                  ? "text-slate-900 dark:text-white font-semibold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
+              }`}
             >
-              <span>{t("nav_courses", "Môn học")}</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showCoursesMenu ? "rotate-180 text-[#1865F2]" : ""}`}
-              />
+              {lang === "en" ? "Home" : "Trang chủ"}
             </button>
 
-            {showCoursesMenu && (
-              <div
-                className="absolute left-0 mt-2 w-80 md:w-96 bg-white dark:bg-[#131E35] text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-5 z-50 text-xs grid grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-150"
-                onMouseLeave={() => setShowCoursesMenu(false)}
+            {/* 2. Products / Khóa học (Dropdown) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "products" ? null : "products")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                  activeDropdown === "products"
+                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow-2xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                }`}
               >
-                <div className="space-y-3">
-                  <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                    {t("nav_featured_fields", "Lĩnh vực nổi bật")}
-                  </p>
+                <span>{lang === "en" ? "Products" : "Khóa học"}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === "products" ? "rotate-180 text-slate-900 dark:text-white" : ""
+                  }`}
+                />
+              </button>
+
+              {activeDropdown === "products" && (
+                <div
+                  className="absolute left-0 top-full mt-2 w-[27rem] sm:w-[29rem] bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
                   <div className="space-y-1">
                     <button
-                      onClick={() => setShowCoursesMenu(false)}
-                      className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
-                    >
-                      <TbMathFunction className="w-4 h-4 text-[#1865F2]" />
-                      <span>{t("nav_math_k12", "Toán: Lớp 1 – Lớp 12")}</span>
-                    </button>
-                    <button
-                      onClick={() => setShowCoursesMenu(false)}
-                      className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
-                    >
-                      <RiAtomLine className="w-4 h-4 text-emerald-600" />
-                      <span>{t("nav_science_stem", "Khoa học & Tự nhiên")}</span>
-                    </button>
-                    <button
-                      onClick={() => setShowCoursesMenu(false)}
-                      className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
-                    >
-                      <Globe className="w-4 h-4 text-purple-600" />
-                      <span>{t("nav_english_lang", "Tiếng Anh & Ngôn ngữ")}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-3 border-l border-slate-100 dark:border-slate-750 pl-4">
-                  <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                    {t("nav_current_grade", "Khối Lớp")}
-                  </p>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
-                      <button
-                        key={g}
-                        onClick={() => {
-                          onSelectGrade({
-                            id: `g-${g}`,
-                            name: `Lớp ${g}`,
-                            code: `GRADE_${g}`,
-                            level: g <= 5 ? "PRIMARY" : g <= 9 ? "SECONDARY" : "HIGH_SCHOOL",
-                            displayOrder: g,
-                          });
-                          setShowCoursesMenu(false);
-                        }}
-                        className={`p-1.5 rounded-lg text-center font-bold text-xs transition ${
-                          selectedGrade?.name === `Lớp ${g}`
-                            ? "bg-[#1865F2] text-white shadow-xs"
-                            : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
-                        }`}
-                      >
-                        {lang === "en" ? `Grade ${g}` : `Lớp ${g}`}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Links inside Courses Dropdown */}
-                <div className="col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                  <span>{t("nav_explore_more", "Khám phá thêm về DMKLab:")}</span>
-                  <div className="flex items-center gap-3">
-                    <button
+                      type="button"
                       onClick={() => {
-                        onChangeView("about");
-                        setShowCoursesMenu(false);
+                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[0]);
+                        onChangeView("student");
+                        setActiveDropdown(null);
                       }}
-                      className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
                     >
-                      {t("nav_about", "Giới thiệu")}
+                      <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <TbMathFunction className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                          {lang === "en" ? "K–12 Mathematics" : "Toán học K–12"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "From foundational arithmetic to algebra, geometry & calculus for national exams"
+                            : "Từ số học cơ bản đến đại số, hình học & giải tích vi phân ôn thi THPT Quốc gia"}
+                        </p>
+                      </div>
                     </button>
+
                     <button
+                      type="button"
+                      onClick={() => {
+                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[2] || MOCK_LESSONS[0]);
+                        onChangeView("student");
+                        setActiveDropdown(null);
+                      }}
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-[#14BF96] dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <Atom className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#14BF96] dark:group-hover:text-emerald-400 transition-colors">
+                          {lang === "en" ? "Science & STEM" : "Khoa học & STEM"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Physics, chemistry, cellular biology and interactive natural sciences"
+                            : "Vật lý lý thuyết, Hóa học hợp chất, Sinh học di truyền & KHTN thực hành"}
+                        </p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[1] || MOCK_LESSONS[0]);
+                        onChangeView("student");
+                        setActiveDropdown(null);
+                      }}
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-[#7433FF] dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <RiRobot2Fill className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#7433FF] dark:group-hover:text-purple-400 transition-colors">
+                          {lang === "en" ? "Coding & Artificial Intelligence" : "Lập trình & Trí Tuệ Nhân Tạo"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Scratch for kids, core Python programming & computational thinking"
+                            : "Học Scratch, Python căn bản, thuật toán & tư duy máy tính cùng AI Tutor"}
+                        </p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[0]);
+                        onChangeView("student");
+                        setActiveDropdown(null);
+                      }}
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-orange-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <RiBookOpenFill className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#EA580C] dark:group-hover:text-orange-400 transition-colors">
+                          {lang === "en" ? "Languages & Humanities" : "Ngôn ngữ & Nhân văn"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Literature comprehension, K-12 CEFR English, Vietnamese history & culture"
+                            : "Ngữ Văn cảm thụ, Tiếng Anh K–12 chuẩn CEFR & Lịch sử, Địa lý Việt Nam"}
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Quick Select Grade at Bottom of Dropdown */}
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      {lang === "en" ? "Quick select grade:" : "Chọn nhanh khối lớp:"}
+                    </p>
+                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1">
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => {
+                            onSelectGrade({
+                              id: `g-${g}`,
+                              name: `Lớp ${g}`,
+                              code: `GRADE_${g}`,
+                              level: g <= 5 ? "PRIMARY" : g <= 9 ? "SECONDARY" : "HIGH_SCHOOL",
+                              displayOrder: g,
+                            });
+                            setActiveDropdown(null);
+                          }}
+                          className={`py-1 text-center font-bold text-[11px] rounded-md transition cursor-pointer ${
+                            selectedGrade?.name === `Lớp ${g}`
+                              ? "bg-[#1865F2] text-white"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                          }`}
+                        >
+                          L{g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Resources / Tài nguyên (Dropdown matching Shadcnblocks screenshot) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "resources" ? null : "resources")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                  activeDropdown === "resources"
+                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow-2xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                }`}
+              >
+                <span>{lang === "en" ? "Resources" : "Tài nguyên"}</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === "resources" ? "rotate-180 text-slate-900 dark:text-white" : ""
+                  }`}
+                />
+              </button>
+
+              {activeDropdown === "resources" && (
+                <div
+                  className="absolute left-0 top-full mt-2 w-[24rem] sm:w-[26rem] bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-800 p-3 sm:p-4 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  <div className="space-y-1">
+                    {/* Item 1: Blog */}
+                    <button
+                      type="button"
                       onClick={() => {
                         onChangeView("articles");
-                        setShowCoursesMenu(false);
+                        setActiveDropdown(null);
                       }}
-                      className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
                     >
-                      {t("nav_articles", "Bài viết")}
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <BookOpen className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                          {lang === "en" ? "Blog" : "Blog & Tin tức"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "The latest industry news, updates, and info"
+                            : "Tin tức giáo dục mới nhất, phương pháp tự học và cẩm nang phụ huynh"}
+                        </p>
+                      </div>
                     </button>
+
+                    {/* Item 2: Company */}
                     <button
+                      type="button"
+                      onClick={() => {
+                        onChangeView("about");
+                        setActiveDropdown(null);
+                      }}
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <Building2 className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                          {lang === "en" ? "Company" : "Về DMKLab"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Our mission is to innovate and empower the world"
+                            : "Sứ mệnh phổ cập nền giáo dục chuẩn quốc tế miễn phí cho học sinh Việt Nam"}
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Item 3: Careers */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChangeView("about");
+                        setActiveDropdown(null);
+                      }}
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <Sparkles className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                          {lang === "en" ? "Careers" : "Cơ hội & Phương pháp"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Browse job listing and discover our workspace"
+                            : "Tìm hiểu phương pháp Socratic AI và cơ hội đồng hành sư phạm"}
+                        </p>
+                      </div>
+                    </button>
+
+                    {/* Item 4: Support */}
+                    <button
+                      type="button"
                       onClick={() => {
                         onChangeView("contact");
-                        setShowCoursesMenu(false);
+                        setActiveDropdown(null);
                       }}
-                      className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
+                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
                     >
-                      {t("nav_contact", "Liên hệ")}
+                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <MessageSquare className="w-5 h-5 text-slate-700 dark:text-slate-300" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                          {lang === "en" ? "Support" : "Hỗ trợ & Liên hệ"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                          {lang === "en"
+                            ? "Get in touch with our support team or visit our community forums"
+                            : "Kết nối đội ngũ tư vấn lộ trình học tập hoặc tham gia cộng đồng"}
+                        </p>
+                      </div>
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Nav links: Giới thiệu, Bài viết, Liên hệ - Solid Surfaces */}
-          <nav className="hidden lg:flex items-center gap-1.5 shrink-0">
+            {/* 4. Pricing / Bảng điều khiển */}
             <button
-              onClick={() => onChangeView("about")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap border ${
-                activeView === "about"
-                  ? "text-white bg-[#1865F2] border-[#1865F2] shadow-2xs"
-                  : "text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700"
+              type="button"
+              onClick={() => {
+                setActiveDropdown(null);
+                onChangeView("dashboard");
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                activeView === "dashboard" && !activeDropdown
+                  ? "text-slate-900 dark:text-white font-semibold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
               }`}
             >
-              {t("nav_about", "Giới thiệu")}
+              {lang === "en" ? "Pricing" : "Lộ trình"}
             </button>
+
+            {/* 5. Blog / Bài viết */}
             <button
-              onClick={() => onChangeView("articles")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap border ${
-                activeView === "articles"
-                  ? "text-white bg-[#1865F2] border-[#1865F2] shadow-2xs"
-                  : "text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700"
+              type="button"
+              onClick={() => {
+                setActiveDropdown(null);
+                onChangeView("articles");
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+                activeView === "articles" && !activeDropdown
+                  ? "text-slate-900 dark:text-white font-semibold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
               }`}
             >
-              {t("nav_articles", "Bài viết")}
-            </button>
-            <button
-              onClick={() => onChangeView("contact")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer whitespace-nowrap border ${
-                activeView === "contact"
-                  ? "text-white bg-[#1865F2] border-[#1865F2] shadow-2xs"
-                  : "text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700"
-              }`}
-            >
-              {t("nav_contact", "Liên hệ")}
+              {lang === "en" ? "Blog" : "Bài viết"}
             </button>
           </nav>
         </div>
@@ -1192,11 +1392,11 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          onClick={() => setShowCoursesMenu(!showCoursesMenu)}
+          onClick={() => setMobileDrawerOpen(true)}
           className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 transition cursor-pointer"
         >
           <BookOpen className="w-4 h-4" />
-          <span>Môn học</span>
+          <span>Danh mục</span>
         </button>
 
         <button
