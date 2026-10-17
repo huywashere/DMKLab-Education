@@ -1,0 +1,33 @@
+# Dependencies & package managers
+node_modules/
+.pnpm-store/
+package-lock.json
+pnpm-lock.yaml
+
+# Build artifacts & caches
+.next/
+out/
+build/
+dist/
+target/
+.turbo/
+
+# Java & backend
+education-backend/target/
+*.class
+*.jar
+
+# Environment & logs
+.env*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Git & IDEs
+.git/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

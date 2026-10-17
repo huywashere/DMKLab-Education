@@ -2,19 +2,19 @@
 
 import React, { useState } from "react";
 import { User, UserRole, Grade } from "@/types";
-import { 
-  Search, 
-  ChevronDown, 
-  Sparkles, 
-  Flame, 
-  LayoutDashboard, 
-  GraduationCap, 
-  UserCheck, 
-  ShieldCheck, 
-  BookOpen, 
-  Compass, 
-  Calculator, 
-  Atom, 
+import {
+  Search,
+  ChevronDown,
+  Sparkles,
+  Flame,
+  LayoutDashboard,
+  GraduationCap,
+  UserCheck,
+  ShieldCheck,
+  BookOpen,
+  Compass,
+  Calculator,
+  Atom,
   Globe,
   User as UserIcon,
   LogOut,
@@ -38,24 +38,24 @@ import {
   X,
   Smartphone,
   Sun,
-  Moon
+  Moon,
 } from "lucide-react";
-import { 
-  FaFireFlameCurved, 
-  FaStar, 
-  FaGraduationCap, 
-  FaChalkboardUser, 
+import {
+  FaFireFlameCurved,
+  FaStar,
+  FaGraduationCap,
+  FaChalkboardUser,
   FaUserShield,
-  FaArrowRightFromBracket 
+  FaArrowRightFromBracket,
 } from "react-icons/fa6";
-import { 
-  RiSparklingFill, 
-  RiTranslate2, 
-  RiNotification3Line, 
+import {
+  RiSparklingFill,
+  RiTranslate2,
+  RiNotification3Line,
   RiDashboardFill,
   RiSearchLine,
   RiAtomLine,
-  RiBookOpenLine
+  RiBookOpenLine,
 } from "react-icons/ri";
 import { TbMathFunction } from "react-icons/tb";
 import { MOCK_LESSONS } from "@/lib/mock-data";
@@ -67,8 +67,30 @@ import { useAccessibility } from "@/lib/a11y/AccessibilityContext";
 interface HeaderProps {
   currentUser: User | null;
   onSwitchUser: (role: UserRole) => void;
-  activeView: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile' | 'about' | 'articles' | 'contact';
-  onChangeView: (view: 'student' | 'dashboard' | 'lesson' | 'admin' | 'login' | 'register' | 'profile' | 'about' | 'articles' | 'contact') => void;
+  activeView:
+    | "student"
+    | "dashboard"
+    | "lesson"
+    | "admin"
+    | "login"
+    | "register"
+    | "profile"
+    | "about"
+    | "articles"
+    | "contact";
+  onChangeView: (
+    view:
+      | "student"
+      | "dashboard"
+      | "lesson"
+      | "admin"
+      | "login"
+      | "register"
+      | "profile"
+      | "about"
+      | "articles"
+      | "contact"
+  ) => void;
   selectedGrade: Grade;
   onSelectGrade: (grade: Grade) => void;
   onOpenAiChat: () => void;
@@ -109,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const { bookmarks, openModal: openBookmarksModal } = useBookmarks();
   const { openShortcuts } = useAccessibility();
-  const [notifCategory, setNotifCategory] = useState<'all' | 'unread' | 'lesson' | 'system'>('all');
+  const [notifCategory, setNotifCategory] = useState<"all" | "unread" | "lesson" | "system">("all");
   const [showChannelsModal, setShowChannelsModal] = useState(false);
   const [channelSettings, setChannelSettings] = useState({
     website: true,
@@ -167,19 +189,23 @@ export const Header: React.FC<HeaderProps> = ({
     },
   ]);
 
-  const filteredNotifications = notifications.filter(n => {
-    if (notifCategory === 'unread') return n.unread;
-    if (notifCategory === 'lesson') return n.category === 'lesson';
-    if (notifCategory === 'system') return n.category === 'system';
+  const filteredNotifications = notifications.filter((n) => {
+    if (notifCategory === "unread") return n.unread;
+    if (notifCategory === "lesson") return n.category === "lesson";
+    if (notifCategory === "system") return n.category === "system";
     return true;
   });
 
-  const unreadNotifCount = notifications.filter(n => n.unread).length;
+  const unreadNotifCount = notifications.filter((n) => n.unread).length;
 
-  const searchResults = searchTerm.trim() === "" ? [] : MOCK_LESSONS.filter(l => 
-    l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (l.description && l.description.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const searchResults =
+    searchTerm.trim() === ""
+      ? []
+      : MOCK_LESSONS.filter(
+          (l) =>
+            l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (l.description && l.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800/90 shadow-2xs transition-colors duration-200">
@@ -198,17 +224,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* DMKLab + Khan Academy Brand Logo (Click to Home) */}
           <button
-            onClick={() => onChangeView('student')}
+            onClick={() => onChangeView("student")}
             className="flex items-center gap-2.5 group cursor-pointer shrink-0"
             title="DMKLab Khan Academy - Về Trang Chủ"
           >
             {/* Authentic Khan Academy Green Sprout Icon */}
             <div className="w-8 h-8 rounded-lg bg-[#14BF96]/15 flex items-center justify-center text-[#14BF96] group-hover:scale-105 transition-transform shadow-xs">
               <svg className="w-5 h-5 text-[#14BF96]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.5 2 5.5 4.5 4.5 8c2.5-.5 5.5.5 7.5 2.5 2-2 5-3 7.5-2.5C18.5 4.5 15.5 2 12 2zm0 8.5c-2-2-5-3-7.5-2.5C4.2 9.5 4 11.5 4 14c0 4.5 4 8 8 8s8-3.5 8-8c0-2.5-.2-4.5-.5-6-2.5-.5-5.5.5-7.5 2.5z"/>
+                <path d="M12 2C8.5 2 5.5 4.5 4.5 8c2.5-.5 5.5.5 7.5 2.5 2-2 5-3 7.5-2.5C18.5 4.5 15.5 2 12 2zm0 8.5c-2-2-5-3-7.5-2.5C4.2 9.5 4 11.5 4 14c0 4.5 4 8 8 8s8-3.5 8-8c0-2.5-.2-4.5-.5-6-2.5-.5-5.5.5-7.5 2.5z" />
               </svg>
             </div>
-            
+
             <div className="flex flex-col text-left">
               <div className="flex items-center gap-1.5 leading-none">
                 <span className="text-base font-extrabold text-[#0B2149] dark:text-white tracking-tight">
@@ -230,63 +256,71 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setShowCoursesMenu(!showCoursesMenu)}
               className="flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-[#1865F2] dark:hover:text-blue-400 rounded-lg hover:bg-slate-100/80 dark:hover:bg-slate-800/60 transition cursor-pointer whitespace-nowrap"
             >
-              <span>{t('nav_courses', 'Môn học')}</span>
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showCoursesMenu ? 'rotate-180 text-[#1865F2]' : ''}`} />
+              <span>{t("nav_courses", "Môn học")}</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showCoursesMenu ? "rotate-180 text-[#1865F2]" : ""}`}
+              />
             </button>
 
             {showCoursesMenu && (
-              <div 
+              <div
                 className="absolute left-0 mt-2 w-80 md:w-96 bg-white dark:bg-[#131E35] text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-5 z-50 text-xs grid grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-150"
                 onMouseLeave={() => setShowCoursesMenu(false)}
               >
                 <div className="space-y-3">
                   <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                    {t('nav_featured_fields', 'Lĩnh vực nổi bật')}
+                    {t("nav_featured_fields", "Lĩnh vực nổi bật")}
                   </p>
                   <div className="space-y-1">
-                    <button 
+                    <button
                       onClick={() => setShowCoursesMenu(false)}
                       className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
                     >
                       <TbMathFunction className="w-4 h-4 text-[#1865F2]" />
-                      <span>{t('nav_math_k12', 'Toán: Lớp 1 – Lớp 12')}</span>
+                      <span>{t("nav_math_k12", "Toán: Lớp 1 – Lớp 12")}</span>
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowCoursesMenu(false)}
                       className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
                     >
                       <RiAtomLine className="w-4 h-4 text-emerald-600" />
-                      <span>{t('nav_science_stem', 'Khoa học & Tự nhiên')}</span>
+                      <span>{t("nav_science_stem", "Khoa học & Tự nhiên")}</span>
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowCoursesMenu(false)}
                       className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-800 dark:text-slate-100 font-semibold transition"
                     >
                       <Globe className="w-4 h-4 text-purple-600" />
-                      <span>{t('nav_english_lang', 'Tiếng Anh & Ngôn ngữ')}</span>
+                      <span>{t("nav_english_lang", "Tiếng Anh & Ngôn ngữ")}</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-3 border-l border-slate-100 dark:border-slate-750 pl-4">
                   <p className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                    {t('nav_current_grade', 'Khối Lớp')}
+                    {t("nav_current_grade", "Khối Lớp")}
                   </p>
                   <div className="grid grid-cols-3 gap-1.5">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
                       <button
                         key={g}
                         onClick={() => {
-                          onSelectGrade({ id: `g-${g}`, name: `Lớp ${g}`, code: `GRADE_${g}`, level: g <= 5 ? 'PRIMARY' : g <= 9 ? 'SECONDARY' : 'HIGH_SCHOOL', displayOrder: g });
+                          onSelectGrade({
+                            id: `g-${g}`,
+                            name: `Lớp ${g}`,
+                            code: `GRADE_${g}`,
+                            level: g <= 5 ? "PRIMARY" : g <= 9 ? "SECONDARY" : "HIGH_SCHOOL",
+                            displayOrder: g,
+                          });
                           setShowCoursesMenu(false);
                         }}
                         className={`p-1.5 rounded-lg text-center font-bold text-xs transition ${
                           selectedGrade?.name === `Lớp ${g}`
-                            ? 'bg-[#1865F2] text-white shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+                            ? "bg-[#1865F2] text-white shadow-xs"
+                            : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200"
                         }`}
                       >
-                        {lang === 'en' ? `Grade ${g}` : `Lớp ${g}`}
+                        {lang === "en" ? `Grade ${g}` : `Lớp ${g}`}
                       </button>
                     ))}
                   </div>
@@ -294,34 +328,34 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {/* Quick Links inside Courses Dropdown */}
                 <div className="col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                  <span>{t('nav_explore_more', 'Khám phá thêm về DMKLab:')}</span>
+                  <span>{t("nav_explore_more", "Khám phá thêm về DMKLab:")}</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => {
-                        onChangeView('about');
+                        onChangeView("about");
                         setShowCoursesMenu(false);
                       }}
                       className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
                     >
-                      {t('nav_about', 'Giới thiệu')}
+                      {t("nav_about", "Giới thiệu")}
                     </button>
                     <button
                       onClick={() => {
-                        onChangeView('articles');
+                        onChangeView("articles");
                         setShowCoursesMenu(false);
                       }}
                       className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
                     >
-                      {t('nav_articles', 'Bài viết')}
+                      {t("nav_articles", "Bài viết")}
                     </button>
                     <button
                       onClick={() => {
-                        onChangeView('contact');
+                        onChangeView("contact");
                         setShowCoursesMenu(false);
                       }}
                       className="text-[#1865F2] dark:text-blue-400 hover:underline cursor-pointer"
                     >
-                      {t('nav_contact', 'Liên hệ')}
+                      {t("nav_contact", "Liên hệ")}
                     </button>
                   </div>
                 </div>
@@ -332,34 +366,34 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Nav links: Giới thiệu, Bài viết, Liên hệ - Clean modern text links without colorful bubbles */}
           <nav className="hidden lg:flex items-center gap-1 shrink-0">
             <button
-              onClick={() => onChangeView('about')}
+              onClick={() => onChangeView("about")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
-                activeView === 'about'
-                  ? 'text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
+                activeView === "about"
+                  ? "text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
               }`}
             >
-              {t('nav_about', 'Giới thiệu')}
+              {t("nav_about", "Giới thiệu")}
             </button>
             <button
-              onClick={() => onChangeView('articles')}
+              onClick={() => onChangeView("articles")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
-                activeView === 'articles'
-                  ? 'text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
+                activeView === "articles"
+                  ? "text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
               }`}
             >
-              {t('nav_articles', 'Bài viết')}
+              {t("nav_articles", "Bài viết")}
             </button>
             <button
-              onClick={() => onChangeView('contact')}
+              onClick={() => onChangeView("contact")}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
-                activeView === 'contact'
-                  ? 'text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50'
+                activeView === "contact"
+                  ? "text-[#1865F2] dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 font-bold"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
               }`}
             >
-              {t('nav_contact', 'Liên hệ')}
+              {t("nav_contact", "Liên hệ")}
             </button>
           </nav>
         </div>
@@ -374,7 +408,7 @@ export const Header: React.FC<HeaderProps> = ({
               setShowSearchResults(true);
             }}
             onFocus={() => setShowSearchResults(true)}
-            placeholder={t('nav_search_placeholder', 'Tìm kiếm bài học...')}
+            placeholder={t("nav_search_placeholder", "Tìm kiếm bài học...")}
             className="w-full bg-slate-100/90 dark:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs rounded-lg pl-8.5 pr-8 py-1.5 border border-slate-200/80 dark:border-slate-700/60 focus:outline-none focus:border-[#1865F2] focus:bg-white dark:focus:bg-slate-900 transition"
           />
           <RiSearchLine className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" />
@@ -392,7 +426,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Live Search Results Dropdown */}
           {showSearchResults && searchTerm.trim() !== "" && (
-            <div 
+            <div
               className="absolute left-0 top-10 w-80 md:w-96 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 text-xs space-y-2 animate-in fade-in zoom-in-95 duration-150"
               onMouseLeave={() => setShowSearchResults(false)}
             >
@@ -493,13 +527,15 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {showNotifications && (
-                <div 
+                <div
                   className="absolute right-0 mt-2 w-84 sm:w-92 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3.5 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150"
                   onMouseLeave={() => setShowNotifications(false)}
                 >
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-900 dark:text-slate-100 text-xs">Thông Báo Tập Trung</span>
+                      <span className="font-extrabold text-slate-900 dark:text-slate-100 text-xs">
+                        Thông Báo Tập Trung
+                      </span>
                       {unreadNotifCount > 0 && (
                         <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
                           {unreadNotifCount} mới
@@ -507,8 +543,10 @@ export const Header: React.FC<HeaderProps> = ({
                       )}
                     </div>
                     {unreadNotifCount > 0 && (
-                      <button 
-                        onClick={() => setNotifications(prev => prev.map(n => ({ ...n, unread: false })))}
+                      <button
+                        onClick={() =>
+                          setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
+                        }
                         className="text-[11px] text-[#1865F2] dark:text-blue-400 hover:underline font-semibold cursor-pointer"
                       >
                         Đã đọc tất cả
@@ -519,18 +557,18 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Notification Category Filters */}
                   <div className="flex items-center gap-1 pb-1 overflow-x-auto no-scrollbar">
                     {[
-                      { key: 'all', label: `Tất cả (${notifications.length})` },
-                      { key: 'unread', label: `Chưa đọc (${unreadNotifCount})` },
-                      { key: 'lesson', label: 'Bài học' },
-                      { key: 'system', label: 'Hệ thống' },
-                    ].map(cat => (
+                      { key: "all", label: `Tất cả (${notifications.length})` },
+                      { key: "unread", label: `Chưa đọc (${unreadNotifCount})` },
+                      { key: "lesson", label: "Bài học" },
+                      { key: "system", label: "Hệ thống" },
+                    ].map((cat) => (
                       <button
                         key={cat.key}
                         onClick={() => setNotifCategory(cat.key as any)}
                         className={`px-2 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap transition cursor-pointer ${
                           notifCategory === cat.key
-                            ? 'bg-[#1865F2] text-white shadow-2xs'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                            ? "bg-[#1865F2] text-white shadow-2xs"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                         }`}
                       >
                         {cat.label}
@@ -546,17 +584,23 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
                     ) : (
                       filteredNotifications.map((n) => (
-                        <div 
+                        <div
                           key={n.id}
-                          onClick={() => setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, unread: false } : x))}
+                          onClick={() =>
+                            setNotifications((prev) =>
+                              prev.map((x) => (x.id === n.id ? { ...x, unread: false } : x))
+                            )
+                          }
                           className={`p-2.5 rounded-xl border transition cursor-pointer ${
-                            n.unread 
-                              ? 'bg-blue-50/50 dark:bg-blue-950/30 border-blue-200/80 dark:border-blue-900/50' 
-                              : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 hover:bg-slate-100/70'
+                            n.unread
+                              ? "bg-blue-50/50 dark:bg-blue-950/30 border-blue-200/80 dark:border-blue-900/50"
+                              : "bg-slate-50/70 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 hover:bg-slate-100/70"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1">
-                            <p className={`font-bold text-[11px] truncate ${n.unread ? 'text-blue-900 dark:text-blue-200' : 'text-slate-800 dark:text-slate-200'}`}>
+                            <p
+                              className={`font-bold text-[11px] truncate ${n.unread ? "text-blue-900 dark:text-blue-200" : "text-slate-800 dark:text-slate-200"}`}
+                            >
                               {n.title}
                             </p>
                             <span className="text-[9px] text-slate-400 shrink-0">{n.time}</span>
@@ -591,42 +635,52 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => setShowLangMenu(!showLangMenu)}
                 className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
-                title={t('lang_select_title', 'Chọn ngôn ngữ')}
+                title={t("lang_select_title", "Chọn ngôn ngữ")}
               >
                 <RiTranslate2 className="w-3.5 h-3.5 text-slate-400" />
-                <span>{lang === 'vi' ? 'VN' : 'EN'}</span>
-                <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showLangMenu ? 'rotate-180' : ''}`} />
+                <span>{lang === "vi" ? "VN" : "EN"}</span>
+                <ChevronDown
+                  className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showLangMenu ? "rotate-180" : ""}`}
+                />
               </button>
 
               {showLangMenu && (
-                <div 
+                <div
                   className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#131E35] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
                   onMouseLeave={() => setShowLangMenu(false)}
                 >
                   <button
                     onClick={() => {
-                      setLang('vi');
+                      setLang("vi");
                       setShowLangMenu(false);
                     }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-medium transition cursor-pointer ${
-                      lang === 'vi' ? 'bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+                      lang === "vi"
+                        ? "bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold"
+                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
                     }`}
                   >
                     <span>🇻🇳 Tiếng Việt</span>
-                    {lang === 'vi' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />}
+                    {lang === "vi" && (
+                      <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
+                    )}
                   </button>
 
                   <button
                     onClick={() => {
-                      setLang('en');
+                      setLang("en");
                       setShowLangMenu(false);
                     }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-medium transition cursor-pointer ${
-                      lang === 'en' ? 'bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+                      lang === "en"
+                        ? "bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold"
+                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
                     }`}
                   >
                     <span>🇬🇧 English</span>
-                    {lang === 'en' && <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />}
+                    {lang === "en" && (
+                      <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
+                    )}
                   </button>
                 </div>
               )}
@@ -637,8 +691,8 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={toggleTheme}
               className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-amber-400 transition cursor-pointer"
-              title={isDark ? t('theme_light', 'Giao diện Sáng') : t('theme_dark', 'Giao diện Tối')}
-              aria-label={t('theme_toggle', 'Chuyển giao diện sáng/tối')}
+              title={isDark ? t("theme_light", "Giao diện Sáng") : t("theme_dark", "Giao diện Tối")}
+              aria-label={t("theme_toggle", "Chuyển giao diện sáng/tối")}
             >
               {isDark ? (
                 <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
@@ -655,7 +709,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="hidden xl:block h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0" />
 
               {/* UNIFIED GAMIFICATION BADGE (Single quiet neutral chip - No rainbow colors!) */}
-              <div 
+              <div
                 className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-100/80 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/60 text-xs font-semibold text-slate-700 dark:text-slate-200"
                 title={`Chuỗi ${currentUser.streakDays || 1} ngày học • ${(currentUser.energyPoints || 1000).toLocaleString()} điểm năng lượng`}
               >
@@ -676,28 +730,28 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Dashboard Navigation Button - Subtle outline, not a harsh pill */}
               <button
                 onClick={() => {
-                  if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') {
-                    window.location.href = '/admin';
+                  if (currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN") {
+                    window.location.href = "/admin";
                   } else {
-                    onChangeView(activeView === 'dashboard' ? 'student' : 'dashboard');
+                    onChangeView(activeView === "dashboard" ? "student" : "dashboard");
                   }
                 }}
                 className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition border cursor-pointer whitespace-nowrap bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
                 title={
-                  currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                  currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
                     ? "Mở Cổng Quản Trị Riêng Biệt (/admin)"
-                    : currentUser.role === 'STUDENT'
-                    ? "Bảng Điều Khiển"
-                    : "Không Gian Giáo Viên"
+                    : currentUser.role === "STUDENT"
+                      ? "Bảng Điều Khiển"
+                      : "Không Gian Giáo Viên"
                 }
               >
                 <RiDashboardFill className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span className="hidden xl:inline">
-                  {currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                  {currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
                     ? "Cổng Quản Trị ↗"
-                    : currentUser.role === 'STUDENT'
-                    ? "Bảng Điều Khiển"
-                    : "Bảng Giáo Viên"}
+                    : currentUser.role === "STUDENT"
+                      ? "Bảng Điều Khiển"
+                      : "Bảng Giáo Viên"}
                 </span>
               </button>
 
@@ -716,13 +770,17 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 {showUserDropdown && (
-                  <div 
+                  <div
                     className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#131E35] text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150"
                     onMouseLeave={() => setShowUserDropdown(false)}
                   >
                     <div className="p-3 border-b border-slate-100 dark:border-slate-800">
-                      <p className="font-bold text-slate-900 dark:text-slate-100">{currentUser.fullName}</p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">@{currentUser.username}</p>
+                      <p className="font-bold text-slate-900 dark:text-slate-100">
+                        {currentUser.fullName}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        @{currentUser.username}
+                      </p>
                       <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                         Vai trò: {currentUser.role}
                       </span>
@@ -731,10 +789,10 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="py-1 space-y-0.5">
                       <button
                         onClick={() => {
-                          if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN') {
-                            window.location.href = '/admin';
+                          if (currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN") {
+                            window.location.href = "/admin";
                           } else {
-                            onChangeView('dashboard');
+                            onChangeView("dashboard");
                           }
                           setShowUserDropdown(false);
                         }}
@@ -742,7 +800,7 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <RiDashboardFill className="w-4 h-4 text-[#1865F2] dark:text-blue-400" />
                         <span>
-                          {currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
+                          {currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
                             ? "Cổng Quản Trị Hệ Thống (/admin) ↗"
                             : "Bảng Điều Khiển Cá Nhân"}
                         </span>
@@ -766,7 +824,7 @@ export const Header: React.FC<HeaderProps> = ({
                       </p>
                       <button
                         onClick={() => {
-                          onSwitchUser('STUDENT');
+                          onSwitchUser("STUDENT");
                           setShowUserDropdown(false);
                         }}
                         className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
@@ -775,12 +833,14 @@ export const Header: React.FC<HeaderProps> = ({
                           <FaGraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           Học sinh
                         </span>
-                        {currentUser.role === 'STUDENT' && <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>}
+                        {currentUser.role === "STUDENT" && (
+                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
+                        )}
                       </button>
 
                       <button
                         onClick={() => {
-                          onSwitchUser('TEACHER');
+                          onSwitchUser("TEACHER");
                           setShowUserDropdown(false);
                         }}
                         className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
@@ -789,12 +849,14 @@ export const Header: React.FC<HeaderProps> = ({
                           <FaChalkboardUser className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                           Giáo viên
                         </span>
-                        {currentUser.role === 'TEACHER' && <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>}
+                        {currentUser.role === "TEACHER" && (
+                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
+                        )}
                       </button>
 
                       <button
                         onClick={() => {
-                          onSwitchUser('SUPER_ADMIN');
+                          onSwitchUser("SUPER_ADMIN");
                           setShowUserDropdown(false);
                         }}
                         className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
@@ -803,7 +865,9 @@ export const Header: React.FC<HeaderProps> = ({
                           <FaUserShield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                           Quản Trị Viên
                         </span>
-                        {currentUser.role === 'SUPER_ADMIN' && <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>}
+                        {currentUser.role === "SUPER_ADMIN" && (
+                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
+                        )}
                       </button>
 
                       <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
@@ -831,14 +895,14 @@ export const Header: React.FC<HeaderProps> = ({
                 className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-[#1865F2] dark:hover:text-blue-400 transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>{t('nav_login', 'Đăng nhập')}</span>
+                <span>{t("nav_login", "Đăng nhập")}</span>
               </button>
               <button
                 onClick={onOpenRegister}
                 className="px-3.5 py-1.5 text-xs font-semibold bg-[#1865F2] hover:bg-[#1557D0] text-white rounded-lg shadow-2xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>{t('nav_register', 'Đăng ký')}</span>
+                <span>{t("nav_register", "Đăng ký")}</span>
               </button>
             </div>
           )}
@@ -863,11 +927,11 @@ export const Header: React.FC<HeaderProps> = ({
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   setShowChannelsModal(false);
                   setChannelSavedMsg(false);
-                }} 
+                }}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold p-1 cursor-pointer"
               >
                 <X className="w-4 h-4" />
@@ -890,13 +954,16 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Thông báo trong Website</span>
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Hiển thị chuông thông báo, bài học mới, và nhắc nhở duy trì chuỗi học tập (Streak).
+                    Hiển thị chuông thông báo, bài học mới, và nhắc nhở duy trì chuỗi học tập
+                    (Streak).
                   </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.website}
-                  onChange={(e) => setChannelSettings(prev => ({ ...prev, website: e.target.checked }))}
+                  onChange={(e) =>
+                    setChannelSettings((prev) => ({ ...prev, website: e.target.checked }))
+                  }
                   className="w-4 h-4 accent-[#1865F2] rounded cursor-pointer shrink-0"
                 />
               </div>
@@ -909,13 +976,16 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Thông báo qua Email</span>
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Gửi thư tổng kết tiến độ hàng tuần, báo cáo phụ huynh và cảnh báo bảo mật tài khoản.
+                    Gửi thư tổng kết tiến độ hàng tuần, báo cáo phụ huynh và cảnh báo bảo mật tài
+                    khoản.
                   </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.email}
-                  onChange={(e) => setChannelSettings(prev => ({ ...prev, email: e.target.checked }))}
+                  onChange={(e) =>
+                    setChannelSettings((prev) => ({ ...prev, email: e.target.checked }))
+                  }
                   className="w-4 h-4 accent-purple-600 rounded cursor-pointer shrink-0"
                 />
               </div>
@@ -928,13 +998,16 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Kênh Zalo OA & Ứng dụng Di động</span>
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Tin nhắn nhắc học mỗi tối 19:30, chúc mừng mở khóa huy hiệu mới qua Zalo Official Account.
+                    Tin nhắn nhắc học mỗi tối 19:30, chúc mừng mở khóa huy hiệu mới qua Zalo
+                    Official Account.
                   </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.zalo}
-                  onChange={(e) => setChannelSettings(prev => ({ ...prev, zalo: e.target.checked }))}
+                  onChange={(e) =>
+                    setChannelSettings((prev) => ({ ...prev, zalo: e.target.checked }))
+                  }
                   className="w-4 h-4 accent-emerald-600 rounded cursor-pointer shrink-0"
                 />
               </div>
@@ -953,7 +1026,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => {
                   try {
-                    localStorage.setItem('dmklab_notification_channels', JSON.stringify(channelSettings));
+                    localStorage.setItem(
+                      "dmklab_notification_channels",
+                      JSON.stringify(channelSettings)
+                    );
                   } catch {}
                   setChannelSavedMsg(true);
                   setTimeout(() => {
@@ -974,7 +1050,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Mobile Drawer (Slide-out menu for tablet/mobile) */}
       {mobileDrawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileDrawerOpen(false)}
           />
@@ -1003,11 +1079,13 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="space-y-1 text-xs font-semibold">
                 <button
                   onClick={() => {
-                    onChangeView('student');
+                    onChangeView("student");
                     setMobileDrawerOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 transition cursor-pointer ${
-                    activeView === 'student' ? 'bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
+                    activeView === "student"
+                      ? "bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] font-bold"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
                   }`}
                 >
                   <Home className="w-4 h-4 text-[#1865F2]" />
@@ -1047,7 +1125,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
-                    onChangeView('about');
+                    onChangeView("about");
                     setMobileDrawerOpen(false);
                   }}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
@@ -1057,7 +1135,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
-                    onChangeView('articles');
+                    onChangeView("articles");
                     setMobileDrawerOpen(false);
                   }}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
@@ -1067,7 +1145,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
-                    onChangeView('contact');
+                    onChangeView("contact");
                     setMobileDrawerOpen(false);
                   }}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
@@ -1079,7 +1157,7 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
-                    window.location.href = '/admin';
+                    window.location.href = "/admin";
                   }}
                   className="w-full text-left px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center justify-between text-slate-800 dark:text-slate-200 transition font-bold cursor-pointer"
                 >
@@ -1097,14 +1175,16 @@ export const Header: React.FC<HeaderProps> = ({
       )}
 
       {/* Mobile Fixed Bottom Navigation Bar (Đa thiết bị: Điện thoại & Máy tính bảng nhỏ) */}
-      <nav 
+      <nav
         aria-label="Điều hướng di động"
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800/90 py-1.5 px-3 flex items-center justify-around shadow-lg"
       >
         <button
-          onClick={() => onChangeView('student')}
+          onClick={() => onChangeView("student")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer ${
-            activeView === 'student' ? 'text-[#1865F2] font-bold' : 'text-slate-500 dark:text-slate-400'
+            activeView === "student"
+              ? "text-[#1865F2] font-bold"
+              : "text-slate-500 dark:text-slate-400"
           }`}
         >
           <Home className="w-4 h-4" />

@@ -7,7 +7,8 @@ export const MOCK_USERS: Record<string, User> = {
     fullName: "Nguyễn Minh An",
     email: "minhan@student.k12.edu.vn",
     role: "STUDENT",
-    avatarUrl: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80",
+    avatarUrl:
+      "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80",
     gradeLevel: 5,
     energyPoints: 2450,
     streakDays: 7,
@@ -18,7 +19,8 @@ export const MOCK_USERS: Record<string, User> = {
     fullName: "Thầy Trần Nam (Toán K-12)",
     email: "trannam@school.edu.vn",
     role: "TEACHER",
-    avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    avatarUrl:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
     energyPoints: 8900,
     streakDays: 45,
   },
@@ -28,7 +30,8 @@ export const MOCK_USERS: Record<string, User> = {
     fullName: "Ban Quản Trị Hệ Thống",
     email: "admin@k12.edu.vn",
     role: "SUPER_ADMIN",
-    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    avatarUrl:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     energyPoints: 12000,
     streakDays: 120,
   },
@@ -107,7 +110,8 @@ export const MOCK_LESSONS: Lesson[] = [
     id: "les-01",
     chapterId: "chap-01",
     title: "1. Khái niệm Phân số và Các tính chất cơ bản",
-    description: "Khám phá bản chất của phân số thông qua ví dụ thực tế về chia bánh pizza và đo lường thể tích.",
+    description:
+      "Khám phá bản chất của phân số thông qua ví dụ thực tế về chia bánh pizza và đo lường thể tích.",
     contentType: "VIDEO",
     // Link video mẫu công khai chất lượng cao cho giáo dục (Big Buck Bunny mp4 hoặc Blender educational)
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
@@ -123,8 +127,10 @@ export const MOCK_LESSONS: Lesson[] = [
       questions: [
         {
           id: "q-1",
-          questionText: "Một chiếc bánh pizza được chia đều thành 8 miếng. Bạn Minh ăn 3 miếng. Phân số chỉ số phần bánh Minh đã ăn là bao nhiêu?",
-          explanation: "Tổng số phần bằng nhau là 8 (mẫu số), số phần đã ăn là 3 (tử số). Do đó phân số biểu diễn là 3/8.",
+          questionText:
+            "Một chiếc bánh pizza được chia đều thành 8 miếng. Bạn Minh ăn 3 miếng. Phân số chỉ số phần bánh Minh đã ăn là bao nhiêu?",
+          explanation:
+            "Tổng số phần bằng nhau là 8 (mẫu số), số phần đã ăn là 3 (tử số). Do đó phân số biểu diễn là 3/8.",
           points: 10,
           options: [
             { id: "opt-1", text: "3/8", isCorrect: true },
@@ -135,8 +141,10 @@ export const MOCK_LESSONS: Lesson[] = [
         },
         {
           id: "q-2",
-          questionText: "Khi nhân cả tử số và mẫu số của một phân số với cùng một số tự nhiên khác 0, ta được:",
-          explanation: "Theo tính chất cơ bản của phân số: Khi nhân cả tử số và mẫu số với cùng một số tự nhiên khác 0, ta được một phân số bằng phân số đã cho.",
+          questionText:
+            "Khi nhân cả tử số và mẫu số của một phân số với cùng một số tự nhiên khác 0, ta được:",
+          explanation:
+            "Theo tính chất cơ bản của phân số: Khi nhân cả tử số và mẫu số với cùng một số tự nhiên khác 0, ta được một phân số bằng phân số đã cho.",
           points: 10,
           options: [
             { id: "opt-5", text: "Một phân số lớn hơn", isCorrect: false },
@@ -152,9 +160,11 @@ export const MOCK_LESSONS: Lesson[] = [
     id: "les-02",
     chapterId: "chap-01",
     title: "2. Quy đồng mẫu số các phân số",
-    description: "Học phương pháp tìm mẫu số chung nhỏ nhất và kỹ thuật quy đồng hai hoặc nhiều phân số.",
+    description:
+      "Học phương pháp tìm mẫu số chung nhỏ nhất và kỹ thuật quy đồng hai hoặc nhiều phân số.",
     contentType: "VIDEO",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     durationSeconds: 653,
     orderNum: 2,
     isCompleted: false,
@@ -186,7 +196,8 @@ export const MOCK_LESSONS: Lesson[] = [
     title: "3. Phép cộng và trừ phân số khác mẫu số",
     description: "Ứng dụng quy đồng mẫu số để thực hiện phép cộng và trừ phân số chính xác.",
     contentType: "VIDEO",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     durationSeconds: 480,
     orderNum: 3,
     isCompleted: false,
@@ -197,9 +208,11 @@ export const MOCK_LESSONS: Lesson[] = [
     id: "les-04",
     chapterId: "chap-02",
     title: "4. Khái niệm Số thập phân và Hàng của số thập phân",
-    description: "Chuyển đổi giữa phân số thập phân sang số thập phân, nhận diện phần nguyên và phần thập phân.",
+    description:
+      "Chuyển đổi giữa phân số thập phân sang số thập phân, nhận diện phần nguyên và phần thập phân.",
     contentType: "VIDEO",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    videoUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     durationSeconds: 520,
     orderNum: 4,
     isCompleted: false,
@@ -212,8 +225,10 @@ export const MOCK_COURSE: Course = {
   id: "course-math-5",
   subjectId: "sub-math-5",
   title: "Toán Học Lớp 5 - Chương Trình Chuẩn Bộ Giáo Dục & Đào Tạo",
-  description: "Khóa học xây dựng nền tảng tư duy logic, làm chủ phân số, số thập phân, hình học phẳng và giải toán có lời văn chuẩn bị cho chuyển cấp THCS.",
-  thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=80",
+  description:
+    "Khóa học xây dựng nền tảng tư duy logic, làm chủ phân số, số thập phân, hình học phẳng và giải toán có lời văn chuẩn bị cho chuyển cấp THCS.",
+  thumbnailUrl:
+    "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&auto=format&fit=crop&q=80",
   chapters: [
     {
       id: "chap-01",

@@ -1,0 +1,14 @@
+{
+  "name": "dmklab-k12-education",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.4.1",
+  "scripts": {
+    "dev": "pnpm --filter education-frontend dev",
+    "build": "pnpm --filter education-frontend build",
+    "start": "pnpm --filter education-frontend start",
+    "lint": "pnpm --filter education-frontend lint",
+    "format": "pnpm --filter education-frontend format",
+    "format:check": "pnpm --filter education-frontend format:check"
+  }
+}

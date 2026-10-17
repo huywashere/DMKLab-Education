@@ -7,21 +7,21 @@ import { MOCK_USERS } from "@/lib/mock-data";
 import { api } from "@/lib/api";
 import { AdminDashboard, AdminTabType } from "@/features/admin/AdminDashboard";
 import { useTheme } from "@/lib/theme/ThemeContext";
-import { 
-  Activity, 
-  Video, 
-  BookOpen, 
-  Users, 
-  GraduationCap, 
-  UserCheck, 
-  ShieldCheck, 
-  Bot, 
-  ExternalLink, 
-  RefreshCw, 
-  Sun, 
-  Moon, 
-  LogOut, 
-  Menu, 
+import {
+  Activity,
+  Video,
+  BookOpen,
+  Users,
+  GraduationCap,
+  UserCheck,
+  ShieldCheck,
+  Bot,
+  ExternalLink,
+  RefreshCw,
+  Sun,
+  Moon,
+  LogOut,
+  Menu,
   X,
   Server,
   Database,
@@ -30,19 +30,20 @@ import {
   Sparkles,
   LayoutDashboard,
   Lock,
-  RotateCcw
+  RotateCcw,
 } from "lucide-react";
 
 export default function StandaloneAdminPortalPage() {
   const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS.admin);
-  const [activeTab, setActiveTab] = useState<AdminTabType>('overview');
+  const [activeTab, setActiveTab] = useState<AdminTabType>("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const { theme, toggleTheme, isDark } = useTheme();
 
   useEffect(() => {
-    api.getMyProfile()
+    api
+      .getMyProfile()
       .then((profile) => {
         if (profile) {
           setCurrentUser(profile);
@@ -57,25 +58,50 @@ export default function StandaloneAdminPortalPage() {
     {
       group: "VẬN HÀNH & GIÁM SÁT",
       items: [
-        { key: "overview" as AdminTabType, label: "Tổng Quan Hệ Thống", icon: Activity, badge: "Live" },
+        {
+          key: "overview" as AdminTabType,
+          label: "Tổng Quan Hệ Thống",
+          icon: Activity,
+          badge: "Live",
+        },
         { key: "audit" as AdminTabType, label: "Nhật Ký Kiểm Toán (Audit)", icon: ShieldCheck },
-        { key: "security" as AdminTabType, label: "Bảo Vệ Dữ Liệu (COPPA)", icon: Lock, badge: "AES" },
-        { key: "reliability" as AdminTabType, label: "Độ Tin Cậy & Phục Hồi", icon: RotateCcw, badge: "DR" },
-      ]
+        {
+          key: "security" as AdminTabType,
+          label: "Bảo Vệ Dữ Liệu (COPPA)",
+          icon: Lock,
+          badge: "AES",
+        },
+        {
+          key: "reliability" as AdminTabType,
+          label: "Độ Tin Cậy & Phục Hồi",
+          icon: RotateCcw,
+          badge: "DR",
+        },
+      ],
     },
     {
       group: "TRÍ TUỆ NHÂN TẠO & CHẤT LƯỢNG",
       items: [
-        { key: "ai_quality" as AdminTabType, label: "Kiểm Định Chất Lượng AI", icon: Sparkles, badge: "K-12" },
+        {
+          key: "ai_quality" as AdminTabType,
+          label: "Kiểm Định Chất Lượng AI",
+          icon: Sparkles,
+          badge: "K-12",
+        },
         { key: "ai" as AdminTabType, label: "Trợ Lý AI Quản Trị", icon: Bot, badge: "AI" },
-      ]
+      ],
     },
     {
       group: "NỘI DUNG & BÀI GIẢNG",
       items: [
         { key: "curriculum" as AdminTabType, label: "Quản Lý Khóa Học & Bài Học", icon: BookOpen },
-        { key: "media" as AdminTabType, label: "Pipeline Video HLS & CDN", icon: Video, badge: "HLS" },
-      ]
+        {
+          key: "media" as AdminTabType,
+          label: "Pipeline Video HLS & CDN",
+          icon: Video,
+          badge: "HLS",
+        },
+      ],
     },
     {
       group: "NGƯỜI DÙNG & PHÂN QUYỀN",
@@ -83,19 +109,19 @@ export default function StandaloneAdminPortalPage() {
         { key: "rbac" as AdminTabType, label: "Quản Lý Người Dùng & Phiên", icon: Users },
         { key: "teacher" as AdminTabType, label: "Không Gian Giáo Viên", icon: GraduationCap },
         { key: "parent" as AdminTabType, label: "Cổng Phụ Huynh K-12", icon: UserCheck },
-      ]
-    }
+      ],
+    },
   ];
 
-  const currentTabLabel = navMenuItems
-    .flatMap(g => g.items)
-    .find(item => item.key === activeTab)?.label || "Tổng Quan Hệ Thống";
+  const currentTabLabel =
+    navMenuItems.flatMap((g) => g.items).find((item) => item.key === activeTab)?.label ||
+    "Tổng Quan Hệ Thống";
 
   return (
     <div className="min-h-screen flex bg-[#F4F6F8] dark:bg-[#070D18] text-slate-800 dark:text-slate-100 font-sans antialiased">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs"
           onClick={() => setMobileMenuOpen(false)}
         />
@@ -109,10 +135,7 @@ export default function StandaloneAdminPortalPage() {
       >
         {/* Sidebar Header: Logo & Branding */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800/80 shrink-0">
-          <Link 
-            href="/admin" 
-            className="flex items-center gap-2.5 overflow-hidden group"
-          >
+          <Link href="/admin" className="flex items-center gap-2.5 overflow-hidden group">
             <img
               src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
               alt="DMKLab"
@@ -175,14 +198,18 @@ export default function StandaloneAdminPortalPage() {
                     title={!isSidebarOpen ? item.label : undefined}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <Icon className={`w-4 h-4 shrink-0 transition ${isActive ? "text-white" : "text-slate-400 group-hover:text-blue-400"}`} />
+                      <Icon
+                        className={`w-4 h-4 shrink-0 transition ${isActive ? "text-white" : "text-slate-400 group-hover:text-blue-400"}`}
+                      />
                       {isSidebarOpen && <span className="truncate">{item.label}</span>}
                     </div>
 
                     {isSidebarOpen && item.badge && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
-                        isActive ? "bg-white/20 text-white" : "bg-slate-800 text-slate-300"
-                      }`}>
+                      <span
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
+                          isActive ? "bg-white/20 text-white" : "bg-slate-800 text-slate-300"
+                        }`}
+                      >
                         {item.badge}
                       </span>
                     )}
@@ -245,7 +272,10 @@ export default function StandaloneAdminPortalPage() {
             </>
           ) : (
             <div className="flex flex-col items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" title="Hệ thống Online" />
+              <span
+                className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"
+                title="Hệ thống Online"
+              />
               <button
                 onClick={() => {
                   api.clearToken();
@@ -262,7 +292,7 @@ export default function StandaloneAdminPortalPage() {
       </aside>
 
       {/* Main Admin Workspace Area */}
-      <div 
+      <div
         className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
           isSidebarOpen ? "lg:ml-72" : "lg:ml-20"
         }`}
@@ -279,7 +309,9 @@ export default function StandaloneAdminPortalPage() {
             </button>
 
             <div className="flex items-center gap-2 text-xs">
-              <span className="font-semibold text-slate-400 dark:text-slate-500">Cổng Quản Trị</span>
+              <span className="font-semibold text-slate-400 dark:text-slate-500">
+                Cổng Quản Trị
+              </span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600" />
               <span className="font-bold text-[#0A2540] dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                 {currentTabLabel}
@@ -291,7 +323,7 @@ export default function StandaloneAdminPortalPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Refresh DB Data Button */}
             <button
-              onClick={() => setRefreshKey(prev => prev + 1)}
+              onClick={() => setRefreshKey((prev) => prev + 1)}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition cursor-pointer"
               title="Làm mới dữ liệu từ Database"
             >

@@ -1,19 +1,19 @@
 "use client";
 
 import React from "react";
-import { 
-  Sparkles, 
-  Target, 
-  Lightbulb, 
-  ShieldCheck, 
-  Users, 
-  GraduationCap, 
-  BookOpen, 
-  Cpu, 
-  Award, 
-  CheckCircle2, 
+import {
+  Sparkles,
+  Target,
+  Lightbulb,
+  ShieldCheck,
+  Users,
+  GraduationCap,
+  BookOpen,
+  Cpu,
+  Award,
+  CheckCircle2,
   ArrowRight,
-  Heart
+  Heart,
 } from "lucide-react";
 import { FaLightbulb, FaShieldHalved } from "react-icons/fa6";
 import { TbTargetArrow } from "react-icons/tb";
@@ -111,7 +111,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            DMKLab Education là nền tảng giáo dục trực tuyến K–12 thế hệ mới, kết hợp tinh hoa sư phạm gợi mở Socratic với công nghệ trí tuệ nhân tạo hiện đại, giúp mọi học sinh từ lớp 1 đến lớp 12 học đúng phương pháp và tiến bộ bền vững.
+            DMKLab Education là nền tảng giáo dục trực tuyến K–12 thế hệ mới, kết hợp tinh hoa sư
+            phạm gợi mở Socratic với công nghệ trí tuệ nhân tạo hiện đại, giúp mọi học sinh từ lớp 1
+            đến lớp 12 học đúng phương pháp và tiến bộ bền vững.
           </p>
 
           <div className="pt-2 flex flex-wrap justify-center gap-3">
@@ -141,7 +143,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({
           {STATS.map((s, idx) => (
             <div key={idx} className="space-y-2 relative z-10">
               <p className="text-3xl sm:text-4xl font-black text-[#14BF96]">{s.value}</p>
-              <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">{s.label}</p>
+              <p className="text-xs sm:text-sm text-slate-300 font-medium leading-snug">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
@@ -159,11 +163,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            Chúng tôi tin rằng mọi học sinh đều có tiềm năng học giỏi nếu được tiếp cận đúng cách. Trong môi trường học tập truyền thống, tốc độ giảng dạy thường cố định cho cả lớp khiến học sinh hổng kiến thức không kịp bắt nhịp.
+            Chúng tôi tin rằng mọi học sinh đều có tiềm năng học giỏi nếu được tiếp cận đúng cách.
+            Trong môi trường học tập truyền thống, tốc độ giảng dạy thường cố định cho cả lớp khiến
+            học sinh hổng kiến thức không kịp bắt nhịp.
           </p>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            Tại <strong>DMKLab Education</strong>, công nghệ được sinh ra để trao quyền: học sinh tự điều khiển nhịp học, xem lại video bất cứ lúc nào, giải bài tập tương tác với sự dẫn dắt từng bước của gia sư AI và nhận điểm thưởng để nuôi dưỡng niềm đam mê khám phá.
+            Tại <strong>DMKLab Education</strong>, công nghệ được sinh ra để trao quyền: học sinh tự
+            điều khiển nhịp học, xem lại video bất cứ lúc nào, giải bài tập tương tác với sự dẫn dắt
+            từng bước của gia sư AI và nhận điểm thưởng để nuôi dưỡng niềm đam mê khám phá.
           </p>
 
           <div className="space-y-3 pt-2">
@@ -194,7 +202,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-900">Cam Kết Chất Lượng</p>
-                <p className="text-[11px] text-slate-500">Giáo trình biên soạn bởi các chuyên gia sư phạm hàng đầu</p>
+                <p className="text-[11px] text-slate-500">
+                  Giáo trình biên soạn bởi các chuyên gia sư phạm hàng đầu
+                </p>
               </div>
             </div>
           </div>
@@ -209,7 +219,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({
               4 Trụ Cột Tạo Nên Sự Khác Biệt
             </h2>
             <p className="text-sm text-slate-500">
-              Kiến trúc hệ thống được xây dựng để phục vụ trực tiếp cho hiệu quả tiếp thu kiến thức của học viên
+              Kiến trúc hệ thống được xây dựng để phục vụ trực tiếp cho hiệu quả tiếp thu kiến thức
+              của học viên
             </p>
           </div>
 
@@ -219,15 +230,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({
                 key={idx}
                 className="bg-white p-7 rounded-3xl border border-slate-200 shadow-xs space-y-4 hover:border-[#1865F2]/40 transition group"
               >
-                <div className={`w-12 h-12 rounded-2xl ${val.bg} flex items-center justify-center transition-transform group-hover:scale-105`}>
+                <div
+                  className={`w-12 h-12 rounded-2xl ${val.bg} flex items-center justify-center transition-transform group-hover:scale-105`}
+                >
                   {val.icon}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#1865F2] transition">
                   {val.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {val.desc}
-                </p>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{val.desc}</p>
               </div>
             ))}
           </div>
@@ -251,7 +262,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {TEAM.map((member, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs text-center space-y-4 hover:shadow-md transition">
+            <div
+              key={idx}
+              className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs text-center space-y-4 hover:shadow-md transition"
+            >
               <img
                 src={member.avatar}
                 alt={member.name}
@@ -261,9 +275,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({
                 <h3 className="font-extrabold text-slate-900 text-base">{member.name}</h3>
                 <p className="text-xs font-bold text-[#1865F2] mt-0.5">{member.role}</p>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {member.bio}
-              </p>
+              <p className="text-xs text-slate-500 leading-relaxed">{member.bio}</p>
             </div>
           ))}
         </div>
@@ -276,7 +288,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({
             Sẵn sàng trải nghiệm phương pháp học tập tương lai?
           </h2>
           <p className="text-sm sm:text-base text-blue-100 max-w-2xl mx-auto leading-relaxed">
-            Đăng ký tài khoản hoàn toàn miễn phí và bắt đầu bài học đầu tiên ngay hôm nay cùng DMK AI Tutor!
+            Đăng ký tài khoản hoàn toàn miễn phí và bắt đầu bài học đầu tiên ngay hôm nay cùng DMK
+            AI Tutor!
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button

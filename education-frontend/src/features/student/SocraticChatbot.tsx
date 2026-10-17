@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage, User } from "@/types";
-import { 
-  X, 
-  Send, 
-  Sparkles, 
-  Lightbulb, 
+import {
+  X,
+  Send,
+  Sparkles,
+  Lightbulb,
   User as UserIcon,
   Minus,
   BookOpen,
@@ -28,14 +28,15 @@ import {
   Coins,
   ShieldAlert,
   Clock,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { RiSparklingFill, RiRobot2Fill } from "react-icons/ri";
 import { FaShieldHalved } from "react-icons/fa6";
 import confetti from "canvas-confetti";
 import { api, SocraticChatResponse, InteractiveQuizData, CitationData } from "@/lib/api";
 
-export type TutorMode = "SOCRATIC" | "GRADE_ADAPTED" | "PRACTICE" | "ERROR_DIAGNOSIS" | "CITE_LESSON";
+export type TutorMode =
+  "SOCRATIC" | "GRADE_ADAPTED" | "PRACTICE" | "ERROR_DIAGNOSIS" | "CITE_LESSON";
 
 interface SocraticChatbotProps {
   currentUser: User;
@@ -47,11 +48,36 @@ interface SocraticChatbotProps {
 }
 
 const TUTOR_MODES: { id: TutorMode; name: string; icon: React.ReactNode; desc: string }[] = [
-  { id: "SOCRATIC", name: "Gợi ý từng bước", icon: <Lightbulb className="w-3.5 h-3.5" />, desc: "Gợi mở tư duy, không giải hộ" },
-  { id: "GRADE_ADAPTED", name: "Theo lớp học", icon: <GraduationCap className="w-3.5 h-3.5" />, desc: "Ngôn ngữ phù hợp lứa tuổi" },
-  { id: "PRACTICE", name: "Tạo bài luyện tập", icon: <HelpCircle className="w-3.5 h-3.5" />, desc: "Trắc nghiệm tương tác tức thì" },
-  { id: "ERROR_DIAGNOSIS", name: "Vì sao em sai?", icon: <RotateCcw className="w-3.5 h-3.5" />, desc: "Chẩn đoán bẫy sai lầm" },
-  { id: "CITE_LESSON", name: "Căn cứ SGK & Video", icon: <BookOpen className="w-3.5 h-3.5" />, desc: "Trích dẫn chương trình GDPT" },
+  {
+    id: "SOCRATIC",
+    name: "Gợi ý từng bước",
+    icon: <Lightbulb className="w-3.5 h-3.5" />,
+    desc: "Gợi mở tư duy, không giải hộ",
+  },
+  {
+    id: "GRADE_ADAPTED",
+    name: "Theo lớp học",
+    icon: <GraduationCap className="w-3.5 h-3.5" />,
+    desc: "Ngôn ngữ phù hợp lứa tuổi",
+  },
+  {
+    id: "PRACTICE",
+    name: "Tạo bài luyện tập",
+    icon: <HelpCircle className="w-3.5 h-3.5" />,
+    desc: "Trắc nghiệm tương tác tức thì",
+  },
+  {
+    id: "ERROR_DIAGNOSIS",
+    name: "Vì sao em sai?",
+    icon: <RotateCcw className="w-3.5 h-3.5" />,
+    desc: "Chẩn đoán bẫy sai lầm",
+  },
+  {
+    id: "CITE_LESSON",
+    name: "Căn cứ SGK & Video",
+    icon: <BookOpen className="w-3.5 h-3.5" />,
+    desc: "Trích dẫn chương trình GDPT",
+  },
 ];
 
 export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
@@ -96,11 +122,15 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [abnormalAlert, setAbnormalAlert] = useState<string | null>(null);
 
   // 3. Phương án dự phòng khi dịch vụ AI lỗi (Graceful Offline Socratic Engine)
-  const [aiEngineMode, setAiEngineMode] = useState<'CLOUD_OPENAI' | 'OFFLINE_FALLBACK'>('CLOUD_OPENAI');
+  const [aiEngineMode, setAiEngineMode] = useState<"CLOUD_OPENAI" | "OFFLINE_FALLBACK">(
+    "CLOUD_OPENAI"
+  );
   const [fallbackActiveToast, setFallbackActiveToast] = useState<string | null>(null);
-  
+
   // Lưu đáp án học sinh đã chọn cho các câu hỏi luyện tập tương tác trong khung chat
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, { selected: string; isCorrect: boolean }>>({});
+  const [quizAnswers, setQuizAnswers] = useState<
+    Record<string, { selected: string; isCorrect: boolean }>
+  >({});
 
   const maxQuota = 30; // Daily quota chuẩn Khanmigo K-12
   const maxTokens = 10000; // Giới hạn token học sinh/ngày
@@ -136,9 +166,13 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     const cccdRegex = /\b[0-9]{9,12}\b/;
 
     if (phoneRegex.test(val)) {
-      setPiiWarning("🛡️ Phát hiện số điện thoại! Để bảo vệ quyền riêng tư, vui lòng không gửi thông tin liên lạc cá nhân.");
+      setPiiWarning(
+        "🛡️ Phát hiện số điện thoại! Để bảo vệ quyền riêng tư, vui lòng không gửi thông tin liên lạc cá nhân."
+      );
     } else if (emailRegex.test(val)) {
-      setPiiWarning("🛡️ Vui lòng không chia sẻ địa chỉ email cá nhân trên khung trò chuyện học tập.");
+      setPiiWarning(
+        "🛡️ Vui lòng không chia sẻ địa chỉ email cá nhân trên khung trò chuyện học tập."
+      );
     } else if (cccdRegex.test(val)) {
       setPiiWarning("🛡️ Phát hiện dãy số định danh! Tuyệt đối không gửi số CCCD/CMND trên mạng.");
     } else {
@@ -152,16 +186,21 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
     // 1. Sliding Window Rate Limiting Cooldown Check (Chống spam prompt)
     if (cooldownSec > 0) {
-      setRateLimitAlert(`Thao tác quá nhanh! Vui lòng suy ngẫm gợi ý trong ${cooldownSec}s trước khi gửi tiếp.`);
+      setRateLimitAlert(
+        `Thao tác quá nhanh! Vui lòng suy ngẫm gợi ý trong ${cooldownSec}s trước khi gửi tiếp.`
+      );
       setTimeout(() => setRateLimitAlert(null), 3000);
       return;
     }
 
     // 2. Kiểm tra hành vi bất thường / Prompt Injection / Jailbreak
-    const injectionRegex = /(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter|tiết lộ prompt)/i;
+    const injectionRegex =
+      /(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter|tiết lộ prompt)/i;
     const isSuspicious = injectionRegex.test(text);
     if (isSuspicious) {
-      setAbnormalAlert("⚠️ CẢNH BÁO AN TOÀN AI: Phát hiện câu lệnh bất thường (Prompt Injection/Jailbreak attempt). Gia sư AI tuân thủ nguyên tắc sư phạm K-12 và đã ghi lại sự kiện vào Nhật ký kiểm toán bảo mật!");
+      setAbnormalAlert(
+        "⚠️ CẢNH BÁO AN TOÀN AI: Phát hiện câu lệnh bất thường (Prompt Injection/Jailbreak attempt). Gia sư AI tuân thủ nguyên tắc sư phạm K-12 và đã ghi lại sự kiện vào Nhật ký kiểm toán bảo mật!"
+      );
     } else {
       setAbnormalAlert(null);
     }
@@ -190,9 +229,14 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     setEstimatedCostUsd((prev) => Number((prev + 0.0002).toFixed(4)));
 
     // Nếu học sinh hoặc admin đang chọn Chế độ Dự Phòng Offline
-    if (aiEngineMode === 'OFFLINE_FALLBACK') {
+    if (aiEngineMode === "OFFLINE_FALLBACK") {
       setTimeout(() => {
-        const botMsg = generateLocalTutorResponse(text, currentMode, selectedGrade, activeLessonTitle);
+        const botMsg = generateLocalTutorResponse(
+          text,
+          currentMode,
+          selectedGrade,
+          activeLessonTitle
+        );
         setMessages((prev) => [...prev, botMsg]);
         setIsTyping(false);
         setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
@@ -234,20 +278,35 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         return;
       }
     } catch (err: any) {
-      if (err?.message && (err.message.includes("429") || err.message.toLowerCase().includes("rate limit") || err.message.includes("quá nhanh"))) {
-        setRateLimitAlert(err.message || "Giới hạn tốc độ: Bạn đang gửi câu hỏi quá nhanh. Vui lòng đợi 15 giây trước khi hỏi tiếp.");
+      if (
+        err?.message &&
+        (err.message.includes("429") ||
+          err.message.toLowerCase().includes("rate limit") ||
+          err.message.includes("quá nhanh"))
+      ) {
+        setRateLimitAlert(
+          err.message ||
+            "Giới hạn tốc độ: Bạn đang gửi câu hỏi quá nhanh. Vui lòng đợi 15 giây trước khi hỏi tiếp."
+        );
         setCooldownSec(15);
         setIsTyping(false);
         return;
       }
       // Dịch vụ Cloud lỗi -> Chuyển sang Graceful Offline Socratic Engine
-      setFallbackActiveToast("⚡ Cloud AI API gặp sự cố. Hệ thống tự động chuyển sang Động cơ Gia sư Socratic Offline dự phòng!");
+      setFallbackActiveToast(
+        "⚡ Cloud AI API gặp sự cố. Hệ thống tự động chuyển sang Động cơ Gia sư Socratic Offline dự phòng!"
+      );
       setTimeout(() => setFallbackActiveToast(null), 4000);
     }
 
     // Fallback Client-side Socratic Engine
     setTimeout(() => {
-      const botMsg = generateLocalTutorResponse(text, currentMode, selectedGrade, activeLessonTitle);
+      const botMsg = generateLocalTutorResponse(
+        text,
+        currentMode,
+        selectedGrade,
+        activeLessonTitle
+      );
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
       setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
@@ -314,10 +373,12 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       if (grade <= 5) {
         quiz = {
           id: `quiz-${Date.now()}`,
-          question: "Một chiếc bánh pizza được chia đều thành 8 miếng. Bạn Minh ăn 3 miếng. Phân số chỉ số phần bánh Minh đã ăn là bao nhiêu?",
+          question:
+            "Một chiếc bánh pizza được chia đều thành 8 miếng. Bạn Minh ăn 3 miếng. Phân số chỉ số phần bánh Minh đã ăn là bao nhiêu?",
           options: ["A. 3/8", "B. 8/3", "C. 5/8", "D. 3/5"],
           correctAnswer: "A. 3/8",
-          explanation: "Tổng số phần chia đều là 8 (Mẫu số), số phần đã ăn là 3 (Tử số). Do đó phân số biểu diễn là 3/8.",
+          explanation:
+            "Tổng số phần chia đều là 8 (Mẫu số), số phần đã ăn là 3 (Tử số). Do đó phân số biểu diễn là 3/8.",
           points: 10,
         };
       } else if (grade <= 9) {
@@ -326,7 +387,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           question: "Mẫu số chung nhỏ nhất của hai phân số 5/12 và 7/18 là số nào?",
           options: ["A. 216", "B. 72", "C. 36", "D. 48"],
           correctAnswer: "C. 36",
-          explanation: "12 = 2² × 3; 18 = 2 × 3². BCNN(12, 18) = 2² × 3² = 36. Mẫu chung nhỏ nhất là 36.",
+          explanation:
+            "12 = 2² × 3; 18 = 2 × 3². BCNN(12, 18) = 2² × 3² = 36. Mẫu chung nhỏ nhất là 36.",
           points: 10,
         };
       } else {
@@ -340,8 +402,10 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         };
       }
     } else if (mode === "ERROR_DIAGNOSIS") {
-      reply = "Thầy đã phân tích câu trả lời của em. Sai sót là một phần tự nhiên của việc học hỏi! Dưới đây là phân tích chi tiết nguyên nhân:";
-      misconception = "Bẫy sai lầm phổ biến: Em đã vô tình cộng gộp cả hai mẫu số với nhau (ví dụ: 2/3 + 3/4 = (2+3)/(3+4) = 5/7). Đây là sai lầm rất thường gặp! Mẫu số chỉ đơn vị phân chia, không được phép cộng trực tiếp mà bắt buộc phải quy đồng mẫu trước.";
+      reply =
+        "Thầy đã phân tích câu trả lời của em. Sai sót là một phần tự nhiên của việc học hỏi! Dưới đây là phân tích chi tiết nguyên nhân:";
+      misconception =
+        "Bẫy sai lầm phổ biến: Em đã vô tình cộng gộp cả hai mẫu số với nhau (ví dụ: 2/3 + 3/4 = (2+3)/(3+4) = 5/7). Đây là sai lầm rất thường gặp! Mẫu số chỉ đơn vị phân chia, không được phép cộng trực tiếp mà bắt buộc phải quy đồng mẫu trước.";
       hints = [
         "Quy tắc vàng 1: Tuyệt đối không cộng mẫu số với nhau.",
         "Quy tắc vàng 2: Quy đồng về cùng mẫu số chung.",
@@ -352,9 +416,11 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     } else {
       // Socratic default
       if (qLower.includes("đáp án") || qLower.includes("kết quả") || qLower.includes("giải hộ")) {
-        reply = "Thầy hiểu em đang rất muốn biết kết quả ngay! Nhưng nếu thầy đưa luôn đáp án, em sẽ không rèn luyện được tư duy của chính mình. Em hãy đọc lại đề bài và cho thầy biết: Bước đầu tiên em đã thử làm là gì?";
+        reply =
+          "Thầy hiểu em đang rất muốn biết kết quả ngay! Nhưng nếu thầy đưa luôn đáp án, em sẽ không rèn luyện được tư duy của chính mình. Em hãy đọc lại đề bài và cho thầy biết: Bước đầu tiên em đã thử làm là gì?";
       } else if (qLower.includes("quy đồng")) {
-        reply = "Quy đồng mẫu số nghĩa là biến đổi các phân số về cùng một mẫu số chung mà giá trị không thay đổi. Ví dụ với hai mẫu số 3 và 4, số nhỏ nhất nào chia hết cho cả 3 và 4 nhỉ?";
+        reply =
+          "Quy đồng mẫu số nghĩa là biến đổi các phân số về cùng một mẫu số chung mà giá trị không thay đổi. Ví dụ với hai mẫu số 3 và 4, số nhỏ nhất nào chia hết cho cả 3 và 4 nhỉ?";
       } else {
         reply = `Câu hỏi rất hay! Để giải quyết vấn đề trong bài học "${lesson}", theo em khái niệm cốt lõi nào chúng ta vừa xem trong video có thể áp dụng đầu tiên?`;
       }
@@ -383,7 +449,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const handleSelectQuizOption = (quizId: string, optionText: string, correctAnswer: string) => {
     if (quizAnswers[quizId]) return; // Không cho chọn lại sau khi đã submit
 
-    const isCorrect = optionText.trim().startsWith(correctAnswer.slice(0, 2)) || optionText.includes(correctAnswer);
+    const isCorrect =
+      optionText.trim().startsWith(correctAnswer.slice(0, 2)) || optionText.includes(correctAnswer);
     setQuizAnswers((prev) => ({
       ...prev,
       [quizId]: { selected: optionText, isCorrect },
@@ -591,17 +658,17 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             <button
               type="button"
               onClick={() => {
-                const next = aiEngineMode === 'CLOUD_OPENAI' ? 'OFFLINE_FALLBACK' : 'CLOUD_OPENAI';
+                const next = aiEngineMode === "CLOUD_OPENAI" ? "OFFLINE_FALLBACK" : "CLOUD_OPENAI";
                 setAiEngineMode(next);
               }}
               className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition cursor-pointer border ${
-                aiEngineMode === 'CLOUD_OPENAI'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300'
+                aiEngineMode === "CLOUD_OPENAI"
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300"
+                  : "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300"
               }`}
               title="Click để chuyển đổi giữa OpenAI API và Động cơ Socratic Offline dự phòng"
             >
-              {aiEngineMode === 'CLOUD_OPENAI' ? (
+              {aiEngineMode === "CLOUD_OPENAI" ? (
                 <>
                   <Wifi className="w-3 h-3 text-emerald-600" />
                   <span>OpenAI Cloud API</span>
@@ -621,7 +688,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           <div className="mt-1.5 flex items-center justify-between text-[10px] text-blue-700 dark:text-blue-300 bg-blue-50/80 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-900 animate-pulse">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              <span>Chống lạm dụng (Sliding window): Vui lòng suy ngẫm gợi ý trước khi hỏi tiếp...</span>
+              <span>
+                Chống lạm dụng (Sliding window): Vui lòng suy ngẫm gợi ý trước khi hỏi tiếp...
+              </span>
             </span>
             <span className="font-mono font-bold">{cooldownSec}s</span>
           </div>
@@ -640,9 +709,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       {abnormalAlert && (
         <div className="bg-rose-50 dark:bg-rose-950/80 border-b border-rose-200 dark:border-rose-900 p-2.5 text-xs text-rose-800 dark:text-rose-200 flex items-start gap-2 shrink-0 animate-in fade-in duration-200">
           <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-          <div className="flex-1 text-[11px] leading-snug">
-            {abnormalAlert}
-          </div>
+          <div className="flex-1 text-[11px] leading-snug">{abnormalAlert}</div>
           <button
             onClick={() => setAbnormalAlert(null)}
             className="text-rose-400 hover:text-rose-600 font-bold"
@@ -698,12 +765,12 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                       {m.mode === "GRADE_ADAPTED"
                         ? `Giải thích chuẩn Lớp ${m.gradeLevel || selectedGrade}`
                         : m.mode === "PRACTICE"
-                        ? "Bài tập luyện tập tương tác"
-                        : m.mode === "ERROR_DIAGNOSIS"
-                        ? "Chẩn đoán sai lầm & Bẫy tư duy"
-                        : m.mode === "CITE_LESSON"
-                        ? "Căn cứ bài học SGK & Video"
-                        : "Gợi ý sư phạm từng bước"}
+                          ? "Bài tập luyện tập tương tác"
+                          : m.mode === "ERROR_DIAGNOSIS"
+                            ? "Chẩn đoán sai lầm & Bẫy tư duy"
+                            : m.mode === "CITE_LESSON"
+                              ? "Căn cứ bài học SGK & Video"
+                              : "Gợi ý sư phạm từng bước"}
                     </span>
                   </div>
                 )}
@@ -753,14 +820,19 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                       {m.interactiveQuiz.options.map((opt, oIdx) => {
                         const answerState = quizAnswers[m.interactiveQuiz!.id];
                         const isSelected = answerState?.selected === opt;
-                        const isCorrectOption = opt.includes(m.interactiveQuiz!.correctAnswer) || opt.startsWith(m.interactiveQuiz!.correctAnswer.slice(0, 2));
+                        const isCorrectOption =
+                          opt.includes(m.interactiveQuiz!.correctAnswer) ||
+                          opt.startsWith(m.interactiveQuiz!.correctAnswer.slice(0, 2));
 
-                        let btnClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1865F2] text-slate-700 dark:text-slate-200";
+                        let btnClass =
+                          "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1865F2] text-slate-700 dark:text-slate-200";
                         if (answerState) {
                           if (isCorrectOption) {
-                            btnClass = "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 font-bold";
+                            btnClass =
+                              "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 font-bold";
                           } else if (isSelected && !answerState.isCorrect) {
-                            btnClass = "bg-rose-50 dark:bg-rose-950/60 border-rose-400 text-rose-800 dark:text-rose-200";
+                            btnClass =
+                              "bg-rose-50 dark:bg-rose-950/60 border-rose-400 text-rose-800 dark:text-rose-200";
                           }
                         }
 
@@ -768,7 +840,13 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                           <button
                             key={oIdx}
                             disabled={!!answerState}
-                            onClick={() => handleSelectQuizOption(m.interactiveQuiz!.id, opt, m.interactiveQuiz!.correctAnswer)}
+                            onClick={() =>
+                              handleSelectQuizOption(
+                                m.interactiveQuiz!.id,
+                                opt,
+                                m.interactiveQuiz!.correctAnswer
+                              )
+                            }
                             className={`w-full p-2.5 rounded-xl border text-left text-xs transition flex items-center justify-between cursor-pointer ${btnClass}`}
                           >
                             <span>{opt}</span>
@@ -790,7 +868,10 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                           {quizAnswers[m.interactiveQuiz.id].isCorrect ? (
                             <>
                               <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Chính xác tuyệt vời! Đạt +{m.interactiveQuiz.points} Điểm Năng Lượng! 🎉</span>
+                              <span>
+                                Chính xác tuyệt vời! Đạt +{m.interactiveQuiz.points} Điểm Năng
+                                Lượng! 🎉
+                              </span>
                             </>
                           ) : (
                             <>
@@ -849,7 +930,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                 )}
 
                 {/* Timestamp */}
-                <span className={`block text-[10px] text-right ${isBot ? "text-slate-400 dark:text-slate-500" : "text-blue-100"}`}>
+                <span
+                  className={`block text-[10px] text-right ${isBot ? "text-slate-400 dark:text-slate-500" : "text-blue-100"}`}
+                >
                   {m.timestamp}
                 </span>
               </div>
@@ -915,11 +998,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1557D0] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0 font-mono text-xs font-bold"
             title={cooldownSec > 0 ? `Vui lòng chờ ${cooldownSec}s` : "Gửi câu hỏi tới Gia sư AI"}
           >
-            {cooldownSec > 0 ? (
-              <span>{cooldownSec}s</span>
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
+            {cooldownSec > 0 ? <span>{cooldownSec}s</span> : <Send className="w-4 h-4" />}
           </button>
         </form>
 

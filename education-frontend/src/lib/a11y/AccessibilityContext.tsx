@@ -73,7 +73,10 @@ export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({ child
 
   const saveSettings = (fs: FontSizeOption, hc: boolean, sd: boolean) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ fontSize: fs, highContrast: hc, subtitlesDefault: sd }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ fontSize: fs, highContrast: hc, subtitlesDefault: sd })
+      );
     } catch {
       // Ignore
     }

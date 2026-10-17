@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const startTime = Date.now();
@@ -23,9 +23,9 @@ export async function GET() {
     const latencyMs = Date.now() - startTime;
 
     return NextResponse.json({
-      status: 'success',
-      orm: 'Prisma 6.4.0',
-      connectedTo: 'PostgreSQL 17 (learning_db)',
+      status: "success",
+      orm: "Prisma 6.4.0",
+      connectedTo: "PostgreSQL 17 (learning_db)",
       latencyMs,
       metrics: {
         totalUsers: userCount,
@@ -38,8 +38,8 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Unknown database error',
+        status: "error",
+        message: error instanceof Error ? error.message : "Unknown database error",
       },
       { status: 500 }
     );

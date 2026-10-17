@@ -15,7 +15,8 @@ export default function DedicatedContactPage() {
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
 
   useEffect(() => {
-    api.getMyProfile()
+    api
+      .getMyProfile()
       .then((profile) => {
         if (profile) setCurrentUser(profile);
       })
@@ -29,28 +30,40 @@ export default function DedicatedContactPage() {
         onSwitchUser={() => {}}
         activeView="contact"
         onChangeView={(v) => {
-          if (v === 'about') window.location.href = '/about';
-          else if (v === 'articles') window.location.href = '/articles';
-          else if (v === 'dashboard') window.location.href = '/dashboard';
-          else window.location.href = '/';
+          if (v === "about") window.location.href = "/about";
+          else if (v === "articles") window.location.href = "/articles";
+          else if (v === "dashboard") window.location.href = "/dashboard";
+          else window.location.href = "/";
         }}
         selectedGrade={selectedGrade}
         onSelectGrade={setSelectedGrade}
         onOpenAiChat={() => setIsAiChatOpen(true)}
-        onOpenLogin={() => { window.location.href = '/'; }}
-        onOpenRegister={() => { window.location.href = '/'; }}
-        onOpenProfile={() => { window.location.href = '/'; }}
+        onOpenLogin={() => {
+          window.location.href = "/";
+        }}
+        onOpenRegister={() => {
+          window.location.href = "/";
+        }}
+        onOpenProfile={() => {
+          window.location.href = "/";
+        }}
         onLogout={() => {
           api.clearToken();
-          window.location.href = '/';
+          window.location.href = "/";
         }}
       />
 
       <main className="flex-1">
         <ContactPage
-          onBackToHome={() => { window.location.href = '/'; }}
-          onOpenArticles={() => { window.location.href = '/articles'; }}
-          onOpenAbout={() => { window.location.href = '/about'; }}
+          onBackToHome={() => {
+            window.location.href = "/";
+          }}
+          onOpenArticles={() => {
+            window.location.href = "/articles";
+          }}
+          onOpenAbout={() => {
+            window.location.href = "/about";
+          }}
         />
       </main>
 
@@ -62,9 +75,13 @@ export default function DedicatedContactPage() {
       />
 
       <Footer
-        onOpenAbout={() => { window.location.href = '/about'; }}
-        onOpenArticles={() => { window.location.href = '/articles'; }}
-        onOpenContact={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        onOpenAbout={() => {
+          window.location.href = "/about";
+        }}
+        onOpenArticles={() => {
+          window.location.href = "/articles";
+        }}
+        onOpenContact={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       />
     </div>
   );

@@ -5,19 +5,19 @@ import { Lesson } from "@/types";
 import { MOCK_LESSONS } from "@/lib/mock-data";
 import { api } from "@/lib/api";
 import confetti from "canvas-confetti";
-import { 
-  ArrowLeft, 
-  Play, 
-  CheckCircle2, 
-  HelpCircle, 
-  FileText, 
-  Sparkles, 
+import {
+  ArrowLeft,
+  Play,
+  CheckCircle2,
+  HelpCircle,
+  FileText,
+  Sparkles,
   Clock,
   ChevronRight,
   Lightbulb,
   Bookmark,
   Plus,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { PlyrVideoPlayer, PlyrPlayerHandle } from "@/components/PlyrVideoPlayer";
 import { useBookmarks } from "@/lib/bookmarks/BookmarksContext";
@@ -37,8 +37,8 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   onCompleteLesson,
 }) => {
   const [activeLesson, setActiveLesson] = useState<Lesson>(initialLesson);
-  const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>('quiz');
-  
+  const [activeTab, setActiveTab] = useState<"notes" | "quiz">("quiz");
+
   // Plyr Video Player Reference & States
   const playerRef = useRef<PlyrPlayerHandle>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,7 +67,9 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     if (!newNoteText.trim()) return;
 
     if (noteCooldownSec > 0) {
-      setNoteRateLimitAlert(`Chống spam: Vui lòng đợi ${noteCooldownSec}s trước khi tạo ghi chú tiếp theo.`);
+      setNoteRateLimitAlert(
+        `Chống spam: Vui lòng đợi ${noteCooldownSec}s trước khi tạo ghi chú tiếp theo.`
+      );
       return;
     }
 
@@ -105,7 +107,9 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     const interval = setInterval(() => {
       if (isPlaying && playerRef.current) {
         const pos = Math.floor(playerRef.current.getCurrentTime());
-        const dur = Math.floor(playerRef.current.getDuration() || activeLesson.durationSeconds || 600);
+        const dur = Math.floor(
+          playerRef.current.getDuration() || activeLesson.durationSeconds || 600
+        );
         api.updateLessonProgress(activeLesson.id, pos, dur, false);
         setSaveStatus(`Đã lưu tiến độ lúc ${formatTime(pos)}`);
         setTimeout(() => setSaveStatus(null), 3000);
@@ -149,11 +153,16 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     try {
       const answersPayload = Object.entries(selectedOptions).map(([qId, optId]) => ({
         questionId: qId,
-        selectedAnswer: optId.replace('opt-', '').toUpperCase(),
+        selectedAnswer: optId.replace("opt-", "").toUpperCase(),
       }));
       await api.submitQuiz(activeLesson.id, answersPayload);
       const pos = playerRef.current ? Math.floor(playerRef.current.getCurrentTime()) : 0;
-      await api.updateLessonProgress(activeLesson.id, pos, duration, score >= activeLesson.quiz.passingScore);
+      await api.updateLessonProgress(
+        activeLesson.id,
+        pos,
+        duration,
+        score >= activeLesson.quiz.passingScore
+      );
     } catch {
       // Local state already updated
     }
@@ -207,22 +216,33 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             onClick={() => toggleBookmark({ id: activeLesson.id, title: activeLesson.title })}
             className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-xs font-bold cursor-pointer border ${
               isBookmarked(activeLesson.id)
-                ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                ? "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
+                : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
             }`}
-            title={isBookmarked(activeLesson.id) ? "Bỏ lưu bài học" : "Lưu vào danh sách cần xem lại"}
+            title={
+              isBookmarked(activeLesson.id) ? "Bỏ lưu bài học" : "Lưu vào danh sách cần xem lại"
+            }
           >
-            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(activeLesson.id) ? 'fill-amber-500 text-amber-500' : ''}`} />
-            <span>{isBookmarked(activeLesson.id) ? 'Đã lưu bài học' : 'Lưu xem lại'}</span>
+            <Bookmark
+              className={`w-3.5 h-3.5 ${isBookmarked(activeLesson.id) ? "fill-amber-500 text-amber-500" : ""}`}
+            />
+            <span>{isBookmarked(activeLesson.id) ? "Đã lưu bài học" : "Lưu xem lại"}</span>
           </button>
 
-          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-            masteryState === 'MASTERED' ? 'bg-emerald-100 text-emerald-700' :
-            masteryState === 'PROFICIENT' ? 'bg-blue-100 text-blue-700' :
-            'bg-amber-100 text-amber-700'
-          }`}>
-            {masteryState === 'MASTERED' ? 'Đã Tinh Thông 🏆' :
-             masteryState === 'PROFICIENT' ? 'Thành Thạo ⚡' : 'Đang Làm Quen 💡'}
+          <span
+            className={`text-xs font-bold px-3 py-1 rounded-full ${
+              masteryState === "MASTERED"
+                ? "bg-emerald-100 text-emerald-700"
+                : masteryState === "PROFICIENT"
+                  ? "bg-blue-100 text-blue-700"
+                  : "bg-amber-100 text-amber-700"
+            }`}
+          >
+            {masteryState === "MASTERED"
+              ? "Đã Tinh Thông 🏆"
+              : masteryState === "PROFICIENT"
+                ? "Thành Thạo ⚡"
+                : "Đang Làm Quen 💡"}
           </span>
         </div>
       </div>
@@ -234,7 +254,10 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
           {/* Trình phát video Plyr hiện đại (https://www.plyrjs.com) */}
           <PlyrVideoPlayer
             ref={playerRef}
-            src={activeLesson.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+            src={
+              activeLesson.videoUrl ||
+              "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            }
             title={activeLesson.title}
             initialTime={activeLesson.positionSeconds || 0}
             chapters={CHAPTERS}
@@ -249,7 +272,12 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             onPause={() => setIsPlaying(false)}
             onEnded={() => {
               setIsPlaying(false);
-              api.updateLessonProgress(activeLesson.id, Math.floor(duration), Math.floor(duration), true);
+              api.updateLessonProgress(
+                activeLesson.id,
+                Math.floor(duration),
+                Math.floor(duration),
+                true
+              );
             }}
           />
 
@@ -263,9 +291,10 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                 key={idx}
                 onClick={() => jumpToChapter(ch.time)}
                 className={`px-3 py-1.5 rounded-xl text-[11px] font-medium transition shrink-0 cursor-pointer ${
-                  currentTime >= ch.time && (idx === CHAPTERS.length - 1 || currentTime < CHAPTERS[idx + 1].time)
-                    ? 'bg-[#1865F2] text-white font-bold shadow-md'
-                    : 'bg-white/10 hover:bg-white/20 text-slate-300'
+                  currentTime >= ch.time &&
+                  (idx === CHAPTERS.length - 1 || currentTime < CHAPTERS[idx + 1].time)
+                    ? "bg-[#1865F2] text-white font-bold shadow-md"
+                    : "bg-white/10 hover:bg-white/20 text-slate-300"
                 }`}
               >
                 {ch.title}
@@ -277,11 +306,11 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
             <div className="flex border-b border-slate-200 bg-slate-50/50">
               <button
-                onClick={() => setActiveTab('quiz')}
+                onClick={() => setActiveTab("quiz")}
                 className={`flex-1 py-3.5 px-4 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition ${
-                  activeTab === 'quiz'
-                    ? 'border-[#14BF96] text-[#0B2147] bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                  activeTab === "quiz"
+                    ? "border-[#14BF96] text-[#0B2147] bg-white"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
                 }`}
               >
                 <HelpCircle className="w-4 h-4 text-[#14BF96]" />
@@ -289,11 +318,11 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
               </button>
 
               <button
-                onClick={() => setActiveTab('notes')}
+                onClick={() => setActiveTab("notes")}
                 className={`flex-1 py-3.5 px-4 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition ${
-                  activeTab === 'notes'
-                    ? 'border-[#14BF96] text-[#0B2147] bg-white'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                  activeTab === "notes"
+                    ? "border-[#14BF96] text-[#0B2147] bg-white"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
                 }`}
               >
                 <FileText className="w-4 h-4 text-blue-600" />
@@ -302,7 +331,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             </div>
 
             <div className="p-6">
-              {activeTab === 'quiz' ? (
+              {activeTab === "quiz" ? (
                 <div className="space-y-6">
                   {activeLesson.quiz ? (
                     <>
@@ -312,7 +341,10 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                           const selected = selectedOptions[q.id];
 
                           return (
-                            <div key={q.id} className="p-5 rounded-xl border border-slate-200 space-y-4 bg-slate-50/30">
+                            <div
+                              key={q.id}
+                              className="p-5 rounded-xl border border-slate-200 space-y-4 bg-slate-50/30"
+                            >
                               <div className="flex items-start justify-between gap-4">
                                 <h3 className="font-bold text-sm sm:text-base text-slate-900">
                                   Câu {idx + 1}: {q.questionText}
@@ -326,16 +358,19 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {q.options.map((opt) => {
                                   const isSelected = selected === opt.id;
-                                  let optionClass = "border-slate-200 bg-white hover:border-[#14BF96]/50 text-slate-700";
+                                  let optionClass =
+                                    "border-slate-200 bg-white hover:border-[#14BF96]/50 text-slate-700";
 
                                   if (isSubmitted) {
                                     if (opt.isCorrect) {
-                                      optionClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold";
+                                      optionClass =
+                                        "border-emerald-500 bg-emerald-50 text-emerald-900 font-bold";
                                     } else if (isSelected && !opt.isCorrect) {
                                       optionClass = "border-rose-400 bg-rose-50 text-rose-800";
                                     }
                                   } else if (isSelected) {
-                                    optionClass = "border-[#14BF96] bg-[#14BF96]/10 text-[#0B2147] font-bold ring-2 ring-[#14BF96]";
+                                    optionClass =
+                                      "border-[#14BF96] bg-[#14BF96]/10 text-[#0B2147] font-bold ring-2 ring-[#14BF96]";
                                   }
 
                                   return (
@@ -375,12 +410,16 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                             <span className="text-sm font-bold text-slate-700">
                               Kết quả: {quizScore}/100 điểm
                             </span>
-                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                              quizScore >= activeLesson.quiz.passingScore 
-                                ? 'bg-emerald-100 text-emerald-700' 
-                                : 'bg-amber-100 text-amber-700'
-                            }`}>
-                              {quizScore >= activeLesson.quiz.passingScore ? "Đạt chuẩn Tinh Thông! 🎉" : "Cần rèn luyện thêm"}
+                            <span
+                              className={`text-xs font-bold px-3 py-1 rounded-full ${
+                                quizScore >= activeLesson.quiz.passingScore
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : "bg-amber-100 text-amber-700"
+                              }`}
+                            >
+                              {quizScore >= activeLesson.quiz.passingScore
+                                ? "Đạt chuẩn Tinh Thông! 🎉"
+                                : "Cần rèn luyện thêm"}
                             </span>
                           </div>
                         ) : (
@@ -428,8 +467,14 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                       <p className="font-bold">Quy tắc vàng cần ghi nhớ:</p>
                       <ul className="list-disc list-inside space-y-1">
                         <li>Tử số chỉ số phần được lấy ra hoặc đề cập đến.</li>
-                        <li>Mẫu số chỉ tổng số phần bằng nhau được chia ra từ một đơn vị (mẫu số luôn khác 0).</li>
-                        <li>Phân số có tử số nhỏ hơn mẫu số luôn bé hơn 1. Phân số có tử lớn hơn mẫu luôn lớn hơn 1.</li>
+                        <li>
+                          Mẫu số chỉ tổng số phần bằng nhau được chia ra từ một đơn vị (mẫu số luôn
+                          khác 0).
+                        </li>
+                        <li>
+                          Phân số có tử số nhỏ hơn mẫu số luôn bé hơn 1. Phân số có tử lớn hơn mẫu
+                          luôn lớn hơn 1.
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -447,7 +492,10 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                     </div>
 
                     {/* New Note Form */}
-                    <form onSubmit={handleSaveNote} className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <form
+                      onSubmit={handleSaveNote}
+                      className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700"
+                    >
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-semibold text-slate-600 dark:text-slate-300">
                           Thêm ghi chú mới:
@@ -481,7 +529,9 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                           className="px-4 py-1.5 rounded-lg bg-[#1865F2] hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          <span>{noteCooldownSec > 0 ? `Chờ (${noteCooldownSec}s)` : "Lưu ghi chú này"}</span>
+                          <span>
+                            {noteCooldownSec > 0 ? `Chờ (${noteCooldownSec}s)` : "Lưu ghi chú này"}
+                          </span>
                         </button>
                       </div>
                     </form>
@@ -507,7 +557,9 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                             <p className="text-slate-800 dark:text-slate-200 font-medium">
                               {note.content}
                             </p>
-                            <span className="text-[10px] text-slate-400 block">{note.createdAt}</span>
+                            <span className="text-[10px] text-slate-400 block">
+                              {note.createdAt}
+                            </span>
                           </div>
 
                           <button
@@ -551,8 +603,8 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                     }}
                     className={`p-3 rounded-xl border text-xs transition cursor-pointer flex items-center justify-between gap-3 ${
                       isActive
-                        ? 'border-[#14BF96] bg-[#14BF96]/5 text-[#0B2147] font-bold shadow-xs'
-                        : 'border-slate-100 hover:bg-slate-50 text-slate-700'
+                        ? "border-[#14BF96] bg-[#14BF96]/5 text-[#0B2147] font-bold shadow-xs"
+                        : "border-slate-100 hover:bg-slate-50 text-slate-700"
                     }`}
                   >
                     <div className="flex items-center gap-2.5">

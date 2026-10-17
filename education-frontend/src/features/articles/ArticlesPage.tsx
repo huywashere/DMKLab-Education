@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  BookOpen, 
-  Search, 
-  Calendar, 
-  Clock, 
-  User, 
-  ArrowRight, 
-  Tag, 
-  Share2, 
+import {
+  BookOpen,
+  Search,
+  Calendar,
+  Clock,
+  User,
+  ArrowRight,
+  Tag,
+  Share2,
   Sparkles,
   ChevronLeft,
   CheckCircle2,
-  ThumbsUp
+  ThumbsUp,
 } from "lucide-react";
 
 export interface Article {
@@ -35,12 +35,13 @@ const SAMPLE_ARTICLES: Article[] = [
   {
     id: "art-1",
     title: "Phương pháp Socratic trong học Toán: Biến nỗi sợ Đại số & Hình học thành niềm say mê",
-    excerpt: "Tại sao việc đưa ra câu trả lời ngay lập tức lại làm giảm khả năng tư duy của học sinh? Khám phá cách các câu hỏi gợi mở từng bước giúp não bộ ghi nhớ lâu hơn 300%.",
+    excerpt:
+      "Tại sao việc đưa ra câu trả lời ngay lập tức lại làm giảm khả năng tư duy của học sinh? Khám phá cách các câu hỏi gợi mở từng bước giúp não bộ ghi nhớ lâu hơn 300%.",
     content: [
       "Khi đối mặt với một bài toán khó, phản xạ đầu tiên của đa số học sinh là tìm kiếm lời giải mẫu hoặc nhờ người khác làm hộ. Tuy nhiên, các nghiên cứu thần kinh học chỉ ra rằng não bộ chỉ thực sự hình thành các liên kết thần kinh bền vững khi trải qua trạng thái 'thử thách có định hướng' (productive struggle).",
       "Phương pháp Socratic – được áp dụng cốt lõi tại DMKLab – biến giáo viên và gia sư AI thành người dẫn đường thông qua chuỗi câu hỏi: 'Em thấy mẫu số hai phân số này có quan hệ gì với nhau?', 'Nếu vẽ hình chữ nhật này ra nháp, diện tích sẽ thay đổi thế nào khi chiều rộng tăng gấp đôi?'.",
       "Nhờ không bị 'cướp mất' cơ hội tự khám phá, học sinh khi tự mình tìm ra đáp án sẽ trải nghiệm cảm giác vỡ òa thành tựu (Aha! Moment). Đây chính là động lực nội tại mạnh mẽ nhất giúp các em yêu thích môn Toán suốt 12 năm phổ thông.",
-      "Lời khuyên cho phụ huynh: Khi con hỏi bài, đừng vội giải hộ. Hãy hỏi ngược lại: 'Theo con bài này đang hỏi về điều gì?' hoặc 'Bước đầu tiên con nghĩ tới là gì?'."
+      "Lời khuyên cho phụ huynh: Khi con hỏi bài, đừng vội giải hộ. Hãy hỏi ngược lại: 'Theo con bài này đang hỏi về điều gì?' hoặc 'Bước đầu tiên con nghĩ tới là gì?'.",
     ],
     category: "math",
     categoryLabel: "Toán Học & STEM",
@@ -54,12 +55,13 @@ const SAMPLE_ARTICLES: Article[] = [
   {
     id: "art-2",
     title: "Gia sư AI trong phòng học K–12: Đồng hành gợi mở tư duy hay giải bài hộ học sinh?",
-    excerpt: "Sự bùng nổ của AI tạo sinh đặt ra bài toán lớn: Làm thế nào để công nghệ giúp học sinh thông minh hơn chứ không biến các em thành người phụ thuộc thụ động?",
+    excerpt:
+      "Sự bùng nổ của AI tạo sinh đặt ra bài toán lớn: Làm thế nào để công nghệ giúp học sinh thông minh hơn chứ không biến các em thành người phụ thuộc thụ động?",
     content: [
       "Trí tuệ nhân tạo (AI) đang thay đổi mọi lĩnh vực, và giáo dục phổ thông không phải ngoại lệ. Nếu học sinh chỉ sao chép lời giải từ các công cụ chat thông thường, các em sẽ mất đi năng lực giải quyết vấn đề độc lập – kỹ năng sinh tồn cốt lõi của thế kỷ 21.",
       "Tại DMKLab Education, hệ sinh thái DMK AI Tutor được thiết lập với rào chắn sư phạm nghiêm ngặt: Tuyệt đối không bao giờ giải trọn vẹn bài tập hộ học sinh. Thay vào đó, AI phân tích câu hỏi, phát hiện điểm tắc nghẽn và đưa ra gợi ý chia nhỏ bài toán.",
       "Hơn nữa, hệ thống giới hạn 30 câu hỏi mỗi ngày nhằm khuyến khích học sinh tự nghiên cứu sách giáo khoa và suy ngẫm trước khi tìm đến sự trợ giúp.",
-      "Kết quả thử nghiệm trên 1,000 học sinh cho thấy: Nhóm sử dụng AI gợi mở có điểm kiểm tra định kỳ cao hơn 24% so với nhóm dùng AI chỉ đưa ra lời giải trực tiếp."
+      "Kết quả thử nghiệm trên 1,000 học sinh cho thấy: Nhóm sử dụng AI gợi mở có điểm kiểm tra định kỳ cao hơn 24% so với nhóm dùng AI chỉ đưa ra lời giải trực tiếp.",
     ],
     category: "ai",
     categoryLabel: "Công Nghệ AI",
@@ -73,12 +75,13 @@ const SAMPLE_ARTICLES: Article[] = [
   {
     id: "art-3",
     title: "Bí quyết duy trì chuỗi học tập (Streak) 30 ngày cho học sinh Tiểu học và THCS",
-    excerpt: "Sức mạnh của thói quen 15 phút mỗi ngày: Tại sao học một chút mỗi ngày lại vượt trội hơn hẳn việc 'nhồi nhét' 4 tiếng vào cuối tuần?",
+    excerpt:
+      "Sức mạnh của thói quen 15 phút mỗi ngày: Tại sao học một chút mỗi ngày lại vượt trội hơn hẳn việc 'nhồi nhét' 4 tiếng vào cuối tuần?",
     content: [
       "Đường cong quên lãng Ebbinghaus chỉ ra rằng con người sẽ quên tới 70% kiến thức mới nạp vào chỉ sau 24 giờ nếu không có hoạt động ôn tập lặp lại ngắt quãng (spaced repetition).",
       "Tính năng Streak (Chuỗi học tập liên tục) tại DMKLab được thiết kế như một trò chơi tích cực: Học sinh chỉ cần hoàn thành 1 bài giảng video 10 phút hoặc 1 bài quiz trắc nghiệm là ngọn lửa Streak sẽ được duy trì.",
       "Khi chuỗi ngày học vượt mốc 7 ngày, 14 ngày, 30 ngày, học sinh hình thành phản xạ tự giác ngồi vào bàn học mà không cần cha mẹ phải nhắc nhở hay quát mắng.",
-      "Mẹo thực hành: Hãy chọn một khung giờ cố định trong ngày (ví dụ 19h30 sau bữa tối) để làm 'Giờ DMKLab'. Dù bận đến đâu cũng hoàn thành tối thiểu 1 bài trắc nghiệm để bảo vệ chuỗi học tập của mình."
+      "Mẹo thực hành: Hãy chọn một khung giờ cố định trong ngày (ví dụ 19h30 sau bữa tối) để làm 'Giờ DMKLab'. Dù bận đến đâu cũng hoàn thành tối thiểu 1 bài trắc nghiệm để bảo vệ chuỗi học tập của mình.",
     ],
     category: "skills",
     categoryLabel: "Kỹ Năng Học Tập",
@@ -91,12 +94,13 @@ const SAMPLE_ARTICLES: Article[] = [
   {
     id: "art-4",
     title: "Cẩm nang phụ huynh: Đồng hành cùng con vượt qua áp lực chuyển cấp vào Lớp 6 và Lớp 10",
-    excerpt: "Giai đoạn chuyển tiếp giữa các cấp học thường chứng kiến sự sụt giảm kết quả học tập đột ngột. Cha mẹ cần làm gì để hỗ trợ tâm lý và phương pháp học cho con?",
+    excerpt:
+      "Giai đoạn chuyển tiếp giữa các cấp học thường chứng kiến sự sụt giảm kết quả học tập đột ngột. Cha mẹ cần làm gì để hỗ trợ tâm lý và phương pháp học cho con?",
     content: [
       "Bước vào lớp 6 (bậc THCS) và lớp 10 (bậc THPT) là hai bước ngoặt lớn: số lượng môn học tăng lên, khối lượng bài tập nặng hơn và phong cách giảng dạy yêu cầu tính tự chủ cao hơn rất nhiều so với cấp dưới.",
       "Nhiều phụ huynh lo lắng khi thấy con từ học sinh giỏi trở nên đuối sức. Chìa khóa không nằm ở việc bắt con học thêm dày đặc, mà là củng cố kiến thức nền tảng của các khối lớp trước đó.",
       "Cổng thông tin Phụ huynh (Parent Portal) của DMKLab giúp cha mẹ nắm bắt chính xác môn nào con đang gặp khó khăn (đang ở mức 'Làm quen' hay 'Chưa đạt') để kịp thời động viên thay vì trách phạt.",
-      "Hãy biến việc học thành niềm vui gia đình: Cùng con theo dõi điểm năng lượng tăng lên mỗi ngày và tặng cho con một phần thưởng nhỏ khi con đạt huy hiệu danh giá mới."
+      "Hãy biến việc học thành niềm vui gia đình: Cùng con theo dõi điểm năng lượng tăng lên mỗi ngày và tặng cho con một phần thưởng nhỏ khi con đạt huy hiệu danh giá mới.",
     ],
     category: "parents",
     categoryLabel: "Góc Phụ Huynh",
@@ -109,12 +113,13 @@ const SAMPLE_ARTICLES: Article[] = [
   {
     id: "art-5",
     title: "Học qua video ngắn & Làm trắc nghiệm ngay: Công thức ghi nhớ sâu 85% kiến thức",
-    excerpt: "Tại sao bài giảng dài 45 phút thường làm học sinh mất tập trung sau phút thứ 15? Tìm hiểu cấu trúc vi học tập (Micro-learning) chuẩn quốc tế.",
+    excerpt:
+      "Tại sao bài giảng dài 45 phút thường làm học sinh mất tập trung sau phút thứ 15? Tìm hiểu cấu trúc vi học tập (Micro-learning) chuẩn quốc tế.",
     content: [
       "Nghiên cứu về khả năng chú ý (attention span) của trẻ em trong thời đại kỹ thuật số cho thấy thời gian tập trung tối ưu chỉ kéo dài từ 8 đến 12 phút.",
       "Đó là lý do toàn bộ kho bài giảng tại DMKLab Education đều được tinh gọn thành các video từ 8–12 phút, giải thích duy nhất một khái niệm trọng tâm kết hợp hình ảnh trực quan.",
       "Ngay sau khi video kết thúc, học sinh được chuyển thẳng tới bộ câu hỏi trắc nghiệm kiểm tra độ tinh thông. Cơ chế này ép não bộ phải truy xuất thông tin ngay lập tức (retrieval practice), giúp tỷ lệ lưu giữ kiến thức tăng vọt từ 20% lên 85%.",
-      "Kết hợp cùng phụ đề song ngữ và các mốc thời gian (chapters), học sinh có thể dễ dàng tua lại đúng đoạn mình chưa hiểu mà không mất thời gian xem lại từ đầu."
+      "Kết hợp cùng phụ đề song ngữ và các mốc thời gian (chapters), học sinh có thể dễ dàng tua lại đúng đoạn mình chưa hiểu mà không mất thời gian xem lại từ đầu.",
     ],
     category: "skills",
     categoryLabel: "Kỹ Năng Học Tập",
@@ -183,7 +188,8 @@ export const ArticlesPage: React.FC<ArticlesPageProps> = ({
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Nơi chia sẻ các bài nghiên cứu sư phạm, phương pháp học tập Socratic, kinh nghiệm đồng hành cùng con và xu hướng ứng dụng AI trong học đường.
+            Nơi chia sẻ các bài nghiên cứu sư phạm, phương pháp học tập Socratic, kinh nghiệm đồng
+            hành cùng con và xu hướng ứng dụng AI trong học đường.
           </p>
 
           {/* Search Box */}
@@ -335,7 +341,9 @@ export const ArticlesPage: React.FC<ArticlesPageProps> = ({
           <div className="text-center py-16 bg-slate-50 rounded-3xl border border-dashed border-slate-300 space-y-3">
             <BookOpen className="w-10 h-10 text-slate-400 mx-auto" />
             <p className="text-sm font-bold text-slate-700">Không tìm thấy bài viết nào phù hợp</p>
-            <p className="text-xs text-slate-500">Hãy thử tìm kiếm với từ khóa khác hoặc chuyển sang danh mục "Tất Cả Bài Viết".</p>
+            <p className="text-xs text-slate-500">
+              Hãy thử tìm kiếm với từ khóa khác hoặc chuyển sang danh mục "Tất Cả Bài Viết".
+            </p>
           </div>
         )}
       </div>
@@ -401,7 +409,8 @@ export const ArticlesPage: React.FC<ArticlesPageProps> = ({
                   Lời khuyên từ ban chuyên môn DMKLab
                 </p>
                 <p className="text-xs sm:text-sm text-slate-700">
-                  Học tập là một hành trình dài hạn. Hãy thực hành từng chút một mỗi ngày cùng DMKLab để tích lũy kiến thức vững chắc và tự tin trong mọi kỳ thi!
+                  Học tập là một hành trình dài hạn. Hãy thực hành từng chút một mỗi ngày cùng
+                  DMKLab để tích lũy kiến thức vững chắc và tự tin trong mọi kỳ thi!
                 </p>
               </div>
             </div>

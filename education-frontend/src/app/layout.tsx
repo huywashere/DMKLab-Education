@@ -91,11 +91,7 @@ export const metadata: Metadata = {
   category: "education",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -120,10 +116,7 @@ export default function RootLayout({
           postalCode: "100000",
           addressCountry: "VN",
         },
-        sameAs: [
-          "https://facebook.com/dmklab.education",
-          "https://youtube.com/@dmklab.education",
-        ],
+        sameAs: ["https://facebook.com/dmklab.education", "https://youtube.com/@dmklab.education"],
       },
       {
         "@type": "WebSite",
@@ -145,7 +138,11 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="vi" suppressHydrationWarning className={`h-full antialiased ${beVietnamPro.variable}`}>
+    <html
+      lang="vi"
+      suppressHydrationWarning
+      className={`h-full antialiased ${beVietnamPro.variable}`}
+    >
       <head>
         {/* Anti-flicker instant theme initialization */}
         <script
@@ -159,7 +156,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${beVietnamPro.className}`}>
+      <body
+        className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${beVietnamPro.className}`}
+      >
         <ThemeProvider>
           <LanguageProvider>
             <AccessibilityProvider>

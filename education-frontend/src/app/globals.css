@@ -3,45 +3,54 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #21242C;
+  --background: #ffffff;
+  --foreground: #21242c;
 
   /* Official Khan Academy Wonder Blocks Palette */
-  --khan-blue: #1865F2;
-  --khan-blue-hover: #0B4ED7;
-  --khan-blue-light: #EBF2FF;
-  --khan-green: #14BF96;
+  --khan-blue: #1865f2;
+  --khan-blue-hover: #0b4ed7;
+  --khan-blue-light: #ebf2ff;
+  --khan-green: #14bf96;
   --khan-green-dark: #008272;
-  --khan-green-light: #E6FAF6;
-  --khan-navy: #0B2149;
-  --khan-navy-dark: #081C3D;
-  --khan-charcoal: #21242C;
-  --khan-gold: #FFC700;
-  --khan-orange: #FF5A36;
-  --khan-purple: #7433FF;
-  --khan-coral: #EA580C;
-  --khan-warm-bg: #FEF8E7;
-  --khan-warm-border: #E8E3D0;
-  --khan-slate-bg: #F7F8FA;
-  --khan-border: #E4E7EB;
-  --card: #FFFFFF;
+  --khan-green-light: #e6faf6;
+  --khan-navy: #0b2149;
+  --khan-navy-dark: #081c3d;
+  --khan-charcoal: #21242c;
+  --khan-gold: #ffc700;
+  --khan-orange: #ff5a36;
+  --khan-purple: #7433ff;
+  --khan-coral: #ea580c;
+  --khan-warm-bg: #fef8e7;
+  --khan-warm-border: #e8e3d0;
+  --khan-slate-bg: #f7f8fa;
+  --khan-border: #e4e7eb;
+  --card: #ffffff;
 }
 
 .dark {
-  --background: #081C3D;
-  --foreground: #F1F5F9;
+  --background: #081c3d;
+  --foreground: #f1f5f9;
 
   /* Dark mode overrides */
-  --khan-warm-bg: #0B2149;
-  --khan-slate-bg: #0F2753;
-  --khan-border: #1B3560;
-  --card: #0D2650;
+  --khan-warm-bg: #0b2149;
+  --khan-slate-bg: #0f2753;
+  --khan-border: #1b3560;
+  --card: #0d2650;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-be-vietnam-pro), "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    var(--font-be-vietnam-pro),
+    "Be Vietnam Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -54,15 +63,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #0F172A;
+  background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
@@ -71,7 +80,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
@@ -80,8 +89,8 @@ body {
 
 /* Khan Academy CTA Buttons */
 .khan-btn-primary {
-  background-color: #1865F2;
-  color: #FFFFFF;
+  background-color: #1865f2;
+  color: #ffffff;
   font-weight: 700;
   padding: 0.625rem 1.5rem;
   border-radius: 9999px;
@@ -93,14 +102,14 @@ body {
 }
 
 .khan-btn-primary:hover {
-  background-color: #0B4ED7;
+  background-color: #0b4ed7;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(24, 101, 242, 0.3);
 }
 
 .khan-btn-green {
-  background-color: #14BF96;
-  color: #FFFFFF;
+  background-color: #14bf96;
+  color: #ffffff;
   font-weight: 700;
   padding: 0.625rem 1.5rem;
   border-radius: 9999px;
@@ -112,14 +121,14 @@ body {
 }
 
 .khan-btn-green:hover {
-  background-color: #10A380;
+  background-color: #10a380;
   transform: translateY(-1px);
 }
 
 .khan-btn-secondary {
-  background-color: #FFFFFF;
-  color: #1865F2;
-  border: 2px solid #1865F2;
+  background-color: #ffffff;
+  color: #1865f2;
+  border: 2px solid #1865f2;
   font-weight: 700;
   padding: 0.5rem 1.5rem;
   border-radius: 9999px;
@@ -130,13 +139,13 @@ body {
 }
 
 .khan-btn-secondary:hover {
-  background-color: #F0F5FF;
+  background-color: #f0f5ff;
 }
 
 .dark .khan-btn-secondary {
   background-color: transparent;
-  color: #60A5FA;
-  border-color: #3B82F6;
+  color: #60a5fa;
+  border-color: #3b82f6;
 }
 
 .dark .khan-btn-secondary:hover {
@@ -144,9 +153,9 @@ body {
 }
 
 .khan-btn-outline {
-  background-color: #FFFFFF;
-  color: #21242C;
-  border: 1px solid #D5D9E2;
+  background-color: #ffffff;
+  color: #21242c;
+  border: 1px solid #d5d9e2;
   font-weight: 600;
   padding: 0.5rem 1.25rem;
   border-radius: 9999px;
@@ -154,43 +163,43 @@ body {
 }
 
 .khan-btn-outline:hover {
-  border-color: #21242C;
-  background-color: #F7F8FA;
+  border-color: #21242c;
+  background-color: #f7f8fa;
 }
 
 .dark .khan-btn-outline {
-  background-color: #1E293B;
-  color: #E2E8F0;
+  background-color: #1e293b;
+  color: #e2e8f0;
   border-color: #334155;
 }
 
 .dark .khan-btn-outline:hover {
-  border-color: #64748B;
+  border-color: #64748b;
   background-color: #334155;
 }
 
 /* Khan card style */
 .khan-card {
-  background-color: #FFFFFF;
-  border: 1px solid #E4E7EB;
+  background-color: #ffffff;
+  border: 1px solid #e4e7eb;
   border-radius: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
 }
 
 .khan-card:hover {
-  border-color: #CBD5E1;
+  border-color: #cbd5e1;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .dark .khan-card {
-  background-color: #131E35;
+  background-color: #131e35;
   border-color: #223254;
-  color: #F1F5F9;
+  color: #f1f5f9;
 }
 
 .dark .khan-card:hover {
-  border-color: #3B82F6;
+  border-color: #3b82f6;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
@@ -198,25 +207,29 @@ body {
    DMKLab Custom Plyr Media Player Theme (https://www.plyrjs.com)
    ========================================================================== */
 :root {
-  --plyr-color-main: #1865F2; /* DMKLab Brand Blue */
-  --plyr-video-control-color: #F8FAFC;
-  --plyr-video-control-color-hover: #FFFFFF;
-  --plyr-video-control-background-hover: #1865F2;
-  --plyr-video-controls-background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(10, 15, 29, 0.88) 100%);
+  --plyr-color-main: #1865f2; /* DMKLab Brand Blue */
+  --plyr-video-control-color: #f8fafc;
+  --plyr-video-control-color-hover: #ffffff;
+  --plyr-video-control-background-hover: #1865f2;
+  --plyr-video-controls-background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(10, 15, 29, 0.88) 100%
+  );
   --plyr-control-radius: 8px;
   --plyr-control-spacing: 10px;
   --plyr-range-thumb-height: 14px;
-  --plyr-range-thumb-background: #FFFFFF;
+  --plyr-range-thumb-background: #ffffff;
   --plyr-range-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   --plyr-range-track-height: 5px;
   --plyr-video-progress-buffered-background: rgba(255, 255, 255, 0.25);
   --plyr-menu-background: rgba(15, 23, 42, 0.95);
-  --plyr-menu-color: #F8FAFC;
+  --plyr-menu-color: #f8fafc;
   --plyr-menu-border-radius: 12px;
   --plyr-menu-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
   --plyr-tooltip-background: rgba(15, 23, 42, 0.92);
   --plyr-tooltip-border-radius: 6px;
-  --plyr-tooltip-color: #FFFFFF;
+  --plyr-tooltip-color: #ffffff;
   --plyr-tooltip-padding: 5px 8px;
   --plyr-font-family: inherit;
   --plyr-font-weight-regular: 500;
@@ -235,11 +248,13 @@ body {
   width: 64px !important;
   height: 64px !important;
   box-shadow: 0 0 25px rgba(24, 101, 242, 0.6) !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease !important;
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease !important;
 }
 
 .dmklab-plyr-container .plyr__control--overlaid:hover {
-  background: #1865F2 !important;
+  background: #1865f2 !important;
   transform: scale(1.1) !important;
 }
 
@@ -251,7 +266,7 @@ body {
   font-size: 13.5px !important;
   line-height: 1.5 !important;
   font-weight: 500 !important;
-  color: #FFFFFF !important;
+  color: #ffffff !important;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
@@ -274,7 +289,7 @@ body {
 .high-contrast button:focus-visible,
 .high-contrast a:focus-visible,
 .high-contrast input:focus-visible {
-  outline: 3px solid #FFC700 !important;
+  outline: 3px solid #ffc700 !important;
   outline-offset: 3px !important;
 }
 
@@ -285,5 +300,3 @@ html.text-size-large {
 html.text-size-xlarge {
   font-size: 20px;
 }
-
-

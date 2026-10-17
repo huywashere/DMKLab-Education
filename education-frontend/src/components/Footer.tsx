@@ -1,16 +1,23 @@
 import React from "react";
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Building2, 
-  ShieldCheck, 
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Building2,
+  ShieldCheck,
   Heart,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { FaLinkedinIn, FaFacebookF, FaYoutube, FaTiktok } from "react-icons/fa6";
-import { RiMapPin2Fill, RiPhoneFill, RiMailFill, RiShieldCheckFill, RiHeartFill, RiBuilding4Fill } from "react-icons/ri";
+import {
+  RiMapPin2Fill,
+  RiPhoneFill,
+  RiMailFill,
+  RiShieldCheckFill,
+  RiHeartFill,
+  RiBuilding4Fill,
+} from "react-icons/ri";
 import { TbCertificate, TbShieldCheck } from "react-icons/tb";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -73,7 +80,8 @@ export const Footer: React.FC<FooterProps> = ({
                 onClick={onOpenContact}
                 className="text-[#14BF96] hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
               >
-                {t("prefooter_pricing_cta", "Liên hệ đội ngũ DMKLab")} <ExternalLink className="w-3 h-3" />
+                {t("prefooter_pricing_cta", "Liên hệ đội ngũ DMKLab")}{" "}
+                <ExternalLink className="w-3 h-3" />
               </button>
             </p>
           </div>
@@ -98,7 +106,6 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Main 4-Column Grid matching Khan Academy's layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-[#183660]">
-            
             {/* Column 1: VỀ CHÚNG TÔI (5 cols on lg) */}
             <div className="lg:col-span-5 space-y-4">
               <div className="flex items-center gap-2">
@@ -107,7 +114,7 @@ export const Footer: React.FC<FooterProps> = ({
                   {t("footer_about_heading", "VỀ CHÚNG TÔI & SỨ MỆNH")}
                 </h3>
               </div>
-              
+
               {/* Official DMKLab + Khan Sprout Identity */}
               <div className="pt-1 flex items-center gap-3">
                 <img
@@ -119,7 +126,9 @@ export const Footer: React.FC<FooterProps> = ({
                 />
                 <div className="border-l border-slate-700 pl-3">
                   <p className="text-xs font-bold text-white">DMKLab Education</p>
-                  <p className="text-[10px] text-[#14BF96] font-semibold">Theo chuẩn Khan Academy</p>
+                  <p className="text-[10px] text-[#14BF96] font-semibold">
+                    Theo chuẩn Khan Academy
+                  </p>
                 </div>
               </div>
 
@@ -131,9 +140,9 @@ export const Footer: React.FC<FooterProps> = ({
               {/* Official Certification Badges */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 {/* Badge Bộ Công Thương */}
-                <a 
-                  href="http://online.gov.vn" 
-                  target="_blank" 
+                <a
+                  href="http://online.gov.vn"
+                  target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0B65C2] text-white shadow-xs hover:opacity-95 transition"
                   title="Đã thông báo Bộ Công Thương"
@@ -142,15 +151,17 @@ export const Footer: React.FC<FooterProps> = ({
                     ✓
                   </div>
                   <div className="flex flex-col text-left leading-tight">
-                    <span className="text-[9px] font-bold uppercase tracking-wider">ĐÃ THÔNG BÁO</span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider">
+                      ĐÃ THÔNG BÁO
+                    </span>
                     <span className="text-[8px] font-medium opacity-90">BỘ CÔNG THƯƠNG</span>
                   </div>
                 </a>
 
                 {/* Badge DMCA Protected */}
-                <a 
-                  href="https://www.dmca.com" 
-                  target="_blank" 
+                <a
+                  href="https://www.dmca.com"
+                  target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center border border-slate-700 rounded overflow-hidden text-[9px] shadow-xs hover:opacity-95 transition"
                   title="DMCA Protected"
@@ -219,16 +230,21 @@ export const Footer: React.FC<FooterProps> = ({
                 <div className="flex items-start gap-2.5">
                   <RiMapPin2Fill className="w-4 h-4 text-[#14BF96] shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    <strong className="text-white">{t("footer_headquarters_label", "Trụ sở:")}</strong>{" "}
-                    {t("footer_headquarters_val", "702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam")}
+                    <strong className="text-white">
+                      {t("footer_headquarters_label", "Trụ sở:")}
+                    </strong>{" "}
+                    {t(
+                      "footer_headquarters_val",
+                      "702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam"
+                    )}
                   </p>
                 </div>
 
                 {/* Phone */}
                 <div className="flex items-center gap-2.5">
                   <RiPhoneFill className="w-4 h-4 text-[#14BF96] shrink-0" />
-                  <a 
-                    href="tel:0909907861" 
+                  <a
+                    href="tel:0909907861"
                     className="font-bold text-white hover:text-[#14BF96] transition"
                   >
                     0909907861
@@ -238,8 +254,8 @@ export const Footer: React.FC<FooterProps> = ({
                 {/* Email */}
                 <div className="flex items-center gap-2.5">
                   <RiMailFill className="w-4 h-4 text-[#14BF96] shrink-0" />
-                  <a 
-                    href="mailto:info@dmklab.vn" 
+                  <a
+                    href="mailto:info@dmklab.vn"
                     className="font-medium text-white hover:text-[#14BF96] transition"
                   >
                     info@dmklab.vn
@@ -268,31 +284,46 @@ export const Footer: React.FC<FooterProps> = ({
 
               <ul className="space-y-2 text-xs text-slate-300">
                 <li>
-                  <a href="#payment-guide" className="hover:text-[#14BF96] transition flex items-center gap-1.5">
+                  <a
+                    href="#payment-guide"
+                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
                     <span>{t("footer_payment_guide", "Hướng Dẫn Thanh Toán")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#warranty" className="hover:text-[#14BF96] transition flex items-center gap-1.5">
+                  <a
+                    href="#warranty"
+                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
                     <span>{t("footer_warranty", "Quy Định Bảo Hành")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#returns" className="hover:text-[#14BF96] transition flex items-center gap-1.5">
+                  <a
+                    href="#returns"
+                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
                     <span>{t("footer_return", "Quy định đổi trả sản phẩm")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#shipping" className="hover:text-[#14BF96] transition flex items-center gap-1.5">
+                  <a
+                    href="#shipping"
+                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
                     <span>{t("footer_shipping", "Quy Định Vận Chuyển")}</span>
                   </a>
                 </li>
                 <li>
-                  <a href="#privacy" className="hover:text-[#14BF96] transition flex items-center gap-1.5">
+                  <a
+                    href="#privacy"
+                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
                     <span>{t("footer_privacy", "Chính Sách Bảo Mật")}</span>
                   </a>
@@ -349,14 +380,11 @@ export const Footer: React.FC<FooterProps> = ({
                 </li>
               </ul>
             </div>
-
           </div>
 
           {/* Bottom Bar: Copyright & Safety */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <p>
-              {t("footer_copyright")}
-            </p>
+            <p>{t("footer_copyright")}</p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1 text-[#285366] dark:text-slate-300">
                 <RiShieldCheckFill className="w-4 h-4 text-emerald-600" />

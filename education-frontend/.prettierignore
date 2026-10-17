@@ -1,0 +1,16 @@
+# Dependencies & package managers
+node_modules/
+.pnpm-store/
+package-lock.json
+pnpm-lock.yaml
+
+# Build artifacts & caches
+.next/
+out/
+build/
+dist/
+.turbo/
+
+# Environment & logs
+.env*
+*.log

@@ -2,17 +2,17 @@
 
 import React, { useState } from "react";
 import { useBookmarks } from "@/lib/bookmarks/BookmarksContext";
-import { 
-  X, 
-  Bookmark, 
-  FileText, 
-  Trash2, 
-  Play, 
-  Clock, 
-  Search, 
+import {
+  X,
+  Bookmark,
+  FileText,
+  Trash2,
+  Play,
+  Clock,
+  Search,
   FolderHeart,
   ChevronRight,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 interface BookmarksModalProps {
@@ -20,13 +20,13 @@ interface BookmarksModalProps {
 }
 
 export const BookmarksModal: React.FC<BookmarksModalProps> = ({ onSelectLesson }) => {
-  const { 
-    isBookmarksModalOpen, 
-    closeBookmarksModal, 
-    bookmarkedLessons, 
-    toggleBookmark, 
-    notes, 
-    deleteNote 
+  const {
+    isBookmarksModalOpen,
+    closeBookmarksModal,
+    bookmarkedLessons,
+    toggleBookmark,
+    notes,
+    deleteNote,
   } = useBookmarks();
 
   const [activeTab, setActiveTab] = useState<"bookmarks" | "notes">("bookmarks");
@@ -55,7 +55,7 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({ onSelectLesson }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div 
+      <div
         className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 animate-in zoom-in-95 duration-150 text-slate-800 dark:text-slate-100 max-h-[88vh] flex flex-col"
         role="dialog"
         aria-modal="true"
@@ -172,60 +172,63 @@ export const BookmarksModal: React.FC<BookmarksModalProps> = ({ onSelectLesson }
               <div className="text-center py-12 space-y-2 text-slate-400">
                 <Bookmark className="w-10 h-10 mx-auto opacity-30" />
                 <p className="text-xs font-medium">Chưa có bài học nào được đánh dấu.</p>
-                <p className="text-[11px] text-slate-500">Hãy nhấn nút "Lưu bài học" khi đang xem bài giảng để xem lại sau!</p>
+                <p className="text-[11px] text-slate-500">
+                  Hãy nhấn nút "Lưu bài học" khi đang xem bài giảng để xem lại sau!
+                </p>
               </div>
             )
-          ) : (
-            filteredNotes.length > 0 ? (
-              filteredNotes.map((note) => (
-                <div
-                  key={note.id}
-                  className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 space-y-2 group"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                        {note.lessonTitle}
+          ) : filteredNotes.length > 0 ? (
+            filteredNotes.map((note) => (
+              <div
+                key={note.id}
+                className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 space-y-2 group"
+              >
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {note.lessonTitle}
+                    </span>
+                    {typeof note.timestampSeconds === "number" && (
+                      <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-[#1865F2] dark:text-blue-400 font-mono text-[10px] font-bold flex items-center gap-1 shrink-0">
+                        <Clock className="w-3 h-3" />
+                        {Math.floor(note.timestampSeconds / 60)}:
+                        {(note.timestampSeconds % 60).toString().padStart(2, "0")}
                       </span>
-                      {typeof note.timestampSeconds === "number" && (
-                        <span className="px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-[#1865F2] dark:text-blue-400 font-mono text-[10px] font-bold flex items-center gap-1 shrink-0">
-                          <Clock className="w-3 h-3" />
-                          {Math.floor(note.timestampSeconds / 60)}:{(note.timestampSeconds % 60).toString().padStart(2, "0")}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-400">{note.createdAt}</span>
-                      <button
-                        onClick={() => deleteNote(note.id)}
-                        className="text-slate-400 hover:text-rose-500 transition cursor-pointer p-1"
-                        title="Xóa ghi chú"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    )}
                   </div>
-
-                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                    {note.content}
-                  </p>
-
-                  <button
-                    onClick={() => handleLessonClicked(note.lessonId)}
-                    className="text-[11px] font-bold text-[#1865F2] hover:underline flex items-center gap-1 cursor-pointer pt-1"
-                  >
-                    <span>Xem lại đoạn video bài học</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-slate-400">{note.createdAt}</span>
+                    <button
+                      onClick={() => deleteNote(note.id)}
+                      className="text-slate-400 hover:text-rose-500 transition cursor-pointer p-1"
+                      title="Xóa ghi chú"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-12 space-y-2 text-slate-400">
-                <FileText className="w-10 h-10 mx-auto opacity-30" />
-                <p className="text-xs font-medium">Bạn chưa ghi chú cho bài học nào.</p>
-                <p className="text-[11px] text-slate-500">Mở bài học và vào tab "Ghi chú cá nhân" để lưu kiến thức quan trọng nhé!</p>
+
+                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                  {note.content}
+                </p>
+
+                <button
+                  onClick={() => handleLessonClicked(note.lessonId)}
+                  className="text-[11px] font-bold text-[#1865F2] hover:underline flex items-center gap-1 cursor-pointer pt-1"
+                >
+                  <span>Xem lại đoạn video bài học</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
               </div>
-            )
+            ))
+          ) : (
+            <div className="text-center py-12 space-y-2 text-slate-400">
+              <FileText className="w-10 h-10 mx-auto opacity-30" />
+              <p className="text-xs font-medium">Bạn chưa ghi chú cho bài học nào.</p>
+              <p className="text-[11px] text-slate-500">
+                Mở bài học và vào tab "Ghi chú cá nhân" để lưu kiến thức quan trọng nhé!
+              </p>
+            </div>
           )}
         </div>
       </div>

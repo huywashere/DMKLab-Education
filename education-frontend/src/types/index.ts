@@ -1,4 +1,4 @@
-export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'STUDENT' | 'PARENT';
+export type UserRole = "SUPER_ADMIN" | "ADMIN" | "TEACHER" | "STUDENT" | "PARENT";
 
 export interface User {
   id: string;
@@ -14,13 +14,13 @@ export interface User {
   createdAt?: string;
 }
 
-export type MasteryLevel = 'NOT_STARTED' | 'FAMILIAR' | 'PROFICIENT' | 'MASTERED';
+export type MasteryLevel = "NOT_STARTED" | "FAMILIAR" | "PROFICIENT" | "MASTERED";
 
 export interface Grade {
   id: string;
   name: string;
   code: string;
-  level: 'PRIMARY' | 'SECONDARY' | 'HIGH_SCHOOL';
+  level: "PRIMARY" | "SECONDARY" | "HIGH_SCHOOL";
   displayOrder: number;
 }
 
@@ -57,7 +57,7 @@ export interface Lesson {
   chapterId: string;
   title: string;
   description: string;
-  contentType: 'VIDEO' | 'ARTICLE' | 'QUIZ';
+  contentType: "VIDEO" | "ARTICLE" | "QUIZ";
   videoUrl?: string;
   durationSeconds: number;
   orderNum: number;
@@ -91,11 +91,11 @@ export interface Quiz {
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: string;
   isSocraticHint?: boolean;
-  mode?: 'SOCRATIC' | 'GRADE_ADAPTED' | 'PRACTICE' | 'ERROR_DIAGNOSIS' | 'CITE_LESSON';
+  mode?: "SOCRATIC" | "GRADE_ADAPTED" | "PRACTICE" | "ERROR_DIAGNOSIS" | "CITE_LESSON";
   gradeLevel?: number;
   stepByStepHints?: string[];
   interactiveQuiz?: {
@@ -123,7 +123,7 @@ export interface MediaAsset {
   originalFilename: string;
   contentType: string;
   fileSizeBytes: number;
-  status: 'READY' | 'TRANSCODING' | 'UPLOADED' | 'FAILED';
+  status: "READY" | "TRANSCODING" | "UPLOADED" | "FAILED";
   hlsUrl?: string;
   createdAt: string;
 }

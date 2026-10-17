@@ -9,32 +9,35 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StudentDashboard } from "@/features/student/StudentDashboard";
 import { SocraticChatbot } from "@/features/student/SocraticChatbot";
-import { 
-  GraduationCap, 
-  Users, 
-  ShieldCheck, 
-  HeartHandshake, 
+import {
+  GraduationCap,
+  Users,
+  ShieldCheck,
+  HeartHandshake,
   ArrowLeft,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 export default function DedicatedDashboardPage() {
   const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS.student);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(MOCK_GRADES[4]);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
-  const [activeRoleTab, setActiveRoleTab] = useState<'STUDENT' | 'TEACHER' | 'PARENT' | 'ADMIN'>('STUDENT');
+  const [activeRoleTab, setActiveRoleTab] = useState<"STUDENT" | "TEACHER" | "PARENT" | "ADMIN">(
+    "STUDENT"
+  );
 
   useEffect(() => {
-    api.getMyProfile()
+    api
+      .getMyProfile()
       .then((profile) => {
         if (profile) {
           setCurrentUser(profile);
-          if (profile.role === 'ADMIN' || profile.role === 'SUPER_ADMIN') {
-            setActiveRoleTab('ADMIN');
-          } else if (profile.role === 'TEACHER') {
-            setActiveRoleTab('TEACHER');
+          if (profile.role === "ADMIN" || profile.role === "SUPER_ADMIN") {
+            setActiveRoleTab("ADMIN");
+          } else if (profile.role === "TEACHER") {
+            setActiveRoleTab("TEACHER");
           } else {
-            setActiveRoleTab('STUDENT');
+            setActiveRoleTab("STUDENT");
           }
         }
       })
@@ -52,32 +55,38 @@ export default function DedicatedDashboardPage() {
       <Header
         currentUser={currentUser}
         onSwitchUser={(role) => {
-          if (role === 'STUDENT') {
+          if (role === "STUDENT") {
             setCurrentUser(MOCK_USERS.student);
-            setActiveRoleTab('STUDENT');
-          } else if (role === 'TEACHER') {
+            setActiveRoleTab("STUDENT");
+          } else if (role === "TEACHER") {
             setCurrentUser(MOCK_USERS.teacher);
-            setActiveRoleTab('TEACHER');
-          } else if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
+            setActiveRoleTab("TEACHER");
+          } else if (role === "SUPER_ADMIN" || role === "ADMIN") {
             setCurrentUser(MOCK_USERS.admin);
-            setActiveRoleTab('ADMIN');
+            setActiveRoleTab("ADMIN");
           }
         }}
         activeView="dashboard"
         onChangeView={(v) => {
-          if (v === 'student') window.location.href = '/';
-          else if (v === 'admin') window.location.href = '/admin';
-          else if (v === 'profile') window.location.href = '/';
+          if (v === "student") window.location.href = "/";
+          else if (v === "admin") window.location.href = "/admin";
+          else if (v === "profile") window.location.href = "/";
         }}
         selectedGrade={selectedGrade}
         onSelectGrade={setSelectedGrade}
         onOpenAiChat={() => setIsAiChatOpen(true)}
-        onOpenLogin={() => { window.location.href = '/'; }}
-        onOpenRegister={() => { window.location.href = '/'; }}
-        onOpenProfile={() => { window.location.href = '/'; }}
+        onOpenLogin={() => {
+          window.location.href = "/";
+        }}
+        onOpenRegister={() => {
+          window.location.href = "/";
+        }}
+        onOpenProfile={() => {
+          window.location.href = "/";
+        }}
         onLogout={() => {
           api.clearToken();
-          window.location.href = '/';
+          window.location.href = "/";
         }}
       />
 
@@ -85,7 +94,7 @@ export default function DedicatedDashboardPage() {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Link 
+            <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#1865F2] transition"
             >
@@ -102,13 +111,13 @@ export default function DedicatedDashboardPage() {
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
             <button
               onClick={() => {
-                setActiveRoleTab('STUDENT');
+                setActiveRoleTab("STUDENT");
                 setCurrentUser(MOCK_USERS.student);
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                activeRoleTab === 'STUDENT'
-                  ? 'bg-white text-[#1865F2] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                activeRoleTab === "STUDENT"
+                  ? "bg-white text-[#1865F2] shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
@@ -117,13 +126,13 @@ export default function DedicatedDashboardPage() {
 
             <button
               onClick={() => {
-                setActiveRoleTab('TEACHER');
+                setActiveRoleTab("TEACHER");
                 setCurrentUser(MOCK_USERS.teacher);
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                activeRoleTab === 'TEACHER'
-                  ? 'bg-white text-[#1865F2] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                activeRoleTab === "TEACHER"
+                  ? "bg-white text-[#1865F2] shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Users className="w-3.5 h-3.5 text-blue-600" />
@@ -132,7 +141,7 @@ export default function DedicatedDashboardPage() {
 
             <button
               onClick={() => {
-                setActiveRoleTab('PARENT');
+                setActiveRoleTab("PARENT");
                 setCurrentUser({
                   ...MOCK_USERS.student,
                   fullName: "Phụ Huynh Trần Văn Bình",
@@ -140,9 +149,9 @@ export default function DedicatedDashboardPage() {
                 });
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
-                activeRoleTab === 'PARENT'
-                  ? 'bg-white text-[#1865F2] shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                activeRoleTab === "PARENT"
+                  ? "bg-white text-[#1865F2] shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <HeartHandshake className="w-3.5 h-3.5 text-rose-500" />
@@ -151,7 +160,7 @@ export default function DedicatedDashboardPage() {
 
             <button
               onClick={() => {
-                window.location.href = '/admin';
+                window.location.href = "/admin";
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40"
               title="Mở Cổng Quản Trị Hệ Thống Riêng Biệt (/admin)"

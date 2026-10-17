@@ -25,7 +25,12 @@ interface BookmarksContextType {
   toggleBookmark: (lesson: { id: string; title: string; grade?: string; subject?: string }) => void;
   isBookmarked: (lessonId: string) => boolean;
   notes: LessonNote[];
-  addNote: (lessonId: string, lessonTitle: string, content: string, timestampSeconds?: number) => void;
+  addNote: (
+    lessonId: string,
+    lessonTitle: string,
+    content: string,
+    timestampSeconds?: number
+  ) => void;
   deleteNote: (id: string) => void;
   getNotesForLesson: (lessonId: string) => LessonNote[];
   isBookmarksModalOpen: boolean;
@@ -63,7 +68,8 @@ export const BookmarksProvider: React.FC<{ children: ReactNode }> = ({ children 
       lessonId: "les-01",
       lessonTitle: "1. Khái niệm Phân số và Các tính chất cơ bản",
       timestampSeconds: 120,
-      content: "Nhớ kỹ: Tử số là phần lấy ra (ở trên), Mẫu số là tổng số phần bằng nhau (ở dưới, luôn khác 0).",
+      content:
+        "Nhớ kỹ: Tử số là phần lấy ra (ở trên), Mẫu số là tổng số phần bằng nhau (ở dưới, luôn khác 0).",
       createdAt: "10:15 - 17/10/2026",
     },
     {
@@ -71,7 +77,8 @@ export const BookmarksProvider: React.FC<{ children: ReactNode }> = ({ children 
       lessonId: "les-01",
       lessonTitle: "1. Khái niệm Phân số và Các tính chất cơ bản",
       timestampSeconds: 330,
-      content: "Ví dụ bánh Pizza chia 4 phần: Ăn 1 miếng là 1/4 cái bánh. Cần ôn lại trước kỳ kiểm tra giữa kỳ!",
+      content:
+        "Ví dụ bánh Pizza chia 4 phần: Ăn 1 miếng là 1/4 cái bánh. Cần ôn lại trước kỳ kiểm tra giữa kỳ!",
       createdAt: "10:22 - 17/10/2026",
     },
   ]);
@@ -90,7 +97,12 @@ export const BookmarksProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, []);
 
-  const toggleBookmark = (lesson: { id: string; title: string; grade?: string; subject?: string }) => {
+  const toggleBookmark = (lesson: {
+    id: string;
+    title: string;
+    grade?: string;
+    subject?: string;
+  }) => {
     setBookmarkedLessons((prev) => {
       const exists = prev.some((l) => l.id === lesson.id);
       let updated: BookmarkedLesson[];
@@ -119,14 +131,20 @@ export const BookmarksProvider: React.FC<{ children: ReactNode }> = ({ children 
     return bookmarkedLessons.some((l) => l.id === lessonId);
   };
 
-  const addNote = (lessonId: string, lessonTitle: string, content: string, timestampSeconds?: number) => {
+  const addNote = (
+    lessonId: string,
+    lessonTitle: string,
+    content: string,
+    timestampSeconds?: number
+  ) => {
     const newNote: LessonNote = {
       id: `note-${Date.now()}`,
       lessonId,
       lessonTitle,
       timestampSeconds,
       content,
-      createdAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " - Hôm nay",
+      createdAt:
+        new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " - Hôm nay",
     };
     setNotes((prev) => {
       const updated = [newNote, ...prev];

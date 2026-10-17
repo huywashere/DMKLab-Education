@@ -3,20 +3,20 @@
 import React from "react";
 import { User, Grade, Subject, Lesson } from "@/types";
 import { MOCK_SUBJECTS, MOCK_COURSE, MOCK_LESSONS } from "@/lib/mock-data";
-import { 
-  Play, 
-  Award, 
-  CheckCircle2, 
-  ArrowRight, 
-  Calculator, 
-  Atom, 
-  BookOpen, 
-  Globe, 
-  Compass, 
+import {
+  Play,
+  Award,
+  CheckCircle2,
+  ArrowRight,
+  Calculator,
+  Atom,
+  BookOpen,
+  Globe,
+  Compass,
   Sparkles,
   Flame,
   Clock,
-  Target
+  Target,
 } from "lucide-react";
 
 interface StudentDashboardProps {
@@ -37,11 +37,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   const getSubjectIcon = (iconName: string) => {
     switch (iconName) {
-      case "Calculator": return <Calculator className="w-6 h-6" />;
-      case "Atom": return <Atom className="w-6 h-6" />;
-      case "BookOpen": return <BookOpen className="w-6 h-6" />;
-      case "Globe": return <Globe className="w-6 h-6" />;
-      default: return <Compass className="w-6 h-6" />;
+      case "Calculator":
+        return <Calculator className="w-6 h-6" />;
+      case "Atom":
+        return <Atom className="w-6 h-6" />;
+      case "BookOpen":
+        return <BookOpen className="w-6 h-6" />;
+      case "Globe":
+        return <Globe className="w-6 h-6" />;
+      default:
+        return <Compass className="w-6 h-6" />;
     }
   };
 
@@ -50,19 +55,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       {/* 1. Welcome & Khan-style Hero Banner */}
       <div className="bg-gradient-to-r from-[#0B2147] to-[#182B49] text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[radial-gradient(#14BF96_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-        
+
         <div className="max-w-2xl relative z-10 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#14BF96] text-xs font-bold border border-white/10">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Mục tiêu tuần này: Hoàn thành 4 kỹ năng toán học</span>
           </div>
-          
+
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Chào mừng trở lại, {currentUser.fullName}!
           </h1>
-          
+
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Học từng bước một với các video bài giảng ngắn gọn và bài tập thực hành theo phương pháp gợi mở.
+            Học từng bước một với các video bài giảng ngắn gọn và bài tập thực hành theo phương pháp
+            gợi mở.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-semibold">
@@ -102,9 +108,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 Cấp độ: Đang thành thạo (Proficient)
               </span>
             </div>
-            <h3 className="text-xl font-bold text-slate-900">
-              {currentLesson.title}
-            </h3>
+            <h3 className="text-xl font-bold text-slate-900">{currentLesson.title}</h3>
             <p className="text-xs sm:text-sm text-slate-600 line-clamp-1">
               {currentLesson.description}
             </p>
@@ -116,8 +120,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span>65%</span>
               </div>
               <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#14BF96] rounded-full transition-all duration-500" 
+                <div
+                  className="h-full bg-[#14BF96] rounded-full transition-all duration-500"
                   style={{ width: "65%" }}
                 />
               </div>
@@ -177,7 +181,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               >
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
-                    <div 
+                    <div
                       className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105"
                       style={{ backgroundColor: sub.color }}
                     >
@@ -206,9 +210,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-300"
-                      style={{ 
+                      style={{
                         width: `${percent}%`,
-                        backgroundColor: sub.color 
+                        backgroundColor: sub.color,
                       }}
                     />
                   </div>
@@ -227,9 +231,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <BookOpen className="w-5 h-5 text-[#14BF96]" />
               {MOCK_COURSE.title}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              {MOCK_COURSE.description}
-            </p>
+            <p className="text-xs text-slate-500 mt-1">{MOCK_COURSE.description}</p>
           </div>
         </div>
 
@@ -263,21 +265,31 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           {lesson.title}
                         </p>
                         <p className="text-xs text-slate-500">
-                          Video · {Math.floor(lesson.durationSeconds / 60)} phút · {lesson.quiz ? "Có bài kiểm tra quiz" : "Lý thuyết"}
+                          Video · {Math.floor(lesson.durationSeconds / 60)} phút ·{" "}
+                          {lesson.quiz ? "Có bài kiểm tra quiz" : "Lý thuyết"}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
-                        lesson.masteryLevel === 'MASTERED' ? 'bg-emerald-100 text-emerald-700' :
-                        lesson.masteryLevel === 'PROFICIENT' ? 'bg-blue-100 text-blue-700' :
-                        lesson.masteryLevel === 'FAMILIAR' ? 'bg-amber-100 text-amber-700' :
-                        'bg-slate-100 text-slate-500'
-                      }`}>
-                        {lesson.masteryLevel === 'MASTERED' ? 'Tinh thông 🏆' :
-                         lesson.masteryLevel === 'PROFICIENT' ? 'Thành thạo ⚡' :
-                         lesson.masteryLevel === 'FAMILIAR' ? 'Làm quen 💡' : 'Chưa học'}
+                      <span
+                        className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
+                          lesson.masteryLevel === "MASTERED"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : lesson.masteryLevel === "PROFICIENT"
+                              ? "bg-blue-100 text-blue-700"
+                              : lesson.masteryLevel === "FAMILIAR"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-slate-100 text-slate-500"
+                        }`}
+                      >
+                        {lesson.masteryLevel === "MASTERED"
+                          ? "Tinh thông 🏆"
+                          : lesson.masteryLevel === "PROFICIENT"
+                            ? "Thành thạo ⚡"
+                            : lesson.masteryLevel === "FAMILIAR"
+                              ? "Làm quen 💡"
+                              : "Chưa học"}
                       </span>
                       <ArrowRight className="w-4 h-4 text-slate-400" />
                     </div>

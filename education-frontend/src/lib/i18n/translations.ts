@@ -385,8 +385,8 @@ export const TRANSLATIONS: Record<string, Record<Language, string>> = {
     en: "Try DMK AI Tutor Now",
   },
   ai_bubble_prompt: {
-    vi: "💡 \"Bước đầu tiên em định làm gì với bài toán này?\"",
-    en: "💡 \"What is your first step to approach this problem?\"",
+    vi: '💡 "Bước đầu tiên em định làm gì với bài toán này?"',
+    en: '💡 "What is your first step to approach this problem?"',
   },
   ai_tutor_badge: {
     vi: "DMK AI Tutor",

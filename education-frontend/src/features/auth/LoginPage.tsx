@@ -3,16 +3,16 @@
 import React, { useState } from "react";
 import { User } from "@/types";
 import { api } from "@/lib/api";
-import { 
-  Eye, 
-  EyeOff, 
-  Lock, 
-  User as UserIcon, 
-  ShieldCheck, 
-  ArrowLeft, 
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  User as UserIcon,
+  ShieldCheck,
+  ArrowLeft,
   AlertCircle,
   CheckCircle2,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 interface LoginPageProps {
@@ -67,7 +67,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setErrorMessage(null);
 
     if (lockedUntil && Date.now() < lockedUntil) {
-      setErrorMessage(`Tài khoản tạm thời bị khóa. Vui lòng thử lại sau ${Math.ceil(lockoutRemainingSec / 60)} phút!`);
+      setErrorMessage(
+        `Tài khoản tạm thời bị khóa. Vui lòng thử lại sau ${Math.ceil(lockoutRemainingSec / 60)} phút!`
+      );
       return;
     }
 
@@ -79,9 +81,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setIsLoading(true);
     try {
       const { user } = await api.login(usernameOrEmail.trim(), password);
-      
+
       // Kiểm tra xem tài khoản có phải Quản trị viên (ADMIN hoặc SUPER_ADMIN) yêu cầu 2FA không
-      if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || user.username === 'admin') {
+      if (user.role === "ADMIN" || user.role === "SUPER_ADMIN" || user.username === "admin") {
         // Chuyển sang Bước 2: Xác thực đa yếu tố (2FA / TOTP)
         setMfaPendingUser(user);
         setMfaCode("");
@@ -99,7 +101,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         const lockoutTime = Date.now() + 15 * 60 * 1000; // Khóa 15 phút
         setLockedUntil(lockoutTime);
         setLockoutRemainingSec(15 * 60);
-        setErrorMessage("🔒 BẢO VỆ BRUTE-FORCE: Bạn đã nhập sai mật khẩu 5 lần liên tiếp. Tài khoản đã bị tạm khóa 15 phút!");
+        setErrorMessage(
+          "🔒 BẢO VỆ BRUTE-FORCE: Bạn đã nhập sai mật khẩu 5 lần liên tiếp. Tài khoản đã bị tạm khóa 15 phút!"
+        );
       } else {
         const remain = 5 - nextFail;
         setErrorMessage(
@@ -121,7 +125,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
 
     // Chấp nhận mã TOTP 6 số bất kỳ hoặc mã mẫu 849201 / 123456
-    const cleanCode = mfaCode.replace(/\s+/g, '');
+    const cleanCode = mfaCode.replace(/\s+/g, "");
     if (cleanCode.length !== 6 || !/^\d{6}$/.test(cleanCode)) {
       setMfaError("Mã xác thực 2FA phải bao gồm đúng 6 chữ số.");
       return;
@@ -195,10 +199,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-300 rounded-full font-bold text-xs text-slate-700 shadow-2xs transition cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+              />
             </svg>
             <span>Tiếp tục với Google</span>
           </button>
@@ -253,11 +269,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   TÀI KHOẢN ĐANG BỊ TẠM KHÓA BẢO VỆ
                 </h4>
                 <p className="text-[11px] text-rose-700 mt-1">
-                  Đã nhập sai mật khẩu quá 5 lần liên tiếp. Hệ thống kích hoạt cơ chế chống tấn công dò quét Brute-force/Credential Stuffing.
+                  Đã nhập sai mật khẩu quá 5 lần liên tiếp. Hệ thống kích hoạt cơ chế chống tấn công
+                  dò quét Brute-force/Credential Stuffing.
                 </p>
                 <div className="mt-2 flex items-center justify-between">
                   <span className="font-mono font-bold text-xs bg-rose-100 px-2.5 py-1 rounded-lg text-rose-800 border border-rose-200">
-                    Thời gian mở lại: {Math.floor(lockoutRemainingSec / 60)}:{(lockoutRemainingSec % 60).toString().padStart(2, '0')}
+                    Thời gian mở lại: {Math.floor(lockoutRemainingSec / 60)}:
+                    {(lockoutRemainingSec % 60).toString().padStart(2, "0")}
                   </span>
                   <button
                     type="button"
@@ -277,7 +295,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
             <span>
-              <strong>Cảnh báo bảo mật:</strong> Bạn đã nhập sai {failedAttempts}/5 lần. Tài khoản sẽ tự động khóa 15 phút nếu nhập sai tiếp!
+              <strong>Cảnh báo bảo mật:</strong> Bạn đã nhập sai {failedAttempts}/5 lần. Tài khoản
+              sẽ tự động khóa 15 phút nếu nhập sai tiếp!
             </span>
           </div>
         )}
@@ -303,7 +322,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 Tài khoản Quản trị viên: {mfaPendingUser.fullName} (@{mfaPendingUser.username})
               </p>
               <p className="text-[11px] text-purple-700 mt-1">
-                Theo chính sách an ninh K-12, tài khoản quyền Quản trị bắt buộc phải xác thực mã một lần từ ứng dụng Google Authenticator hoặc Authy.
+                Theo chính sách an ninh K-12, tài khoản quyền Quản trị bắt buộc phải xác thực mã một
+                lần từ ứng dụng Google Authenticator hoặc Authy.
               </p>
             </div>
 
@@ -324,7 +344,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     type="text"
                     maxLength={6}
                     value={mfaCode}
-                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                    onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
                     placeholder="000 000"
                     autoFocus
                     className="w-full text-center tracking-[0.4em] font-mono text-xl font-black py-3 bg-slate-50 border-2 border-purple-300 rounded-xl text-purple-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
@@ -386,10 +406,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-700">
-                  Mật khẩu
-                </label>
-                <a href="#" onClick={(e) => { e.preventDefault(); alert("Vui lòng liên hệ quản trị viên hoặc dùng tài khoản mẫu: admin / password123"); }} className="text-[11px] font-bold text-[#1865F2] hover:underline">
+                <label className="block text-xs font-bold text-slate-700">Mật khẩu</label>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert(
+                      "Vui lòng liên hệ quản trị viên hoặc dùng tài khoản mẫu: admin / password123"
+                    );
+                  }}
+                  className="text-[11px] font-bold text-[#1865F2] hover:underline"
+                >
                   Quên mật khẩu?
                 </a>
               </div>

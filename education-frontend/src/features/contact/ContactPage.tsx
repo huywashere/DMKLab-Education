@@ -17,7 +17,7 @@ import {
   User,
   GraduationCap,
   ShieldCheck,
-  ShieldAlert
+  ShieldAlert,
 } from "lucide-react";
 import { FaPhoneVolume, FaEnvelopeOpenText, FaLocationDot } from "react-icons/fa6";
 import { RiCustomerService2Fill, RiMailSendFill, RiMapPin2Fill, RiTimeFill } from "react-icons/ri";
@@ -87,7 +87,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({
       setIsSubmitted(true);
       setCooldownSec(120); // 2 phút cooldown giữa các lần gửi
     } catch (err: any) {
-      setRateLimitError(err.message || "Gửi tin nhắn không thành công do vi phạm tốc độ (Rate Limit). Vui lòng thử lại sau.");
+      setRateLimitError(
+        err.message ||
+          "Gửi tin nhắn không thành công do vi phạm tốc độ (Rate Limit). Vui lòng thử lại sau."
+      );
       if (err.message && err.message.includes("429")) {
         setCooldownSec(60);
       }
@@ -138,7 +141,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({
             Liên Hệ Với <span className="text-[#38BDF8]">DMKLab Education</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Chúng tôi luôn sẵn sàng lắng nghe mọi câu hỏi, ý kiến đóng góp hoặc yêu cầu tư vấn lộ trình học tập từ học sinh, phụ huynh và quý thầy cô.
+            Chúng tôi luôn sẵn sàng lắng nghe mọi câu hỏi, ý kiến đóng góp hoặc yêu cầu tư vấn lộ
+            trình học tập từ học sinh, phụ huynh và quý thầy cô.
           </p>
         </div>
       </section>
@@ -146,7 +150,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({
       {/* Main Content: Info Cards & Form */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 mb-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
           {/* Left Column: Direct Contact Info (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
@@ -155,7 +158,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 Kênh Hỗ Trợ Trực Tiếp
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Đội ngũ chuyên viên sư phạm và kỹ thuật của DMKLab luôn trực tuyến để giải đáp thắc mắc và hỗ trợ tài khoản nhanh chóng.
+                Đội ngũ chuyên viên sư phạm và kỹ thuật của DMKLab luôn trực tuyến để giải đáp thắc
+                mắc và hỗ trợ tài khoản nhanh chóng.
               </p>
 
               <div className="space-y-5 pt-2">
@@ -165,11 +169,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <FaPhoneVolume className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng Đài & Hotline Hỗ Trợ</div>
-                    <a href="tel:0909907861" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
-                      0909907861 <span className="text-xs font-normal text-emerald-600">(Hotline/Zalo)</span>
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Tổng Đài & Hotline Hỗ Trợ
+                    </div>
+                    <a
+                      href="tel:0909907861"
+                      className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors"
+                    >
+                      0909907861{" "}
+                      <span className="text-xs font-normal text-emerald-600">(Hotline/Zalo)</span>
                     </a>
-                    <div className="text-xs text-slate-500 mt-0.5">Tổng đài CSKH: 1900 6868 (8:00 – 21:30)</div>
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      Tổng đài CSKH: 1900 6868 (8:00 – 21:30)
+                    </div>
                   </div>
                 </div>
 
@@ -179,11 +191,18 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <FaEnvelopeOpenText className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Hòm Thư Điện Tử</div>
-                    <a href="mailto:info@dmklab.vn" className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Hòm Thư Điện Tử
+                    </div>
+                    <a
+                      href="mailto:info@dmklab.vn"
+                      className="text-base font-bold text-[#0A2540] hover:text-[#1865F2] transition-colors"
+                    >
                       info@dmklab.vn
                     </a>
-                    <div className="text-xs text-slate-500 mt-0.5">Tiếp nhận thông tin 24/7 (Phản hồi trong 2h)</div>
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      Tiếp nhận thông tin 24/7 (Phản hồi trong 2h)
+                    </div>
                   </div>
                 </div>
 
@@ -193,7 +212,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <FaLocationDot className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Trụ Sở Công Ty Đức Mai Khôi</div>
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Trụ Sở Công Ty Đức Mai Khôi
+                    </div>
                     <div className="text-sm font-semibold text-[#0A2540] mt-0.5 leading-snug">
                       702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam
                     </div>
@@ -206,7 +227,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     <TbClockHour4 className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Thời Gian Làm Việc Văn Phòng</div>
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Thời Gian Làm Việc Văn Phòng
+                    </div>
                     <div className="text-sm font-semibold text-[#0A2540] mt-0.5">
                       Thứ Hai – Thứ Bảy: 8:00 – 18:00 (Nền tảng online hoạt động 24/7)
                     </div>
@@ -241,7 +264,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                 Cam Kết Bảo Mật Thông Tin
               </div>
               <p className="text-xs text-blue-50 leading-relaxed">
-                Mọi thông tin liên hệ của học sinh và phụ huynh gửi về DMKLab đều được bảo mật theo tiêu chuẩn quốc tế COPPA và GDPR. Chúng tôi tuyệt đối không chia sẻ thông tin cho bên thứ ba vì bất kỳ mục đích thương mại nào.
+                Mọi thông tin liên hệ của học sinh và phụ huynh gửi về DMKLab đều được bảo mật theo
+                tiêu chuẩn quốc tế COPPA và GDPR. Chúng tôi tuyệt đối không chia sẻ thông tin cho
+                bên thứ ba vì bất kỳ mục đích thương mại nào.
               </p>
             </div>
           </div>
@@ -256,7 +281,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   </div>
                   <h3 className="text-2xl font-bold text-[#0A2540]">Gửi Tin Nhắn Thành Công!</h3>
                   <p className="text-slate-600 max-w-md mx-auto text-sm leading-relaxed">
-                    Cảm ơn bạn <strong className="text-[#0A2540]">{formData.fullName}</strong> đã liên hệ với DMKLab Education. Ban cố vấn giáo dục sẽ phản hồi qua email hoặc số điện thoại trong vòng 2 giờ làm việc.
+                    Cảm ơn bạn <strong className="text-[#0A2540]">{formData.fullName}</strong> đã
+                    liên hệ với DMKLab Education. Ban cố vấn giáo dục sẽ phản hồi qua email hoặc số
+                    điện thoại trong vòng 2 giờ làm việc.
                   </p>
                   <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
                     <button
@@ -287,9 +314,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-[#0A2540]">Gửi Thắc Mắc Cho Chúng Tôi</h2>
+                    <h2 className="text-2xl font-bold text-[#0A2540]">
+                      Gửi Thắc Mắc Cho Chúng Tôi
+                    </h2>
                     <p className="text-sm text-slate-500 mt-1">
-                      Điền thông tin bên dưới để được chuyên viên DMKLab tư vấn lộ trình học phù hợp nhất.
+                      Điền thông tin bên dưới để được chuyên viên DMKLab tư vấn lộ trình học phù hợp
+                      nhất.
                     </p>
                   </div>
 
@@ -385,10 +415,18 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors"
                       >
-                        <option value="Lộ trình học tập cá nhân hóa">Tư vấn lộ trình học Socratic</option>
-                        <option value="Hỗ trợ kỹ thuật / tài khoản">Hỗ trợ kỹ thuật & đăng nhập</option>
-                        <option value="Hướng dẫn sử dụng DMK AI Tutor">Hướng dẫn dùng DMK AI Tutor</option>
-                        <option value="Triển khai cho trường học">Đăng ký tài khoản Giáo viên / Trường học</option>
+                        <option value="Lộ trình học tập cá nhân hóa">
+                          Tư vấn lộ trình học Socratic
+                        </option>
+                        <option value="Hỗ trợ kỹ thuật / tài khoản">
+                          Hỗ trợ kỹ thuật & đăng nhập
+                        </option>
+                        <option value="Hướng dẫn sử dụng DMK AI Tutor">
+                          Hướng dẫn dùng DMK AI Tutor
+                        </option>
+                        <option value="Triển khai cho trường học">
+                          Đăng ký tài khoản Giáo viên / Trường học
+                        </option>
                         <option value="Góp ý phát triển">Góp ý nội dung chuyên môn</option>
                       </select>
                     </div>
@@ -429,7 +467,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                       <div className="flex-1">
                         {rateLimitError || (
                           <span>
-                            Hệ thống bảo vệ chống spam đang hoạt động: Vui lòng đợi <strong>{cooldownSec} giây</strong> trước khi gửi yêu cầu tiếp theo.
+                            Hệ thống bảo vệ chống spam đang hoạt động: Vui lòng đợi{" "}
+                            <strong>{cooldownSec} giây</strong> trước khi gửi yêu cầu tiếp theo.
                           </span>
                         )}
                       </div>
@@ -463,7 +502,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   {/* Anti-Spam Security Trust Badge */}
                   <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium pt-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Hệ thống bảo vệ Rate Limiting chống spam (Tối đa 3 tin nhắn / 10 phút)</span>
+                    <span>
+                      Hệ thống bảo vệ Rate Limiting chống spam (Tối đa 3 tin nhắn / 10 phút)
+                    </span>
                   </div>
                 </form>
               )}
@@ -501,9 +542,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     onClick={() => setFaqOpenIndex(isOpen ? null : index)}
                     className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 bg-slate-50/50 hover:bg-slate-50 transition-colors"
                   >
-                    <span className="text-sm sm:text-base font-bold text-[#0A2540]">
-                      {faq.q}
-                    </span>
+                    <span className="text-sm sm:text-base font-bold text-[#0A2540]">{faq.q}</span>
                     <ChevronDown
                       className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 ${
                         isOpen ? "rotate-180 text-[#1865F2]" : ""

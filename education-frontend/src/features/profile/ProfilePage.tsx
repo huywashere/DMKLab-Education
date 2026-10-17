@@ -3,19 +3,19 @@
 import React, { useState } from "react";
 import { User } from "@/types";
 import { api } from "@/lib/api";
-import { 
-  User as UserIcon, 
-  Flame, 
-  Star, 
-  Award, 
-  ShieldCheck, 
-  Key, 
-  Lock, 
-  Calendar, 
-  Edit3, 
-  Check, 
-  LogOut, 
-  Copy, 
+import {
+  User as UserIcon,
+  Flame,
+  Star,
+  Award,
+  ShieldCheck,
+  Key,
+  Lock,
+  Calendar,
+  Edit3,
+  Check,
+  LogOut,
+  Copy,
   Sparkles,
   BookOpen,
   ArrowLeft,
@@ -29,7 +29,7 @@ import {
   Mail,
   ShieldAlert,
   QrCode,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 
 interface ProfilePageProps {
@@ -51,12 +51,58 @@ const AVATAR_OPTIONS = [
 ];
 
 const KHAN_BADGES = [
-  { id: 1, name: "Thiên Thạch Khởi Đầu", category: "Thiên Thạch", desc: "Hoàn thành bài tập trắc nghiệm đầu tiên", icon: "☄️", unlocked: true, date: "10/2026" },
-  { id: 2, name: "Thợ Săn Chuỗi Ngày", category: "Thiên Thạch", desc: "Đạt chuỗi 3 ngày học liên tiếp", icon: "🔥", unlocked: true, date: "10/2026" },
-  { id: 3, name: "Ánh Trăng Soi Sáng", category: "Mặt Trăng", desc: "Đạt điểm tuyệt đối 100% trong bài kiểm tra Toán", icon: "🌙", unlocked: true, date: "10/2026" },
-  { id: 4, name: "Kiến Tạo Không Gian", category: "Trái Đất", desc: "Tích lũy trên 5,000 điểm năng lượng", icon: "🌍", unlocked: true, date: "10/2026" },
-  { id: 5, name: "Mặt Trời Rực Rỡ", category: "Mặt Trời", desc: "Hoàn thành toàn bộ chương trình một khối lớp", icon: "☀️", unlocked: false },
-  { id: 6, name: "Hố Đen Huyền Thoại", category: "Hố Đen", desc: "Đạt 50,000 điểm năng lượng và chuỗi 100 ngày", icon: "🕳️", unlocked: false },
+  {
+    id: 1,
+    name: "Thiên Thạch Khởi Đầu",
+    category: "Thiên Thạch",
+    desc: "Hoàn thành bài tập trắc nghiệm đầu tiên",
+    icon: "☄️",
+    unlocked: true,
+    date: "10/2026",
+  },
+  {
+    id: 2,
+    name: "Thợ Săn Chuỗi Ngày",
+    category: "Thiên Thạch",
+    desc: "Đạt chuỗi 3 ngày học liên tiếp",
+    icon: "🔥",
+    unlocked: true,
+    date: "10/2026",
+  },
+  {
+    id: 3,
+    name: "Ánh Trăng Soi Sáng",
+    category: "Mặt Trăng",
+    desc: "Đạt điểm tuyệt đối 100% trong bài kiểm tra Toán",
+    icon: "🌙",
+    unlocked: true,
+    date: "10/2026",
+  },
+  {
+    id: 4,
+    name: "Kiến Tạo Không Gian",
+    category: "Trái Đất",
+    desc: "Tích lũy trên 5,000 điểm năng lượng",
+    icon: "🌍",
+    unlocked: true,
+    date: "10/2026",
+  },
+  {
+    id: 5,
+    name: "Mặt Trời Rực Rỡ",
+    category: "Mặt Trời",
+    desc: "Hoàn thành toàn bộ chương trình một khối lớp",
+    icon: "☀️",
+    unlocked: false,
+  },
+  {
+    id: 6,
+    name: "Hố Đen Huyền Thoại",
+    category: "Hố Đen",
+    desc: "Đạt 50,000 điểm năng lượng và chuỗi 100 ngày",
+    icon: "🕳️",
+    unlocked: false,
+  },
 ];
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
@@ -65,7 +111,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onLogout,
   onBackToHome,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'badges' | 'security'>('overview');
+  const [activeTab, setActiveTab] = useState<"overview" | "badges" | "security">("overview");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState(currentUser.fullName);
   const [editBio, setEditBio] = useState(currentUser.bio || "");
@@ -76,7 +122,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordStatus, setPasswordStatus] = useState<{ success: boolean; message: string } | null>(null);
+  const [passwordStatus, setPasswordStatus] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
   const [isChangingPass, setIsChangingPass] = useState(false);
 
   // Copy token
@@ -121,7 +170,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   const [sessionActionMsg, setSessionActionMsg] = useState<string | null>(null);
 
   // 2FA TOTP State
-  const [is2FaEnabled, setIs2FaEnabled] = useState(currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN');
+  const [is2FaEnabled, setIs2FaEnabled] = useState(
+    currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
+  );
   const [show2FaModal, setShow2FaModal] = useState(false);
 
   const handleSendVerificationEmail = () => {
@@ -129,18 +180,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     setEmailVerifyMsg(null);
     setTimeout(() => {
       setIsSendingVerifyEmail(false);
-      setEmailVerifyMsg("✓ Đã gửi email xác minh đến " + currentUser.email + ". Vui lòng kiểm tra hộp thư!");
+      setEmailVerifyMsg(
+        "✓ Đã gửi email xác minh đến " + currentUser.email + ". Vui lòng kiểm tra hộp thư!"
+      );
     }, 800);
   };
 
   const handleRevokeSession = (sessionId: string) => {
-    setSessions(prev => prev.filter(s => s.id !== sessionId));
+    setSessions((prev) => prev.filter((s) => s.id !== sessionId));
     setSessionActionMsg("Đã thu hồi phiên đăng nhập và vô hiệu hóa JWT trên thiết bị.");
     setTimeout(() => setSessionActionMsg(null), 3000);
   };
 
   const handleRevokeAllOtherSessions = () => {
-    setSessions(prev => prev.filter(s => s.isCurrent));
+    setSessions((prev) => prev.filter((s) => s.isCurrent));
     setSessionActionMsg("Đã thu hồi thành công toàn bộ phiên đăng nhập trên các thiết bị khác!");
     setTimeout(() => setSessionActionMsg(null), 3500);
   };
@@ -252,7 +305,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   @{currentUser.username} • {currentUser.email}
                 </p>
                 <p className="text-xs text-slate-600 mt-2 max-w-xl italic">
-                  "{currentUser.bio || 'Chưa có tiểu sử.'}"
+                  "{currentUser.bio || "Chưa có tiểu sử."}"
                 </p>
               </div>
             </div>
@@ -309,9 +362,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-500">Huy hiệu đạt được</p>
-                <p className="text-lg font-black text-emerald-600">
-                  4 / 6 Huy hiệu
-                </p>
+                <p className="text-lg font-black text-emerald-600">4 / 6 Huy hiệu</p>
               </div>
             </div>
 
@@ -321,9 +372,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-500">Bảo mật tài khoản</p>
-                <p className="text-xs font-black text-purple-700">
-                  JWT HMAC-512
-                </p>
+                <p className="text-xs font-black text-purple-700">JWT HMAC-512</p>
               </div>
             </div>
           </div>
@@ -332,31 +381,31 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         {/* Tab Switcher */}
         <div className="flex border-b border-slate-200 mb-6 gap-6">
           <button
-            onClick={() => setActiveTab('overview')}
+            onClick={() => setActiveTab("overview")}
             className={`pb-3 font-extrabold text-sm transition border-b-2 cursor-pointer ${
-              activeTab === 'overview'
-                ? 'border-[#1865F2] text-[#1865F2]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === "overview"
+                ? "border-[#1865F2] text-[#1865F2]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             Tổng quan & Tiến độ
           </button>
           <button
-            onClick={() => setActiveTab('badges')}
+            onClick={() => setActiveTab("badges")}
             className={`pb-3 font-extrabold text-sm transition border-b-2 cursor-pointer ${
-              activeTab === 'badges'
-                ? 'border-[#1865F2] text-[#1865F2]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === "badges"
+                ? "border-[#1865F2] text-[#1865F2]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             Bộ sưu tập Huy hiệu DMKLab
           </button>
           <button
-            onClick={() => setActiveTab('security')}
+            onClick={() => setActiveTab("security")}
             className={`pb-3 font-extrabold text-sm transition border-b-2 cursor-pointer ${
-              activeTab === 'security'
-                ? 'border-[#1865F2] text-[#1865F2]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+              activeTab === "security"
+                ? "border-[#1865F2] text-[#1865F2]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             Bảo mật & Phiên JWT
@@ -364,7 +413,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
 
         {/* TAB 1: OVERVIEW */}
-        {activeTab === 'overview' && (
+        {activeTab === "overview" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               {/* Mastery progress */}
@@ -420,8 +469,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         ✓
                       </div>
                       <div>
-                        <p className="font-bold text-slate-800">Hoàn thành: Bài 1 Mệnh đề toán học</p>
-                        <p className="text-[11px] text-slate-400">Đạt 100% điểm quiz (+50 năng lượng)</p>
+                        <p className="font-bold text-slate-800">
+                          Hoàn thành: Bài 1 Mệnh đề toán học
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          Đạt 100% điểm quiz (+50 năng lượng)
+                        </p>
                       </div>
                     </div>
                     <span className="text-[11px] text-slate-400 font-medium">Hôm nay</span>
@@ -474,7 +527,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <h4 className="font-extrabold text-sm">DMK AI Tutor</h4>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Trợ lý gia sư Socratic luôn sẵn sàng giải đáp thắc mắc về các khái niệm Toán, Lý, Hóa và hướng dẫn từng bước.
+                  Trợ lý gia sư Socratic luôn sẵn sàng giải đáp thắc mắc về các khái niệm Toán, Lý,
+                  Hóa và hướng dẫn từng bước.
                 </p>
               </div>
             </div>
@@ -482,10 +536,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         )}
 
         {/* TAB 2: DMKLAB BADGES */}
-        {activeTab === 'badges' && (
+        {activeTab === "badges" && (
           <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
             <div className="mb-6">
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">Bộ sưu tập Huy hiệu DMKLab</h3>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                Bộ sưu tập Huy hiệu DMKLab
+              </h3>
               <p className="text-xs text-slate-500 mt-1">
                 Tích lũy điểm năng lượng và chinh phục các bài học để mở khóa huy hiệu danh giá
               </p>
@@ -497,8 +553,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   key={b.id}
                   className={`p-4 rounded-2xl border transition ${
                     b.unlocked
-                      ? 'bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-2xs'
-                      : 'bg-slate-50/70 border-dashed border-slate-300 opacity-60'
+                      ? "bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-2xs"
+                      : "bg-slate-50/70 border-dashed border-slate-300 opacity-60"
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -516,12 +572,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                           </span>
                         )}
                       </div>
-                      <h4 className="font-extrabold text-xs text-slate-900 mt-0.5">
-                        {b.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-                        {b.desc}
-                      </p>
+                      <h4 className="font-extrabold text-xs text-slate-900 mt-0.5">{b.name}</h4>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">{b.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -531,7 +583,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         )}
 
         {/* TAB 3: SECURITY & JWT */}
-        {activeTab === 'security' && (
+        {activeTab === "security" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* JWT Active Session Card */}
             <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
@@ -540,7 +592,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-slate-900">Phiên Đăng Nhập JWT Hiện Tại</h3>
+                  <h3 className="font-black text-sm text-slate-900">
+                    Phiên Đăng Nhập JWT Hiện Tại
+                  </h3>
                   <p className="text-[11px] text-slate-400">Bảo mật cao nhất chuẩn RFC 7519</p>
                 </div>
               </div>
@@ -566,7 +620,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-slate-700 text-xs">Access Token (Bearer Header):</span>
+                    <span className="font-bold text-slate-700 text-xs">
+                      Access Token (Bearer Header):
+                    </span>
                     <button
                       onClick={handleCopyToken}
                       className="text-[11px] font-bold text-[#1865F2] hover:underline flex items-center gap-1 cursor-pointer"
@@ -590,15 +646,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
                 <div>
                   <h3 className="font-black text-sm text-slate-900">Đổi Mật Khẩu Tài Khoản</h3>
-                  <p className="text-[11px] text-slate-400">Mã hóa một chiều với BCrypt 10 rounds</p>
+                  <p className="text-[11px] text-slate-400">
+                    Mã hóa một chiều với BCrypt 10 rounds
+                  </p>
                 </div>
               </div>
 
               {passwordStatus && (
-                <div className={`mb-4 p-3 rounded-2xl text-xs flex items-center gap-2 ${
-                  passwordStatus.success ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'
-                }`}>
-                  {passwordStatus.success ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <Lock className="w-4 h-4 text-rose-500 shrink-0" />}
+                <div
+                  className={`mb-4 p-3 rounded-2xl text-xs flex items-center gap-2 ${
+                    passwordStatus.success
+                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                      : "bg-rose-50 text-rose-800 border border-rose-200"
+                  }`}
+                >
+                  {passwordStatus.success ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  ) : (
+                    <Lock className="w-4 h-4 text-rose-500 shrink-0" />
+                  )}
                   <span>{passwordStatus.message}</span>
                 </div>
               )}
@@ -663,8 +729,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-sm text-slate-900">Xác Minh Email & Bảo Vệ 2 Lớp (2FA)</h3>
-                  <p className="text-[11px] text-slate-400">Bảo vệ tài khoản học tập chống giả mạo danh tính</p>
+                  <h3 className="font-black text-sm text-slate-900">
+                    Xác Minh Email & Bảo Vệ 2 Lớp (2FA)
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Bảo vệ tài khoản học tập chống giả mạo danh tính
+                  </p>
                 </div>
               </div>
 
@@ -713,18 +783,24 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <QrCode className="w-4 h-4 text-purple-600" />
-                      <span className="font-bold text-slate-800">Xác thực 2 yếu tố (TOTP / OTP):</span>
+                      <span className="font-bold text-slate-800">
+                        Xác thực 2 yếu tố (TOTP / OTP):
+                      </span>
                     </div>
-                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                      is2FaEnabled ? 'bg-purple-100 text-purple-800' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      {is2FaEnabled ? 'Đang Bật' : 'Chưa kích hoạt'}
+                    <span
+                      className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                        is2FaEnabled
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {is2FaEnabled ? "Đang Bật" : "Chưa kích hoạt"}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 mb-3">
-                    {currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN'
-                      ? 'Tài khoản Quản trị viên bắt buộc phải kích hoạt 2FA để bảo vệ dữ liệu toàn trường.'
-                      : 'Kích hoạt mã xác thực 6 chữ số qua ứng dụng Google Authenticator để gia tăng an toàn.'}
+                    {currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
+                      ? "Tài khoản Quản trị viên bắt buộc phải kích hoạt 2FA để bảo vệ dữ liệu toàn trường."
+                      : "Kích hoạt mã xác thực 6 chữ số qua ứng dụng Google Authenticator để gia tăng an toàn."}
                   </p>
                   <button
                     type="button"
@@ -746,8 +822,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <Laptop className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-black text-sm text-slate-900">Thiết Bị & Thu Hồi Phiên Đăng Nhập</h3>
-                    <p className="text-[11px] text-slate-400">Giám sát và đăng xuất từ xa khỏi các thiết bị lạ</p>
+                    <h3 className="font-black text-sm text-slate-900">
+                      Thiết Bị & Thu Hồi Phiên Đăng Nhập
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Giám sát và đăng xuất từ xa khỏi các thiết bị lạ
+                    </p>
                   </div>
                 </div>
 
@@ -774,18 +854,22 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   <div
                     key={sess.id}
                     className={`p-3.5 rounded-2xl border transition flex items-center justify-between ${
-                      sess.isCurrent 
-                        ? 'bg-emerald-50/50 border-emerald-200' 
-                        : 'bg-slate-50 border-slate-200'
+                      sess.isCurrent
+                        ? "bg-emerald-50/50 border-emerald-200"
+                        : "bg-slate-50 border-slate-200"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                        sess.isCurrent ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'
-                      }`}>
-                        {sess.type === 'laptop' && <Laptop className="w-4 h-4" />}
-                        {sess.type === 'smartphone' && <Smartphone className="w-4 h-4" />}
-                        {sess.type === 'tablet' && <Tablet className="w-4 h-4" />}
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                          sess.isCurrent
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-600"
+                        }`}
+                      >
+                        {sess.type === "laptop" && <Laptop className="w-4 h-4" />}
+                        {sess.type === "smartphone" && <Smartphone className="w-4 h-4" />}
+                        {sess.type === "tablet" && <Tablet className="w-4 h-4" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -799,9 +883,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                         <p className="text-[11px] text-slate-500 mt-0.5">
                           {sess.browser} · IP: <span className="font-mono">{sess.ip}</span>
                         </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          {sess.lastActive}
-                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{sess.lastActive}</p>
                       </div>
                     </div>
 
@@ -829,7 +911,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-purple-600" />
-                <h3 className="font-black text-sm text-slate-900">Thiết Lập Xác Thực 2 Yếu Tố (TOTP)</h3>
+                <h3 className="font-black text-sm text-slate-900">
+                  Thiết Lập Xác Thực 2 Yếu Tố (TOTP)
+                </h3>
               </div>
               <button
                 onClick={() => setShow2FaModal(false)}
@@ -841,14 +925,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
             <div className="space-y-4 text-xs text-slate-600">
               <p>
-                1. Mở ứng dụng <strong>Google Authenticator</strong> hoặc <strong>Authy</strong> trên điện thoại của bạn.
+                1. Mở ứng dụng <strong>Google Authenticator</strong> hoặc <strong>Authy</strong>{" "}
+                trên điện thoại của bạn.
               </p>
 
               <div className="flex justify-center p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <div className="text-center">
                   <div className="w-36 h-36 bg-white border-2 border-slate-800 rounded-xl p-2 mx-auto flex items-center justify-center shadow-inner">
-                    <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=otpauth://totp/DMKLab:${currentUser.username}?secret=JBSWY3DPEHPK3PXP&issuer=DMKLabEducation`} 
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=otpauth://totp/DMKLab:${currentUser.username}?secret=JBSWY3DPEHPK3PXP&issuer=DMKLabEducation`}
                       alt="2FA QR Code"
                       className="w-full h-full object-contain"
                     />
@@ -860,7 +945,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
 
               <p>
-                2. Quét mã QR ở trên hoặc nhập khóa bí mật thủ công. Mỗi 30 giây ứng dụng sẽ sinh mã 6 số để bạn đăng nhập.
+                2. Quét mã QR ở trên hoặc nhập khóa bí mật thủ công. Mỗi 30 giây ứng dụng sẽ sinh mã
+                6 số để bạn đăng nhập.
               </p>
 
               <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-purple-900 text-[11px]">
@@ -909,7 +995,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                       type="button"
                       onClick={() => setEditAvatar(av)}
                       className={`p-1 rounded-2xl border-2 transition cursor-pointer flex items-center justify-center ${
-                        editAvatar === av ? 'border-[#1865F2] bg-blue-50/50 ring-2 ring-blue-200' : 'border-slate-200 hover:border-slate-300'
+                        editAvatar === av
+                          ? "border-[#1865F2] bg-blue-50/50 ring-2 ring-blue-200"
+                          : "border-slate-200 hover:border-slate-300"
                       }`}
                     >
                       <img src={av} alt="avatar" className="w-12 h-12 rounded-full" />
@@ -919,9 +1007,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Họ và tên
-                </label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Họ và tên</label>
                 <input
                   type="text"
                   value={editFullName}
@@ -932,9 +1018,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tiểu sử (Bio)
-                </label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Tiểu sử (Bio)</label>
                 <textarea
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}

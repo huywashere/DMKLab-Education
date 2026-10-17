@@ -204,19 +204,19 @@ export const PlyrVideoPlayer = forwardRef<PlyrPlayerHandle, PlyrVideoPlayerProps
           player = new PlyrModule(videoRef.current, {
             controls: [
               "play-large", // Nút play lớn ở giữa
-              "restart",    // Phát lại từ đầu
-              "rewind",     // Tua lùi 10s
-              "play",       // Phát/Tạm dừng
+              "restart", // Phát lại từ đầu
+              "rewind", // Tua lùi 10s
+              "play", // Phát/Tạm dừng
               "fast-forward", // Tua nhanh 10s
-              "progress",   // Thanh tiến độ
+              "progress", // Thanh tiến độ
               "current-time", // Thời gian hiện tại
-              "duration",   // Tổng thời gian
-              "mute",       // Tắt/bật âm
-              "volume",     // Thanh trượt âm lượng
-              "captions",   // Phụ đề CC
-              "settings",   // Cài đặt tốc độ, lặp lại
-              "pip",        // Picture-in-picture
-              "airplay",    // Airplay nếu có
+              "duration", // Tổng thời gian
+              "mute", // Tắt/bật âm
+              "volume", // Thanh trượt âm lượng
+              "captions", // Phụ đề CC
+              "settings", // Cài đặt tốc độ, lặp lại
+              "pip", // Picture-in-picture
+              "airplay", // Airplay nếu có
               "fullscreen", // Toàn màn hình
             ],
             settings: ["captions", "speed", "loop"],
@@ -342,7 +342,9 @@ export const PlyrVideoPlayer = forwardRef<PlyrPlayerHandle, PlyrVideoPlayerProps
     const activeVtt = subtitlesUrl || subtitlesBlobUrl;
 
     return (
-      <div className={`relative dmklab-plyr-container bg-black rounded-2xl overflow-hidden shadow-2xl ${className}`}>
+      <div
+        className={`relative dmklab-plyr-container bg-black rounded-2xl overflow-hidden shadow-2xl ${className}`}
+      >
         {/* Native video element targeted by Plyr */}
         <video
           ref={videoRef}
@@ -369,7 +371,9 @@ export const PlyrVideoPlayer = forwardRef<PlyrPlayerHandle, PlyrVideoPlayerProps
         {!isClient && (
           <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center text-white gap-3">
             <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-medium text-slate-300">Đang chuẩn bị trình phát Plyr...</span>
+            <span className="text-xs font-medium text-slate-300">
+              Đang chuẩn bị trình phát Plyr...
+            </span>
           </div>
         )}
       </div>

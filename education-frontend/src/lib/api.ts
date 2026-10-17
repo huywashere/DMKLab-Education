@@ -1,14 +1,14 @@
-import { Grade, Subject, Lesson, Question, User } from '@/types';
-import { MOCK_GRADES, MOCK_SUBJECTS, MOCK_LESSONS, MOCK_USERS } from './mock-data';
+import { Grade, Subject, Lesson, Question, User } from "@/types";
+import { MOCK_GRADES, MOCK_SUBJECTS, MOCK_LESSONS, MOCK_USERS } from "./mock-data";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-const TOKEN_KEY = 'khan_k12_jwt_token';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+const TOKEN_KEY = "khan_k12_jwt_token";
 
 export interface BackendGrade {
   id: string;
   name: string;
   code: string;
-  level: 'PRIMARY' | 'SECONDARY' | 'HIGH_SCHOOL';
+  level: "PRIMARY" | "SECONDARY" | "HIGH_SCHOOL";
   displayOrder: number;
 }
 
@@ -192,18 +192,18 @@ const apiCache = {
 export const api = {
   // Token Management
   getToken(): string | null {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === "undefined") return null;
     return localStorage.getItem(TOKEN_KEY);
   },
 
   setToken(token: string): void {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(TOKEN_KEY, token);
     }
   },
 
   clearToken(): void {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem(TOKEN_KEY);
     }
   },
@@ -211,7 +211,7 @@ export const api = {
   getAuthHeaders(): HeadersInit {
     const token = this.getToken();
     return {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   },
@@ -219,17 +219,20 @@ export const api = {
   // Auth & Profile APIs
   async login(usernameOrEmail: string, password: string): Promise<{ user: User; token: string }> {
     const res = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usernameOrEmail, password }),
     });
 
     const json = await res.json().catch(() => ({}));
     if (res.status === 429) {
-      throw new Error(json.message || 'Hệ thống phát hiện quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút (HTTP 429).');
+      throw new Error(
+        json.message ||
+          "Hệ thống phát hiện quá nhiều lần thử đăng nhập. Vui lòng thử lại sau 15 phút (HTTP 429)."
+      );
     }
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Đăng nhập không thành công');
+      throw new Error(json.message || "Đăng nhập không thành công");
     }
 
     const { accessToken, user: rawUser } = json.data;
@@ -241,8 +244,9 @@ export const api = {
       fullName: rawUser.fullName,
       email: rawUser.email,
       role: rawUser.role,
-      avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-      bio: rawUser.bio || 'Học viên DMKLab Education K-12',
+      avatarUrl:
+        rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
+      bio: rawUser.bio || "Học viên DMKLab Education K-12",
       energyPoints: rawUser.energyPoints || 1000,
       streakDays: rawUser.streakDays || 1,
       createdAt: rawUser.createdAt,
@@ -259,17 +263,20 @@ export const api = {
     role: string;
   }): Promise<{ user: User; token: string }> {
     const res = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     const json = await res.json().catch(() => ({}));
     if (res.status === 429) {
-      throw new Error(json.message || 'Đã vượt quá giới hạn đăng ký tài khoản (Tối đa 3 tài khoản/30 phút). Vui lòng thử lại sau (HTTP 429).');
+      throw new Error(
+        json.message ||
+          "Đã vượt quá giới hạn đăng ký tài khoản (Tối đa 3 tài khoản/30 phút). Vui lòng thử lại sau (HTTP 429)."
+      );
     }
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Đăng ký không thành công');
+      throw new Error(json.message || "Đăng ký không thành công");
     }
 
     const { accessToken, user: rawUser } = json.data;
@@ -281,8 +288,9 @@ export const api = {
       fullName: rawUser.fullName,
       email: rawUser.email,
       role: rawUser.role,
-      avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-      bio: rawUser.bio || 'Học viên mới DMKLab Education K-12',
+      avatarUrl:
+        rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
+      bio: rawUser.bio || "Học viên mới DMKLab Education K-12",
       energyPoints: rawUser.energyPoints || 1000,
       streakDays: rawUser.streakDays || 1,
       createdAt: rawUser.createdAt,
@@ -297,7 +305,7 @@ export const api = {
 
     try {
       const res = await fetch(`${API_BASE}/auth/me`, {
-        method: 'GET',
+        method: "GET",
         headers: this.getAuthHeaders(),
       });
 
@@ -317,8 +325,10 @@ export const api = {
           fullName: rawUser.fullName,
           email: rawUser.email,
           role: rawUser.role,
-          avatarUrl: rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
-          bio: rawUser.bio || 'Học viên DMKLab Education K-12',
+          avatarUrl:
+            rawUser.avatarUrl ||
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
+          bio: rawUser.bio || "Học viên DMKLab Education K-12",
           energyPoints: rawUser.energyPoints || 1000,
           streakDays: rawUser.streakDays || 1,
           createdAt: rawUser.createdAt,
@@ -332,14 +342,14 @@ export const api = {
 
   async updateProfile(data: { fullName: string; avatarUrl: string; bio: string }): Promise<User> {
     const res = await fetch(`${API_BASE}/auth/profile`, {
-      method: 'PUT',
+      method: "PUT",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
 
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Cập nhật hồ sơ thất bại');
+      throw new Error(json.message || "Cập nhật hồ sơ thất bại");
     }
 
     const rawUser = json.data;
@@ -359,16 +369,16 @@ export const api = {
 
   async changePassword(oldPassword: string, newPassword: string): Promise<string> {
     const res = await fetch(`${API_BASE}/auth/change-password`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ oldPassword, newPassword }),
     });
 
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Đổi mật khẩu thất bại');
+      throw new Error(json.message || "Đổi mật khẩu thất bại");
     }
-    return json.message || 'Đổi mật khẩu thành công!';
+    return json.message || "Đổi mật khẩu thành công!";
   },
 
   // Academics & Content (With in-memory caching to optimize network roundtrips)
@@ -378,7 +388,7 @@ export const api = {
     }
     try {
       const res = await fetch(`${API_BASE}/grades`);
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         const mapped = json.data.map((g: BackendGrade) => ({
@@ -403,7 +413,7 @@ export const api = {
     }
     try {
       const res = await fetch(`${API_BASE}/grades/${gradeId}/subjects`);
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         const mapped = json.data.map((s: BackendSubject) => ({
@@ -411,8 +421,8 @@ export const api = {
           gradeId: gradeId,
           name: s.name,
           code: s.code,
-          color: s.color || '#1865F2',
-          icon: s.icon || 'book',
+          color: s.color || "#1865F2",
+          icon: s.icon || "book",
           totalLessons: 12,
           completedLessons: 3,
         }));
@@ -422,27 +432,27 @@ export const api = {
     } catch {
       // Fallback
     }
-    return MOCK_SUBJECTS.filter((s) => s.gradeId === gradeId || s.gradeId === 'g-5');
+    return MOCK_SUBJECTS.filter((s) => s.gradeId === gradeId || s.gradeId === "g-5");
   },
 
   async getLessons(subjectId: string): Promise<Lesson[]> {
     try {
       const res = await fetch(`${API_BASE}/subjects/${subjectId}/lessons`);
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         return json.data.map((l: BackendLesson, index: number) => ({
           id: l.id,
-          chapterId: 'c-live',
+          chapterId: "c-live",
           title: l.title,
-          description: l.description || '',
-          contentType: 'VIDEO',
-          videoUrl: l.videoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          description: l.description || "",
+          contentType: "VIDEO",
+          videoUrl: l.videoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
           durationSeconds: l.videoDurationSeconds || 600,
-          orderNum: l.displayOrder || (index + 1),
+          orderNum: l.displayOrder || index + 1,
           isCompleted: false,
           positionSeconds: 0,
-          masteryLevel: 'FAMILIAR',
+          masteryLevel: "FAMILIAR",
         }));
       }
     } catch {
@@ -454,19 +464,23 @@ export const api = {
   async getLessonQuiz(lessonId: string): Promise<Question[]> {
     try {
       const res = await fetch(`${API_BASE}/lessons/${lessonId}/quiz`);
-      if (!res.ok) throw new Error('API failed');
+      if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         return json.data.map((q: BackendQuizQuestion) => ({
           id: q.id,
           questionText: q.question,
-          explanation: q.explanation || '',
+          explanation: q.explanation || "",
           points: 10,
           options: [
-            { id: 'opt-a', text: q.optionA, isCorrect: q.correctAnswer === 'A' },
-            { id: 'opt-b', text: q.optionB, isCorrect: q.correctAnswer === 'B' },
-            ...(q.optionC ? [{ id: 'opt-c', text: q.optionC, isCorrect: q.correctAnswer === 'C' }] : []),
-            ...(q.optionD ? [{ id: 'opt-d', text: q.optionD, isCorrect: q.correctAnswer === 'D' }] : []),
+            { id: "opt-a", text: q.optionA, isCorrect: q.correctAnswer === "A" },
+            { id: "opt-b", text: q.optionB, isCorrect: q.correctAnswer === "B" },
+            ...(q.optionC
+              ? [{ id: "opt-c", text: q.optionC, isCorrect: q.correctAnswer === "C" }]
+              : []),
+            ...(q.optionD
+              ? [{ id: "opt-d", text: q.optionD, isCorrect: q.correctAnswer === "D" }]
+              : []),
           ],
         }));
       }
@@ -485,7 +499,7 @@ export const api = {
   ): Promise<BackendProgressResponse | null> {
     try {
       const res = await fetch(`${API_BASE}/lessons/${lessonId}/progress`, {
-        method: 'PUT',
+        method: "PUT",
         headers: this.getAuthHeaders(),
         body: JSON.stringify({ positionSeconds, durationSeconds, isCompleted }),
       });
@@ -526,13 +540,13 @@ export const api = {
     answers: { questionId: string; selectedAnswer: string }[]
   ): Promise<QuizSubmissionResult> {
     const res = await fetch(`${API_BASE}/lessons/${lessonId}/quiz/submit`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ answers }),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Lỗi nộp bài trắc nghiệm');
+      throw new Error(json.message || "Lỗi nộp bài trắc nghiệm");
     }
     return json.data;
   },
@@ -561,29 +575,26 @@ export const api = {
       contextSubject: options?.contextSubject,
     };
     const res = await fetch(`${API_BASE}/ai/learning/chat`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(payload),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Lỗi kết nối Trợ lý DMK AI');
+      throw new Error(json.message || "Lỗi kết nối Trợ lý DMK AI");
     }
     return json.data;
   },
 
-  async sendAdminChat(
-    message: string,
-    sessionId?: string
-  ): Promise<SocraticChatResponse> {
+  async sendAdminChat(message: string, sessionId?: string): Promise<SocraticChatResponse> {
     const res = await fetch(`${API_BASE}/ai/admin/chat`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ message, sessionId }),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Lỗi kết nối AI Quản trị');
+      throw new Error(json.message || "Lỗi kết nối AI Quản trị");
     }
     return json.data;
   },
@@ -604,8 +615,8 @@ export const api = {
   async getAdminUsers(role?: string, q?: string): Promise<AdminUserItem[]> {
     try {
       const params = new URLSearchParams();
-      if (role && role !== 'ALL') params.set('role', role);
-      if (q) params.set('q', q);
+      if (role && role !== "ALL") params.set("role", role);
+      if (q) params.set("q", q);
       const res = await fetch(`${API_BASE}/admin/users?${params.toString()}`, {
         headers: this.getAuthHeaders(),
       });
@@ -618,13 +629,13 @@ export const api = {
 
   async toggleUserStatus(userId: string, active: boolean): Promise<AdminUserItem> {
     const res = await fetch(`${API_BASE}/admin/users/${userId}/status`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ active }),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Cập nhật trạng thái người dùng thất bại');
+      throw new Error(json.message || "Cập nhật trạng thái người dùng thất bại");
     }
     return json.data;
   },
@@ -643,33 +654,35 @@ export const api = {
 
   async requestPresignedUploadUrl(
     filename: string,
-    contentType: string = 'video/mp4',
+    contentType: string = "video/mp4",
     fileSizeBytes: number = 50000000
   ): Promise<UploadUrlResponse> {
     const res = await fetch(`${API_BASE}/admin/media/upload-url`, {
-      method: 'POST',
+      method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ filename, contentType, fileSizeBytes }),
     });
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Lỗi cấp URL ký');
+      throw new Error(json.message || "Lỗi cấp URL ký");
     }
     return json.data;
   },
 
   async submitContact(data: ContactFormData): Promise<{ success: boolean; message: string }> {
     const res = await fetch(`${API_BASE}/public/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const json = await res.json().catch(() => ({}));
     if (res.status === 429) {
-      throw new Error(json.message || 'Bạn đang gửi tin nhắn quá nhanh. Vui lòng thử lại sau vài phút (HTTP 429).');
+      throw new Error(
+        json.message || "Bạn đang gửi tin nhắn quá nhanh. Vui lòng thử lại sau vài phút (HTTP 429)."
+      );
     }
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Gửi tin nhắn không thành công.');
+      throw new Error(json.message || "Gửi tin nhắn không thành công.");
     }
     return { success: true, message: json.data || json.message };
   },
@@ -687,15 +700,17 @@ export const api = {
   },
 
   async unblockRateLimitKey(key: string): Promise<string> {
-    const res = await fetch(`${API_BASE}/admin/security/ratelimit/unblock?key=${encodeURIComponent(key)}`, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/admin/security/ratelimit/unblock?key=${encodeURIComponent(key)}`,
+      {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+      }
+    );
     const json = await res.json();
     if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Không thể mở khóa key');
+      throw new Error(json.message || "Không thể mở khóa key");
     }
-    return json.data || 'Đã mở khóa thành công';
+    return json.data || "Đã mở khóa thành công";
   },
 };
-

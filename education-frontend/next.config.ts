@@ -57,7 +57,8 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.plyr.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://api.dicebear.com; media-src 'self' blob: https: https://cdn.plyr.io https://commondatastorage.googleapis.com; connect-src 'self' http://localhost:8080 https:; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.plyr.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://api.dicebear.com; media-src 'self' blob: https: https://cdn.plyr.io https://commondatastorage.googleapis.com; connect-src 'self' http://localhost:8080 https:; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
           },
         ],
       },
