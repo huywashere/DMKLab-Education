@@ -1,24 +1,8 @@
-import React from "react";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Building2,
-  ShieldCheck,
-  Heart,
-  ChevronRight,
-  ExternalLink,
-} from "lucide-react";
-import { FaLinkedinIn, FaFacebookF, FaYoutube, FaTiktok } from "react-icons/fa6";
-import {
-  RiMapPin2Fill,
-  RiPhoneFill,
-  RiMailFill,
-  RiShieldCheckFill,
-  RiHeartFill,
-  RiBuilding4Fill,
-} from "react-icons/ri";
-import { TbCertificate, TbShieldCheck } from "react-icons/tb";
+"use client";
+
+import React, { useState } from "react";
+import { ChevronDown, ExternalLink } from "lucide-react";
+import { FaLinkedinIn, FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa6";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface FooterProps {
@@ -36,62 +20,59 @@ export const Footer: React.FC<FooterProps> = ({
   onGetStarted,
   showPreFooter = true,
 }) => {
-  const { lang, t } = useLanguage();
+  const { lang, setLang, toggleLang } = useLanguage();
+  const [showLangMenu, setShowLangMenu] = useState(false);
+
+  const isVi = lang === "vi";
 
   return (
     <>
       {/* ────────────────────────────────────────────────────────
-          KHAN ACADEMY STYLE PRE-FOOTER CTA SECTION
-          Default Vietnamese / English with i18n
+          KHAN ACADEMY PRE-FOOTER CTA SECTION (Solid Pitch Black)
       ──────────────────────────────────────────────────────── */}
       {showPreFooter && (
-        <section className="bg-[#0B2149] text-white pt-16 sm:pt-20 pb-0 overflow-hidden relative">
+        <section className="bg-black text-white pt-16 sm:pt-20 pb-0 overflow-hidden relative selection:bg-blue-600 selection:text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-3 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#14BF96] text-xs font-bold mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#14BF96] animate-pulse" />
-              <span>Nền Tảng Giáo Dục K–12 Chuẩn Quốc Tế</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
-              {t("prefooter_title", "Tiếp sức cho mọi lớp học và học sinh.")}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              {isVi ? "Tiếp sức cho mọi lớp học." : "Strengthen every classroom."}
             </h2>
-            <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              {t(
-                "prefooter_desc",
-                "Từ từng học sinh cá nhân đến toàn bộ hệ thống trường học, DMKLab giúp việc học tập trở nên hứng khởi và hiệu quả."
-              )}
+            <p className="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl mx-auto leading-relaxed pt-1">
+              {isVi
+                ? "Từ từng học sinh cá nhân đến toàn bộ hệ thống trường học, Khan Academy giúp việc học tập trở nên hứng khởi và hiệu quả."
+                : "From individual learners to entire school systems, Khan Academy helps learning happen."}
             </p>
 
-            {/* CTA Button in Khan Royal Blue */}
+            {/* Khan Royal Blue Pill CTA Button */}
             <div className="pt-4 flex justify-center">
               <button
                 type="button"
                 onClick={onGetStarted || onOpenAbout}
-                className="px-8 py-3 rounded-full bg-[#1865F2] hover:bg-[#0B4ED7] active:scale-[0.98] text-white text-sm font-extrabold shadow-lg shadow-blue-900/30 transition-all cursor-pointer"
+                className="px-8 py-3 rounded-full bg-[#1865F2] hover:bg-[#0B4ED7] active:scale-[0.98] text-white text-sm sm:text-base font-bold shadow-md hover:shadow-lg transition-all duration-150 cursor-pointer"
               >
-                {t("prefooter_btn", "Bắt đầu ngay")}
+                {isVi ? "Bắt đầu ngay" : "Get started"}
               </button>
             </div>
 
-            {/* Sublink */}
-            <p className="text-xs text-slate-300 pt-2 font-medium">
-              {t("prefooter_pricing_prompt", "Bạn quan tâm giải pháp cho trường học?")}{" "}
+            {/* Sublink with External Link Arrow */}
+            <p className="text-xs sm:text-sm text-slate-300 pt-2 font-medium">
+              {isVi ? "Bạn quan tâm giải pháp cho trường học?" : "Looking for district pricing?"}{" "}
               <button
                 type="button"
                 onClick={onOpenContact}
-                className="text-[#14BF96] hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
+                className="text-white hover:text-slate-200 underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors"
               >
-                {t("prefooter_pricing_cta", "Liên hệ đội ngũ DMKLab")}{" "}
-                <ExternalLink className="w-3 h-3" />
+                <span>{isVi ? "Liên hệ đội ngũ của chúng tôi" : "Talk to our team"}</span>
+                <ExternalLink className="w-3.5 h-3.5 inline shrink-0" />
               </button>
             </p>
           </div>
 
-          {/* Graphic Mascot with floating badges resting on bottom edge */}
-          <div className="mt-8 flex justify-center w-full px-2">
+          {/* Khan Academy Mascot Graphic resting seamlessly flush on black bottom */}
+          <div className="mt-8 sm:mt-12 flex justify-center w-full px-2">
             <img
               src="/img-web/75eaf31453137fba-pre_footer_graphic_desktop@2x.webp"
-              alt="Strengthen every classroom with DMKLab"
-              className="w-full max-w-4xl lg:max-w-5xl h-auto object-contain select-none pointer-events-none -mb-1 block"
+              alt="Strengthen every classroom - Khan Academy"
+              className="w-full max-w-4xl lg:max-w-5xl h-auto object-contain select-none pointer-events-none -mb-1 block mx-auto"
               loading="lazy"
               decoding="async"
             />
@@ -100,300 +81,459 @@ export const Footer: React.FC<FooterProps> = ({
       )}
 
       {/* ────────────────────────────────────────────────────────
-          MAIN FOOTER (Khan Academy Official Midnight Navy)
+          MAIN FOOTER (Authentic Khan Academy Black & White Style)
       ──────────────────────────────────────────────────────── */}
-      <footer className="bg-[#08182D] text-slate-300 border-t border-[#132A4D] pt-14 pb-8 transition-colors duration-200">
+      <footer className="bg-black text-slate-300 border-t border-[#222222] pt-14 pb-8 transition-colors duration-200 selection:bg-blue-600 selection:text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Main 4-Column Grid matching Khan Academy's layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-[#183660]">
-            {/* Column 1: VỀ CHÚNG TÔI (5 cols on lg) */}
-            <div className="lg:col-span-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#14BF96]" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  {t("footer_about_heading", "VỀ CHÚNG TÔI & SỨ MỆNH")}
+          {/* Main 5-Column Grid matching Khan Academy's layout */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10 pb-12">
+            {/* Column 1: SCHOOL SYSTEMS & CONTACT */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                  {isVi ? "HỆ THỐNG TRƯỜNG HỌC" : "SCHOOL SYSTEMS"}
                 </h3>
+                <ul className="space-y-2 text-xs sm:text-sm">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={onOpenAbout}
+                      className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                    >
+                      {isVi ? "Khan Academy cho Trường học" : "Khan Academy School Systems"}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={onOpenAbout}
+                      className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                    >
+                      {isVi ? "Khan Kids cho Mầm non" : "Khan Kids for Schools"}
+                    </button>
+                  </li>
+                </ul>
               </div>
 
-              {/* Official DMKLab + Khan Sprout Identity */}
-              <div className="pt-1 flex items-center gap-3">
-                <img
-                  src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
-                  alt="DMKLab - Công ty Đức Mai Khôi"
-                  className="h-10 w-auto object-contain brightness-0 invert"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="border-l border-slate-700 pl-3">
-                  <p className="text-xs font-bold text-white">DMKLab Education</p>
-                  <p className="text-[10px] text-[#14BF96] font-semibold">
-                    Theo chuẩn Khan Academy
-                  </p>
-                </div>
-              </div>
-
-              {/* Exact Company Description from Reference Image */}
-              <p className="text-xs text-slate-300 leading-relaxed text-justify pr-2">
-                {t("footer_company_desc")}
-              </p>
-
-              {/* Official Certification Badges */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                {/* Badge Bộ Công Thương */}
-                <a
-                  href="http://online.gov.vn"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0B65C2] text-white shadow-xs hover:opacity-95 transition"
-                  title="Đã thông báo Bộ Công Thương"
-                >
-                  <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center font-bold text-[10px]">
-                    ✓
-                  </div>
-                  <div className="flex flex-col text-left leading-tight">
-                    <span className="text-[9px] font-bold uppercase tracking-wider">
-                      ĐÃ THÔNG BÁO
-                    </span>
-                    <span className="text-[8px] font-medium opacity-90">BỘ CÔNG THƯƠNG</span>
-                  </div>
-                </a>
-
-                {/* Badge DMCA Protected */}
-                <a
-                  href="https://www.dmca.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center border border-slate-700 rounded overflow-hidden text-[9px] shadow-xs hover:opacity-95 transition"
-                  title="DMCA Protected"
-                >
-                  <span className="bg-[#60B832] text-white px-2 py-1 font-bold">PROTECTED BY</span>
-                  <span className="bg-white text-slate-800 px-2 py-1 font-black">DMCA.com</span>
-                </a>
-              </div>
-
-              {/* 4 Social Media Buttons */}
-              <div className="pt-2 flex items-center gap-2.5">
-                {/* LinkedIn */}
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-full bg-[#0077B5] text-white flex items-center justify-center hover:scale-110 transition shadow-xs"
-                  title="LinkedIn DMKLab"
-                >
-                  <FaLinkedinIn className="w-4 h-4" />
-                </a>
-
-                {/* Facebook */}
-                <a
-                  href="https://facebook.com/dmklab.vn"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition shadow-xs"
-                  title="Facebook DMKLab"
-                >
-                  <FaFacebookF className="w-3.5 h-3.5" />
-                </a>
-
-                {/* YouTube */}
-                <a
-                  href="https://youtube.com/@dmklab"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-full bg-[#FF0000] text-white flex items-center justify-center hover:scale-110 transition shadow-xs"
-                  title="YouTube DMKLab"
-                >
-                  <FaYoutube className="w-4 h-4" />
-                </a>
-
-                {/* TikTok */}
-                <a
-                  href="https://tiktok.com/@dmklab"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-8 h-8 rounded-full bg-[#000000] text-white flex items-center justify-center hover:scale-110 transition shadow-xs"
-                  title="TikTok DMKLab"
-                >
-                  <FaTiktok className="w-3.5 h-3.5" />
-                </a>
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                  {isVi ? "LIÊN HỆ" : "CONTACT"}
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={onOpenContact}
+                      className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                    >
+                      {isVi ? "Báo chí & Truyền thông" : "Press"}
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={onOpenContact}
+                      className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                    >
+                      {isVi ? "Trung tâm trợ giúp" : "Help center"}
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            {/* Column 2: LIÊN HỆ (3.5 cols on lg) */}
-            <div className="lg:col-span-3 space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                {t("footer_contact_heading", "LIÊN HỆ")}
+            {/* Column 2: TEACHERS & DOWNLOADS */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                  {isVi ? "GIÁO VIÊN" : "TEACHERS"}
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={onOpenAbout}
+                      className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                    >
+                      {isVi ? "Khan Academy cho Giáo viên" : "Khan Academy for Teachers"}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                  {isVi ? "TẢI ỨNG DỤNG" : "DOWNLOADS"}
+                </h3>
+                <div className="space-y-2.5">
+                  {/* Apple App Store Official Badge */}
+                  <a
+                    href="https://apps.apple.com/app/khan-academy/id469863705"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black border border-white/30 hover:border-white text-white transition-all w-36 shadow-xs group"
+                  >
+                    <svg className="w-5 h-5 fill-current text-white shrink-0" viewBox="0 0 170 170">
+                      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.05-7.73-7.85-12.09-14.42-7.16-10.74-12.63-22.75-16.41-36.03C8.19 96.16 6.3 83.21 6.3 70.43c0-14.88 3.8-27.42 11.4-37.63 7.6-10.22 17.29-15.42 29.07-15.63 4.8 0 10.23 1.34 16.31 4.03 6.08 2.68 10.05 4.1 11.92 4.24 1.5.07 5.75-1.42 12.75-4.47 7-3.05 12.98-4.38 17.95-3.98 13.37 1.07 23.95 5.92 31.74 14.57-11.83 7.15-17.58 16.9-17.25 29.24.33 9.87 4.12 18.06 11.38 24.58 7.25 6.51 15.82 10.15 25.7 10.92-2.1 6.46-4.78 13.06-8.05 19.8-.15.35-.3.71-.46 1.07zM119.22 33.56c0-7.84 2.82-15.11 8.46-21.8 5.64-6.7 12.68-10.96 21.13-12.76.22 1.48.33 2.82.33 4.02 0 7.84-2.88 15.36-8.65 22.56-5.76 7.2-12.96 11.51-21.6 12.93-.32-1.74-.48-3.32-.48-4.75z" />
+                    </svg>
+                    <div className="flex flex-col text-left leading-none">
+                      <span className="text-[8px] text-slate-300 font-normal">Download on the</span>
+                      <span className="text-[12px] font-semibold text-white tracking-tight mt-0.5">App Store</span>
+                    </div>
+                  </a>
+
+                  {/* Google Play Official Badge */}
+                  <a
+                    href="https://play.google.com/store/apps/details?id=org.khanacademy.android"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black border border-white/30 hover:border-white text-white transition-all w-36 shadow-xs group"
+                  >
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M3.6 1.9L13.8 12 3.6 22.1c-.4-.4-.6-.9-.6-1.6V3.5c0-.7.2-1.2.6-1.6z"/>
+                      <path fill="#FBBC04" d="M17.3 8.6L13.8 12l3.5 3.4 4-2.3c.7-.4.7-1.8 0-2.2l-4-2.3z"/>
+                      <path fill="#EA4335" d="M3.6 22.1l10.2-10.1 3.5 3.4-11.8 6.8c-.7.4-1.5.3-1.9-.1z"/>
+                      <path fill="#34A853" d="M17.3 8.6L13.8 12 3.6 1.9C4 1.5 4.8 1.4 5.5 1.8l11.8 6.8z"/>
+                    </svg>
+                    <div className="flex flex-col text-left leading-none">
+                      <span className="text-[8px] text-slate-300 font-normal uppercase tracking-wider">GET IT ON</span>
+                      <span className="text-[12px] font-semibold text-white tracking-tight mt-0.5">Google Play</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Column 3: ORGANIZATION */}
+            <div>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                {isVi ? "TỔ CHỨC" : "ORGANIZATION"}
               </h3>
-
-              <div className="space-y-3.5 text-xs text-slate-300">
-                {/* Address */}
-                <div className="flex items-start gap-2.5">
-                  <RiMapPin2Fill className="w-4 h-4 text-[#14BF96] shrink-0 mt-0.5" />
-                  <p className="leading-relaxed">
-                    <strong className="text-white">
-                      {t("footer_headquarters_label", "Trụ sở:")}
-                    </strong>{" "}
-                    {t(
-                      "footer_headquarters_val",
-                      "702/67/9 Lê Đức Thọ, Phường An Hội Đông, Thành phố Hồ Chí Minh, Việt Nam"
-                    )}
-                  </p>
-                </div>
-
-                {/* Phone */}
-                <div className="flex items-center gap-2.5">
-                  <RiPhoneFill className="w-4 h-4 text-[#14BF96] shrink-0" />
-                  <a
-                    href="tel:0909907861"
-                    className="font-bold text-white hover:text-[#14BF96] transition"
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenAbout}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
                   >
-                    0909907861
-                  </a>
-                </div>
-
-                {/* Email */}
-                <div className="flex items-center gap-2.5">
-                  <RiMailFill className="w-4 h-4 text-[#14BF96] shrink-0" />
-                  <a
-                    href="mailto:info@dmklab.vn"
-                    className="font-medium text-white hover:text-[#14BF96] transition"
+                    {isVi ? "Về chúng tôi" : "About us"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenAbout}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
                   >
-                    info@dmklab.vn
-                  </a>
-                </div>
-
-                {/* Quick direct contact button */}
-                <div className="pt-2">
+                    {isVi ? "Tác động" : "Impact"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenAbout}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                  >
+                    {isVi ? "Lãnh đạo" : "Leadership"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenAbout}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                  >
+                    {isVi ? "Nhà tài trợ & Đối tác" : "Supporters"}
+                  </button>
+                </li>
+                <li>
                   <button
                     type="button"
                     onClick={onOpenContact}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white font-bold text-xs hover:bg-slate-700 hover:border-[#14BF96] transition cursor-pointer"
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
                   >
-                    <span>{t("footer_send_message_btn", "Gửi tin nhắn tư vấn")}</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-[#14BF96]" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Column 3: THÔNG TIN (2 cols on lg) */}
-            <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                {t("footer_info_heading", "THÔNG TIN")}
-              </h3>
-
-              <ul className="space-y-2 text-xs text-slate-300">
-                <li>
-                  <a
-                    href="#payment-guide"
-                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_payment_guide", "Hướng Dẫn Thanh Toán")}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#warranty"
-                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_warranty", "Quy Định Bảo Hành")}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#returns"
-                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_return", "Quy định đổi trả sản phẩm")}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#shipping"
-                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_shipping", "Quy Định Vận Chuyển")}</span>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#privacy"
-                    className="hover:text-[#14BF96] transition flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_privacy", "Chính Sách Bảo Mật")}</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 4: GIÁO DỤC K–12 (1.5 cols on lg) */}
-            <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                {t("footer_k12_heading", "GIÁO DỤC K–12")}
-              </h3>
-
-              <ul className="space-y-2 text-xs text-slate-300">
-                <li>
-                  <button
-                    type="button"
-                    onClick={onOpenAbout}
-                    className="hover:text-[#14BF96] transition text-left cursor-pointer flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_about_dmklab", "Giới thiệu DMKLab")}</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={onOpenAbout}
-                    className="hover:text-[#14BF96] transition text-left cursor-pointer flex items-center gap-1.5"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_socratic_method", "Phương Pháp Socratic")}</span>
+                    {isVi ? "Tuyển dụng" : "Careers"}
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
                     onClick={onOpenArticles}
-                    className="hover:text-[#14BF96] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_articles_link", "Bài viết & Cẩm nang")}</span>
+                    {isVi ? "Blog chia sẻ" : "Blog"}
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: GET INVOLVED */}
+            <div>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">
+                {isVi ? "THAM GIA CÙNG CHÚNG TÔI" : "GET INVOLVED"}
+              </h3>
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenContact}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                  >
+                    {isVi ? "Chia sẻ câu chuyện của bạn" : "Share your story"}
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
                     onClick={onOpenContact}
-                    className="hover:text-[#14BF96] transition text-left cursor-pointer flex items-center gap-1.5"
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
-                    <span>{t("footer_hotline_label", "Tổng đài: 1900 6868")}</span>
+                    {isVi ? "Ủng hộ / Quyên góp" : "Giving"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenContact}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                  >
+                    {isVi ? "Cơ hội nghề nghiệp" : "Careers"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={onOpenContact}
+                    className="text-slate-300 hover:text-white hover:underline transition-colors text-left cursor-pointer"
+                  >
+                    {isVi ? "Thực tập sinh" : "Internships"}
                   </button>
                 </li>
               </ul>
             </div>
+
+            {/* Column 5: OFFICIAL BRAND LOGO & MISSION */}
+            <div className="col-span-2 md:col-span-1 lg:col-span-1 space-y-4">
+              <div className="flex items-center gap-2.5">
+                {/* Official Khan Academy Sprout Hexagon Icon */}
+                <div className="w-8 h-8 rounded-lg bg-[#14BF96] flex items-center justify-center shrink-0 shadow-xs">
+                  <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C9.5 4.5 8 8 8 11.5c0 2.2 1.8 4 4 4s4-1.8 4-4C16 8 14.5 4.5 12 2z" />
+                    <path d="M8.5 11c-1.8 0-3.5 1.5-3.5 3.5 0 1.8 1.5 3.5 3.5 3.5 1 0 2.2-.4 3-1-.6-2-1.8-4.5-3-6z" opacity="0.85" />
+                    <path d="M15.5 11c1.8 0 3.5 1.5 3.5 3.5 0 1.8-1.5 3.5-3.5 3.5-1 0-2.2-.4-3-1 .6-2 1.8-4.5 3-6z" opacity="0.85" />
+                  </svg>
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">Khan Academy</span>
+              </div>
+
+              {/* Mission Statement */}
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+                {isVi
+                  ? "Sứ mệnh của chúng tôi là cung cấp nền giáo dục miễn phí, đẳng cấp thế giới cho bất kỳ ai, ở bất cứ nơi đâu."
+                  : "Our mission is to provide a free, world-class education to anyone, anywhere."}
+              </p>
+
+              {/* 501(c)(3) Nonprofit Notice with Support Link */}
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {isVi ? (
+                  <>
+                    Khan Academy là tổ chức phi lợi nhuận 501(c)(3). Xin vui lòng{" "}
+                    <button
+                      type="button"
+                      onClick={onOpenContact}
+                      className="underline text-white hover:text-[#14BF96] inline-flex items-center gap-0.5 font-medium cursor-pointer"
+                    >
+                      <span>ủng hộ chúng tôi</span>
+                      <ExternalLink className="w-2.5 h-2.5 inline" />
+                    </button>{" "}
+                    ngay hôm nay.
+                  </>
+                ) : (
+                  <>
+                    Khan Academy is a 501(c)(3) nonprofit organization. Please{" "}
+                    <button
+                      type="button"
+                      onClick={onOpenContact}
+                      className="underline text-white hover:text-[#14BF96] inline-flex items-center gap-0.5 font-medium cursor-pointer"
+                    >
+                      <span>support us</span>
+                      <ExternalLink className="w-2.5 h-2.5 inline" />
+                    </button>{" "}
+                    today.
+                  </>
+                )}
+              </p>
+            </div>
           </div>
 
-          {/* Bottom Bar: Copyright & Safety */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <p>{t("footer_copyright")}</p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 text-[#285366] dark:text-slate-300">
-                <RiShieldCheckFill className="w-4 h-4 text-emerald-600" />
-                <span>{t("footer_coppa", "Chuẩn an toàn dữ liệu học sinh & COPPA")}</span>
+          {/* Language Selector & Country Row matching Khan Academy */}
+          <div className="pt-4 pb-8 space-y-2 border-t border-[#1C1C1C]">
+            <div className="flex items-center gap-2 text-xs text-slate-400 relative">
+              <span className="font-semibold text-slate-400">Language</span>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowLangMenu(!showLangMenu)}
+                  className="inline-flex items-center gap-1 text-white font-medium hover:underline cursor-pointer py-1"
+                >
+                  <span>{isVi ? "Tiếng Việt" : "English"}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showLangMenu ? "rotate-180" : ""}`} />
+                </button>
+
+                {showLangMenu && (
+                  <div className="absolute bottom-full left-0 mb-1 w-32 bg-[#1A1A1A] border border-white/20 rounded-md shadow-xl py-1 z-30">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLang("en");
+                        setShowLangMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 text-xs transition cursor-pointer ${
+                        !isVi ? "bg-blue-600 text-white font-bold" : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      English
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLang("vi");
+                        setShowLangMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 text-xs transition cursor-pointer ${
+                        isVi ? "bg-blue-600 text-white font-bold" : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      Tiếng Việt
+                    </button>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-1 text-[#285366] dark:text-slate-300">
-                <span>{t("footer_partner_vn", "Đồng hành cùng học sinh Việt Nam")}</span>
-                <RiHeartFill className="w-3.5 h-3.5 text-rose-500" />
-              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+              <span className="font-semibold text-slate-400">Country</span>
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className="inline-flex items-center gap-1 text-slate-300 hover:text-white hover:underline cursor-pointer"
+              >
+                <span>🇺🇸</span> U.S.
+              </button>
+              <span className="text-slate-600">•</span>
+              <span className="inline-flex items-center gap-1 text-slate-300 hover:text-white hover:underline cursor-pointer">
+                <span>🇮🇳</span> India
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="inline-flex items-center gap-1 text-slate-300 hover:text-white hover:underline cursor-pointer">
+                <span>🇲🇽</span> Mexico
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="inline-flex items-center gap-1 text-slate-300 hover:text-white hover:underline cursor-pointer">
+                <span>🇧🇷</span> Brazil
+              </span>
+              <span className="text-slate-600">•</span>
+              <button
+                type="button"
+                onClick={() => setLang("vi")}
+                className="inline-flex items-center gap-1 text-slate-300 hover:text-white hover:underline cursor-pointer"
+              >
+                <span>🇻🇳</span> Vietnam
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom Bar: Copyright, Legal Links, Social Icons */}
+          <div className="pt-6 border-t border-[#1C1C1C] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            {/* Left side: Copyright & Legal Links */}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 justify-center md:justify-start">
+              <span className="text-slate-300">© 2026 Khan Academy</span>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="hover:text-white hover:underline transition cursor-pointer"
+              >
+                Terms
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="hover:text-white hover:underline transition cursor-pointer"
+              >
+                Privacy
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="hover:text-white hover:underline transition cursor-pointer"
+              >
+                Accessibility
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="hover:text-white hover:underline transition cursor-pointer"
+              >
+                Cookie Notice
+              </button>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="hover:text-white hover:underline transition cursor-pointer"
+              >
+                Cookie Preferences
+              </button>
+            </div>
+
+            {/* Right side: 4 Social Icons */}
+            <div className="flex items-center gap-3">
+              {/* LinkedIn */}
+              <a
+                href="https://www.linkedin.com/company/khan-academy"
+                target="_blank"
+                rel="noreferrer"
+                className="w-7 h-7 rounded bg-[#1A1A1A] hover:bg-white text-white hover:text-black flex items-center justify-center transition-all cursor-pointer"
+                title="LinkedIn"
+                aria-label="LinkedIn"
+              >
+                <FaLinkedinIn className="w-3.5 h-3.5" />
+              </a>
+
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com/khanacademy"
+                target="_blank"
+                rel="noreferrer"
+                className="w-7 h-7 rounded bg-[#1A1A1A] hover:bg-white text-white hover:text-black flex items-center justify-center transition-all cursor-pointer"
+                title="Facebook"
+                aria-label="Facebook"
+              >
+                <FaFacebookF className="w-3.5 h-3.5" />
+              </a>
+
+              {/* Instagram */}
+              <a
+                href="https://www.instagram.com/khanacademy"
+                target="_blank"
+                rel="noreferrer"
+                className="w-7 h-7 rounded bg-[#1A1A1A] hover:bg-white text-white hover:text-black flex items-center justify-center transition-all cursor-pointer"
+                title="Instagram"
+                aria-label="Instagram"
+              >
+                <FaInstagram className="w-3.5 h-3.5" />
+              </a>
+
+              {/* YouTube */}
+              <a
+                href="https://www.youtube.com/user/khanacademy"
+                target="_blank"
+                rel="noreferrer"
+                className="w-7 h-7 rounded bg-[#1A1A1A] hover:bg-white text-white hover:text-black flex items-center justify-center transition-all cursor-pointer"
+                title="YouTube"
+                aria-label="YouTube"
+              >
+                <FaYoutube className="w-3.5 h-3.5" />
+              </a>
             </div>
           </div>
         </div>
