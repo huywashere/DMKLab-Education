@@ -38,14 +38,14 @@ import {
   GridPattern,
 } from "@/components/ui";
 
-interface KhanHomepageProps {
+interface HomepageProps {
   currentUser: User;
   selectedGrade: Grade;
   onOpenLesson: (lesson: Lesson) => void;
   onOpenAiChat: () => void;
 }
 
-export const KhanHomepage: React.FC<KhanHomepageProps> = ({
+export const Homepage: React.FC<HomepageProps> = ({
   currentUser,
   selectedGrade,
   onOpenLesson,
@@ -998,3 +998,6 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
     </div>
   );
 };
+
+export { Homepage as KhanHomepage };
+export default Homepage;

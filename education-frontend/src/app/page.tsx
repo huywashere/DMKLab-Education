@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import dynamic from "next/dynamic";
-import { KhanHomepage } from "@/features/student/KhanHomepage";
+import { Homepage } from "@/features/student/homepage";
 
 // Fast lightweight loading skeleton for code-split components
 const ViewSkeleton = () => (
@@ -257,7 +257,7 @@ export default function HomePage() {
 
       <main className="flex-1">
         {activeView === "home" && (
-          <KhanHomepage
+          <Homepage
             currentUser={currentUser || MOCK_USERS.student}
             selectedGrade={selectedGrade}
             onOpenLesson={handleOpenLesson}
