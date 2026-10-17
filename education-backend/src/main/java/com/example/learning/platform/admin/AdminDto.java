@@ -82,4 +82,28 @@ public class AdminDto {
         private boolean isLiveConfigured;
         private String message;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TranscodeSubmitRequest {
+        private String storageKey;
+        private UUID lessonId;
+        private String watermarkText;
+        private java.util.List<String> targetQualities;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TranscodeCallbackRequest {
+        private String jobId;
+        private String lessonId;
+        private String status;
+        private String hlsMasterUrl;
+        private String thumbnailUrl;
+        private double durationSeconds;
+        private int uploadedFiles;
+        private String errorMessage;
+    }
 }

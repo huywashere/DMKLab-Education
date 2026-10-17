@@ -21,3 +21,11 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+temp_transcode/

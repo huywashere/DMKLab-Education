@@ -43,6 +43,9 @@ public class AdminController {
     private final StorageService storageService;
     private final org.springframework.cache.CacheManager cacheManager;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+
     @GetMapping("/reports/overview")
     @Operation(summary = "Lấy báo cáo tổng quan KPI hệ thống và hạ tầng (Cache 60s)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<AdminDto.OverviewReport>> getOverviewReport() {
@@ -185,6 +188,88 @@ public class AdminController {
     @Operation(summary = "Kiểm tra cấu hình và trạng thái kết nối Cloudflare R2 / S3", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<StorageDto.StorageProviderInfo>> getStorageStatus() {
         return ResponseEntity.ok(ApiResponse.success(storageService.getProviderInfo()));
+    }
+
+    @PostMapping("/media/transcode/submit")
+    @Operation(summary = "Đẩy tác vụ nén video HLS đa độ phân giải sang Golang Transcoder Worker qua Redis", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> submitTranscodeJob(
+            @RequestBody AdminDto.TranscodeSubmitRequest req,
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        String jobId = UUID.randomUUID().toString();
+        String watermark = req.getWatermarkText() != null ? req.getWatermarkText() : "DMKLab Education K12";
+        List<String> qualities = (req.getTargetQualities() != null && !req.getTargetQualities().isEmpty())
+                ? req.getTargetQualities()
+                : List.of("360p", "720p", "1080p");
+
+        String callbackUrl = "http://backend:8080/api/v1/admin/media/transcode-callback";
+
+        java.util.Map<String, Object> jobData = new java.util.HashMap<>();
+        jobData.put("jobId", jobId);
+        jobData.put("lessonId", req.getLessonId() != null ? req.getLessonId().toString() : "");
+        jobData.put("storageKey", req.getStorageKey());
+        jobData.put("watermarkText", watermark);
+        jobData.put("targetQualities", qualities);
+        jobData.put("callbackUrl", callbackUrl);
+
+        boolean queuedInRedis = false;
+        if (redisTemplate != null) {
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                redisTemplate.opsForList().rightPush("queue:video:transcode", mapper.writeValueAsString(jobData));
+                queuedInRedis = true;
+            } catch (Exception e) {
+                // Redis is optional in dev
+            }
+        }
+
+        UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
+        auditService.logAction(
+                actorId,
+                "DISPATCH_TRANSCODE_JOB",
+                "VIDEO_HLS",
+                req.getStorageKey(),
+                "Khởi chạy nén HLS Adaptive Bitrate qua Golang Worker (Job: " + jobId + ")",
+                "127.0.0.1"
+        );
+
+        java.util.Map<String, Object> res = new java.util.HashMap<>();
+        res.put("jobId", jobId);
+        res.put("status", queuedInRedis ? "QUEUED_IN_REDIS" : "SUBMITTED");
+        res.put("targetQualities", qualities);
+        res.put("workerService", "video-transcoder-worker (Golang 1.23 / Alpine)");
+
+        return ResponseEntity.ok(ApiResponse.success("Đã tiếp nhận tác vụ nén video HLS thành công!", res));
+    }
+
+    @PostMapping("/media/transcode-callback")
+    @Operation(summary = "Webhook nhận kết quả xử lý HLS từ Golang Video Transcoder Worker")
+    public ResponseEntity<ApiResponse<String>> handleTranscodeCallback(
+            @RequestBody AdminDto.TranscodeCallbackRequest req) {
+
+        if (req.getLessonId() != null && !req.getLessonId().isBlank()) {
+            try {
+                UUID lId = UUID.fromString(req.getLessonId());
+                lessonRepository.findById(lId).ifPresent(lesson -> {
+                    if ("COMPLETED".equalsIgnoreCase(req.getStatus())) {
+                        lesson.setVideoUrl(req.getHlsMasterUrl());
+                        lessonRepository.save(lesson);
+                    }
+                });
+            } catch (Exception ignored) {
+            }
+        }
+
+        auditService.logAction(
+                UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                "TRANSCODE_CALLBACK_" + req.getStatus(),
+                "VIDEO_HLS",
+                req.getJobId(),
+                "Golang Transcoder hoàn tất job " + req.getJobId() + " (" + req.getUploadedFiles() + " files HLS). Stream: " + req.getHlsMasterUrl(),
+                "127.0.0.1"
+        );
+
+        return ResponseEntity.ok(ApiResponse.success("Đã ghi nhận kết quả chuyển đổi HLS từ Golang Worker."));
     }
 
     @GetMapping("/security/ratelimit-stats")
