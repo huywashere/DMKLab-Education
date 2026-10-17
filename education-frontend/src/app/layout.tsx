@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-plus-jakarta",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-be-vietnam-pro",
 });
 
 export const viewport: Viewport = {
@@ -141,7 +141,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="vi" suppressHydrationWarning className={`h-full antialiased ${plusJakartaSans.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`h-full antialiased ${beVietnamPro.variable}`}>
       <head>
         {/* Anti-flicker instant theme initialization */}
         <script
@@ -155,7 +155,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${plusJakartaSans.className}`}>
+      <body className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${beVietnamPro.className}`}>
         <ThemeProvider>
           <LanguageProvider>
             {children}
