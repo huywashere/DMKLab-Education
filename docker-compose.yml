@@ -144,6 +144,26 @@ services:
       redis:
         condition: service_healthy
 
+  # Golang Live Gateway & Progress Heartbeat Aggregator (WebSocket Hub)
+  live_gateway:
+    build:
+      context: ./live-gateway
+      dockerfile: Dockerfile
+    container_name: education_live_gateway
+    restart: unless-stopped
+    environment:
+      PORT: 8087
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      FLUSH_INTERVAL_SECONDS: 60
+      MAX_BATCH_SIZE: 500
+      BACKEND_SYNC_URL: http://backend:8080/api/v1/internal/progress/batch-sync
+    ports:
+      - "8087:8087"
+    depends_on:
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   minio_data:

@@ -846,4 +846,92 @@ export const api = {
     const json = await res.json();
     return json.data || json.message || "Đã làm mới cache thành công";
   },
+
+  // Real-time Live Gateway & WebSocket Hub (Golang Port 8087)
+  connectLiveGateway(options: {
+    userId?: string;
+    userName?: string;
+    lessonId?: string;
+    onMessage?: (msg: any) => void;
+    onOpen?: () => void;
+    onClose?: () => void;
+  }) {
+    if (typeof window === "undefined") {
+      return {
+        sendHeartbeat: () => {},
+        sendChat: () => {},
+        joinLesson: () => {},
+        leaveLesson: () => {},
+        disconnect: () => {},
+      };
+    }
+
+    const wsUrl = process.env.NEXT_PUBLIC_LIVE_GATEWAY_WS || "ws://localhost:8087/ws";
+    const params = new URLSearchParams();
+    if (options.userId) params.set("userId", options.userId);
+    if (options.userName) params.set("userName", options.userName);
+    if (options.lessonId) params.set("lessonId", options.lessonId);
+
+    const fullUrl = `${wsUrl}?${params.toString()}`;
+    let ws: WebSocket | null = null;
+    try {
+      ws = new WebSocket(fullUrl);
+      ws.onopen = () => {
+        if (options.onOpen) options.onOpen();
+      };
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (options.onMessage) options.onMessage(data);
+        } catch {}
+      };
+      ws.onclose = () => {
+        if (options.onClose) options.onClose();
+      };
+      ws.onerror = () => {};
+    } catch {}
+
+    return {
+      sendHeartbeat: (positionSeconds: number, durationSeconds: number, isCompleted: boolean) => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              type: "HEARTBEAT",
+              lessonId: options.lessonId,
+              positionSeconds,
+              durationSeconds,
+              isCompleted,
+            })
+          );
+        }
+      },
+      sendChat: (text: string) => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(
+            JSON.stringify({
+              type: "CHAT",
+              lessonId: options.lessonId,
+              text,
+            })
+          );
+        }
+      },
+      joinLesson: (lessonId: string) => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "JOIN_ROOM", lessonId }));
+        }
+      },
+      leaveLesson: (lessonId: string) => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "LEAVE_ROOM", lessonId }));
+        }
+      },
+      disconnect: () => {
+        if (ws) {
+          ws.close();
+          ws = null;
+        }
+      },
+    };
+  },
 };

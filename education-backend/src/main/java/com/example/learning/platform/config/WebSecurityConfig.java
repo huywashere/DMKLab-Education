@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/v1/progress/**").permitAll()
                 .requestMatchers("/api/v1/ai/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").permitAll()
+                .requestMatchers("/api/v1/internal/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/v1/auth/me", "/api/v1/auth/profile", "/api/v1/auth/change-password").authenticated()

@@ -99,4 +99,42 @@ public class ProgressService {
                 .currentRank(rank)
                 .build();
     }
+
+    @Transactional
+    public int processBatchSync(java.util.List<java.util.Map<String, Object>> records) {
+        if (records == null || records.isEmpty()) return 0;
+        int count = 0;
+        for (java.util.Map<String, Object> r : records) {
+            try {
+                String uStr = (String) r.get("userId");
+                String lStr = (String) r.get("lessonId");
+                if (uStr == null || lStr == null) continue;
+                UUID userId = UUID.fromString(uStr);
+                UUID lessonId = UUID.fromString(lStr);
+                int pos = r.get("positionSeconds") instanceof Number ? ((Number) r.get("positionSeconds")).intValue() : 0;
+                boolean completed = Boolean.TRUE.equals(r.get("isCompleted"));
+
+                LearningProgress progress = progressRepository.findByUserIdAndLessonId(userId, lessonId)
+                        .orElseGet(() -> LearningProgress.builder()
+                                .userId(userId)
+                                .lessonId(lessonId)
+                                .positionSeconds(0)
+                                .isCompleted(false)
+                                .masteryLevel("FAMILIAR")
+                                .build());
+
+                if (pos > progress.getPositionSeconds()) {
+                    progress.setPositionSeconds(pos);
+                }
+                if (completed) {
+                    progress.setCompleted(true);
+                    progress.setMasteryLevel("PROFICIENT");
+                }
+                progressRepository.save(progress);
+                count++;
+            } catch (Exception ignored) {
+            }
+        }
+        return count;
+    }
 }

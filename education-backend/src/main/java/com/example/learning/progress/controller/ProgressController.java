@@ -63,4 +63,20 @@ public class ProgressController {
         return ResponseEntity.ok(ApiResponse.success(
                 progressService.getSummary(principal.getId())));
     }
+
+    @PostMapping("/internal/progress/batch-sync")
+    @Operation(summary = "Batch Sync nhận nhịp tim học tập gộp từ Golang Live Gateway (Write-Behind Cache)")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> batchSyncProgress(
+            @RequestBody java.util.Map<String, Object> req) {
+
+        @SuppressWarnings("unchecked")
+        java.util.List<java.util.Map<String, Object>> records = (java.util.List<java.util.Map<String, Object>>) req.get("records");
+        int updated = progressService.processBatchSync(records);
+
+        java.util.Map<String, Object> result = java.util.Map.of(
+                "updatedCount", updated,
+                "message", "Đã đồng bộ thành công " + updated + " bản ghi nhịp tim vào PostgreSQL."
+        );
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
 }
