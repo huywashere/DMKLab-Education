@@ -1,29 +1,22 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Lesson, Course } from "@/types";
-import { MOCK_COURSE, MOCK_LESSONS } from "@/lib/mock-data";
+import { Lesson } from "@/types";
+import { MOCK_LESSONS } from "@/lib/mock-data";
 import { api } from "@/lib/api";
 import confetti from "canvas-confetti";
 import { 
   ArrowLeft, 
   Play, 
-  Pause, 
-  RotateCcw, 
-  RotateCw, 
-  Volume2, 
-  VolumeX, 
-  Maximize, 
   CheckCircle2, 
   HelpCircle, 
   FileText, 
   Sparkles, 
-  Award,
   Clock,
-  Send,
   ChevronRight,
   Lightbulb
 } from "lucide-react";
+import { PlyrVideoPlayer, PlyrPlayerHandle } from "@/components/PlyrVideoPlayer";
 
 interface LessonRoomProps {
   currentLesson: Lesson;
@@ -41,15 +34,12 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const [activeLesson, setActiveLesson] = useState<Lesson>(initialLesson);
   const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>('quiz');
   
-  // Video Player States
-  const videoRef = useRef<HTMLVideoElement>(null);
+  // Plyr Video Player Reference & States
+  const playerRef = useRef<PlyrPlayerHandle>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(activeLesson.positionSeconds || 0);
   const [duration, setDuration] = useState(activeLesson.durationSeconds || 600);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
-  const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
 
   // Mốc thời gian chương học (Mục 8.3 PDF)
   const CHAPTERS = [
@@ -60,13 +50,11 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   ];
 
   const jumpToChapter = (seconds: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = seconds;
+    if (playerRef.current) {
+      playerRef.current.seekTo(seconds);
       setCurrentTime(seconds);
-      if (!isPlaying) {
-        videoRef.current.play();
-        setIsPlaying(true);
-      }
+      playerRef.current.play();
+      setIsPlaying(true);
     }
   };
 
@@ -79,9 +67,9 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   // 1. Heartbeat tiến độ xem video (Mục 8.4 trong PDF - gửi mỗi 10-15s)
   useEffect(() => {
     const interval = setInterval(() => {
-      if (isPlaying && videoRef.current) {
-        const pos = Math.floor(videoRef.current.currentTime);
-        const dur = Math.floor(videoRef.current.duration || activeLesson.durationSeconds || 600);
+      if (isPlaying && playerRef.current) {
+        const pos = Math.floor(playerRef.current.getCurrentTime());
+        const dur = Math.floor(playerRef.current.getDuration() || activeLesson.durationSeconds || 600);
         api.updateLessonProgress(activeLesson.id, pos, dur, false);
         setSaveStatus(`Đã lưu tiến độ lúc ${formatTime(pos)}`);
         setTimeout(() => setSaveStatus(null), 3000);
@@ -90,46 +78,6 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
 
     return () => clearInterval(interval);
   }, [isPlaying, activeLesson.id, activeLesson.durationSeconds]);
-
-  // Handle Play/Pause
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const skipTime = (seconds: number) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, Math.min(videoRef.current.currentTime + seconds, duration));
-    }
-  };
-
-  const handleRateChange = (rate: number) => {
-    setPlaybackRate(rate);
-    if (videoRef.current) {
-      videoRef.current.playbackRate = rate;
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration || activeLesson.durationSeconds);
-      if (activeLesson.positionSeconds > 0) {
-        videoRef.current.currentTime = activeLesson.positionSeconds;
-      }
-    }
-  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -168,7 +116,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
         selectedAnswer: optId.replace('opt-', '').toUpperCase(),
       }));
       await api.submitQuiz(activeLesson.id, answersPayload);
-      const pos = videoRef.current ? Math.floor(videoRef.current.currentTime) : 0;
+      const pos = playerRef.current ? Math.floor(playerRef.current.getCurrentTime()) : 0;
       await api.updateLessonProgress(activeLesson.id, pos, duration, score >= activeLesson.quiz.passingScore);
     } catch {
       // Local state already updated
@@ -234,145 +182,40 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 Cols): Video Player & Interactive Tabs */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Khan-style Video Player */}
-          <div className="bg-black rounded-2xl overflow-hidden shadow-xl border border-slate-800 relative group">
-            <video
-              ref={videoRef}
-              src={activeLesson.videoUrl}
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleLoadedMetadata}
-              className="w-full aspect-video object-cover cursor-pointer"
-              onClick={togglePlay}
-            />
-
-            {/* WebVTT Subtitles Overlay (Mục 8.3 PDF) */}
-            {subtitlesEnabled && (
-              <div className="absolute bottom-16 inset-x-4 flex justify-center pointer-events-none">
-                <span className="bg-black/85 text-white px-4 py-1.5 rounded-lg text-xs md:text-sm font-medium text-center shadow-lg border border-white/10 max-w-xl">
-                  {currentTime < 120 
-                    ? "Chào mừng các em! Trong bài học này, chúng ta sẽ cùng khám phá bản chất cốt lõi của Phân số."
-                    : currentTime < 330
-                    ? "Tử số là số phần được lấy ra, còn Mẫu số biểu thị tổng số phần bằng nhau được chia."
-                    : currentTime < 480
-                    ? "Ví dụ: Một chiếc bánh Pizza chia làm 4 phần bằng nhau, nếu ta ăn 1 phần tức là ta đã lấy 1/4 chiếc bánh."
-                    : "Quy tắc: Khi nhân hoặc chia cả tử và mẫu với cùng một số tự nhiên khác 0, ta được một phân số mới bằng phân số đã cho."}
-                </span>
-              </div>
-            )}
-
-            {/* Custom Control Overlay */}
-            <div className="p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent space-y-2 text-white">
-              {/* Timeline Scrubber */}
-              <div 
-                className="relative w-full h-1.5 bg-white/20 rounded-full cursor-pointer hover:h-2 transition-all"
-                onClick={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const clickX = e.clientX - rect.left;
-                  const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-                  skipTime(ratio * duration - currentTime);
-                }}
-              >
-                <div
-                  className="h-full bg-[#14BF96] rounded-full relative"
-                  style={{ width: `${(currentTime / duration) * 100}%` }}
-                >
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow" />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-xs pt-1">
-                {/* Left Controls */}
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={togglePlay}
-                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition text-white cursor-pointer"
-                  >
-                    {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
-                  </button>
-
-                  <button onClick={() => skipTime(-10)} className="hover:text-[#14BF96] transition cursor-pointer" title="Lùi 10 giây">
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => skipTime(10)} className="hover:text-[#14BF96] transition cursor-pointer" title="Tiến 10 giây">
-                    <RotateCw className="w-4 h-4" />
-                  </button>
-
-                  <div className="text-slate-300 font-medium text-xs ml-1">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </div>
-                </div>
-
-                {/* Right Controls: CC, Speed, Volume, Fullscreen */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                  {/* CC Subtitles Toggle Button (Mục 8.3 PDF) */}
-                  <button
-                    onClick={() => setSubtitlesEnabled(!subtitlesEnabled)}
-                    className={`px-2 py-0.5 rounded text-[11px] font-bold border transition cursor-pointer ${
-                      subtitlesEnabled 
-                        ? 'bg-[#14BF96] text-white border-[#14BF96]' 
-                        : 'bg-white/10 text-slate-300 border-white/20 hover:text-white'
-                    }`}
-                    title="Bật/Tắt phụ đề WebVTT"
-                  >
-                    CC
-                  </button>
-
-                  {/* Speed Selector (0.5x - 2x) */}
-                  <div className="flex items-center gap-0.5 bg-white/10 px-1.5 py-0.5 rounded text-[11px] font-semibold">
-                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                      <button
-                        key={rate}
-                        onClick={() => handleRateChange(rate)}
-                        className={`px-1 rounded transition cursor-pointer ${playbackRate === rate ? 'text-[#14BF96] font-bold bg-white/20' : 'text-slate-300 hover:text-white'}`}
-                      >
-                        {rate}x
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      if (videoRef.current) {
-                        videoRef.current.muted = !isMuted;
-                        setIsMuted(!isMuted);
-                      }
-                    }}
-                    className="hover:text-[#14BF96] transition cursor-pointer"
-                  >
-                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      if (videoRef.current) {
-                        if (document.fullscreenElement) {
-                          document.exitFullscreen();
-                        } else {
-                          videoRef.current.requestFullscreen();
-                        }
-                      }
-                    }}
-                    className="hover:text-[#14BF96] transition cursor-pointer"
-                  >
-                    <Maximize className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Trình phát video Plyr hiện đại (https://www.plyrjs.com) */}
+          <PlyrVideoPlayer
+            ref={playerRef}
+            src={activeLesson.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+            title={activeLesson.title}
+            initialTime={activeLesson.positionSeconds || 0}
+            chapters={CHAPTERS}
+            defaultSubtitles={false}
+            onTimeUpdate={(curTime, dur) => {
+              setCurrentTime(curTime);
+              if (dur > 0 && dur !== duration) {
+                setDuration(dur);
+              }
+            }}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => {
+              setIsPlaying(false);
+              api.updateLessonProgress(activeLesson.id, Math.floor(duration), Math.floor(duration), true);
+            }}
+          />
 
           {/* Chapter Timeline Markers Bar (Mục 8.3 PDF) */}
-          <div className="bg-slate-900 text-white p-3 rounded-2xl flex items-center gap-2 overflow-x-auto text-xs no-scrollbar shadow-sm">
+          <div className="bg-slate-900 text-white p-3 rounded-2xl flex items-center gap-2 overflow-x-auto text-xs no-scrollbar shadow-sm border border-slate-800">
             <span className="text-slate-400 font-bold shrink-0 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#14BF96]" /> Chương học:
+              <Clock className="w-3.5 h-3.5 text-[#1865F2]" /> Chương học:
             </span>
             {CHAPTERS.map((ch, idx) => (
               <button
                 key={idx}
                 onClick={() => jumpToChapter(ch.time)}
-                className={`px-3 py-1 rounded-xl text-[11px] font-medium transition shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-[11px] font-medium transition shrink-0 cursor-pointer ${
                   currentTime >= ch.time && (idx === CHAPTERS.length - 1 || currentTime < CHAPTERS[idx + 1].time)
-                    ? 'bg-[#14BF96] text-white font-bold shadow-xs'
+                    ? 'bg-[#1865F2] text-white font-bold shadow-md'
                     : 'bg-white/10 hover:bg-white/20 text-slate-300'
                 }`}
               >

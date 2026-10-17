@@ -187,3 +187,70 @@ body {
   border-color: #3B82F6;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
+
+/* ==========================================================================
+   DMKLab Custom Plyr Media Player Theme (https://www.plyrjs.com)
+   ========================================================================== */
+:root {
+  --plyr-color-main: #1865F2; /* DMKLab Brand Blue */
+  --plyr-video-control-color: #F8FAFC;
+  --plyr-video-control-color-hover: #FFFFFF;
+  --plyr-video-control-background-hover: #1865F2;
+  --plyr-video-controls-background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(10, 15, 29, 0.88) 100%);
+  --plyr-control-radius: 8px;
+  --plyr-control-spacing: 10px;
+  --plyr-range-thumb-height: 14px;
+  --plyr-range-thumb-background: #FFFFFF;
+  --plyr-range-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --plyr-range-track-height: 5px;
+  --plyr-video-progress-buffered-background: rgba(255, 255, 255, 0.25);
+  --plyr-menu-background: rgba(15, 23, 42, 0.95);
+  --plyr-menu-color: #F8FAFC;
+  --plyr-menu-border-radius: 12px;
+  --plyr-menu-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
+  --plyr-tooltip-background: rgba(15, 23, 42, 0.92);
+  --plyr-tooltip-border-radius: 6px;
+  --plyr-tooltip-color: #FFFFFF;
+  --plyr-tooltip-padding: 5px 8px;
+  --plyr-font-family: inherit;
+  --plyr-font-weight-regular: 500;
+  --plyr-font-weight-bold: 700;
+}
+
+.dmklab-plyr-container .plyr--video {
+  border-radius: 1rem;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.dmklab-plyr-container .plyr__control--overlaid {
+  background: rgba(24, 101, 242, 0.9) !important;
+  border-radius: 9999px !important;
+  width: 64px !important;
+  height: 64px !important;
+  box-shadow: 0 0 25px rgba(24, 101, 242, 0.6) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease !important;
+}
+
+.dmklab-plyr-container .plyr__control--overlaid:hover {
+  background: #1865F2 !important;
+  transform: scale(1.1) !important;
+}
+
+.dmklab-plyr-container .plyr__captions span {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  padding: 6px 14px !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dmklab-plyr-container .plyr__menu__container {
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
