@@ -77,6 +77,12 @@ export const Homepage: React.FC<HomepageProps> = ({
 
   const filledCount = Object.values(puzzlePieces).filter(Boolean).length;
 
+  // Biology Homology Interactive Simulation States
+  const [heroWidgetMode, setHeroWidgetMode] = useState<"limbs" | "chromosomes" | "math">("limbs");
+  const [homologySpecies, setHomologySpecies] = useState<"human" | "bat" | "whale" | "cat">("human");
+  const [activeBoneGroup, setActiveBoneGroup] = useState<"all" | "humerus" | "radiusUlna" | "carpals" | "phalanges">("all");
+  const [crossedOver, setCrossedOver] = useState(false);
+
   const SUBJECT_ITEMS = [
     {
       icon: <TbMathFunction className="w-5 h-5" />,
@@ -222,14 +228,14 @@ export const Homepage: React.FC<HomepageProps> = ({
                 {isVi ? (
                   <>
                     Gia sư cá nhân <br className="hidden sm:inline" />
-                    cho toán học <br className="hidden sm:inline" />
+                    cho toán học, sinh học <br className="hidden sm:inline" />
                     và lập trình
                   </>
                 ) : (
                   <>
                     Your personal <br className="hidden sm:inline" />
-                    tutor for math <br className="hidden sm:inline" />
-                    and coding
+                    tutor for math, science <br className="hidden sm:inline" />
+                    and biology
                   </>
                 )}
               </h1>
@@ -309,172 +315,594 @@ export const Homepage: React.FC<HomepageProps> = ({
               </div>
             </div>
 
-            {/* Right: Brilliant Interactive Geometric Dissection Puzzle Card */}
+            {/* Right: Brilliant-style Interactive Biology Homology & Science Card */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="w-full max-w-[440px] sm:max-w-[480px] bg-white dark:bg-[#131E35] rounded-[36px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-200/90 dark:border-slate-800 p-6 sm:p-10 flex flex-col items-center justify-center relative select-none">
-                {/* Puzzle SVG */}
-                <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[360px] flex items-center justify-center">
-                  <svg
-                    viewBox="0 0 300 300"
-                    className="w-full h-full drop-shadow-sm overflow-visible"
-                  >
-                    {/* Dissection Pieces (Interactive: click to toggle purple fill) */}
-                    {/* p1: Top-Left Corner Triangle */}
-                    <path
-                      d="M 30 30 L 150 30 L 30 150 Z"
-                      fill={puzzlePieces.cornerTL ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("cornerTL")}
-                    />
-
-                    {/* p5: Top-Right Corner Triangle */}
-                    <path
-                      d="M 150 30 L 270 30 L 270 150 Z"
-                      fill={puzzlePieces.cornerTR ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("cornerTR")}
-                    />
-
-                    {/* p6: Bottom-Right Corner Triangle */}
-                    <path
-                      d="M 270 150 L 270 270 L 150 270 Z"
-                      fill={puzzlePieces.cornerBR ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("cornerBR")}
-                    />
-
-                    {/* p4: Bottom-Left Corner Triangle */}
-                    <path
-                      d="M 30 150 L 150 270 L 30 270 Z"
-                      fill={puzzlePieces.cornerBL ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("cornerBL")}
-                    />
-
-                    {/* p2: Upper-Left Tilted Square inside Diamond */}
-                    <polygon
-                      points="150,30 90,90 150,150 210,90"
-                      fill={puzzlePieces.innerSq ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("innerSq")}
-                    />
-
-                    {/* p3: Upper-Right Triangle inside Diamond */}
-                    <polygon
-                      points="150,30 210,90 270,150"
-                      fill={puzzlePieces.innerTR ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("innerTR")}
-                    />
-
-                    {/* p7: Lower-Left Triangle inside Diamond */}
-                    <polygon
-                      points="30,150 90,90 150,270"
-                      fill={puzzlePieces.innerBL ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("innerBL")}
-                    />
-
-                    {/* p8: Lower-Right Square inside Diamond */}
-                    <polygon
-                      points="150,150 210,90 270,150 210,210"
-                      fill={puzzlePieces.innerBR ? "#A78BFA" : "#FFFFFF"}
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="cursor-pointer transition-colors duration-150 text-slate-900 dark:text-white hover:opacity-90"
-                      onClick={() => togglePiece("innerBR")}
-                    />
-
-                    {/* Outer Square Border */}
-                    <rect
-                      x="30"
-                      y="30"
-                      width="240"
-                      height="240"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      className="text-slate-900 dark:text-white pointer-events-none"
-                    />
-
-                    {/* Glowing Emerald Dotted Crosshairs */}
-                    <line
-                      x1="10"
-                      y1="150"
-                      x2="290"
-                      y2="150"
-                      stroke="#10B981"
-                      strokeWidth="2.5"
-                      strokeDasharray="5 5"
-                      style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }}
-                      className="pointer-events-none"
-                    />
-                    <line
-                      x1="150"
-                      y1="10"
-                      x2="150"
-                      y2="290"
-                      stroke="#10B981"
-                      strokeWidth="2.5"
-                      strokeDasharray="5 5"
-                      style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }}
-                      className="pointer-events-none"
-                    />
-
-                    {/* Iconic Black Mouse Cursor Arrow with White Outline */}
-                    <g transform="translate(155, 130)" className="pointer-events-none filter drop-shadow-md animate-bounce duration-1000">
-                      <path
-                        d="M 0 0 L 0 22 L 6 16 L 11 26 L 14 24.5 L 9 14.5 L 16 14.5 Z"
-                        fill="#000000"
-                        stroke="#FFFFFF"
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                      />
-                    </g>
-                  </svg>
-                </div>
-
-                {/* Interactive Feedback Pill below Puzzle */}
-                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 w-full flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA]" />
-                    <span>
-                      {isVi ? `Diện tích: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)` : `Area: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)`}
-                    </span>
+              <div className="w-full max-w-[440px] sm:max-w-[490px] bg-white dark:bg-[#131E35] rounded-[36px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.08)] border border-slate-200/90 dark:border-slate-800 p-5 sm:p-7 flex flex-col items-center justify-center relative select-none">
+                {/* Top: Mode Switcher Pills (Chi tương đồng / NST tương đồng / Toán học) */}
+                <div className="w-full flex items-center justify-between pb-3 mb-2 border-b border-slate-100 dark:border-slate-800 gap-1 text-[11px] font-bold">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setHeroWidgetMode("limbs")}
+                      className={`px-2.5 py-1 rounded-full transition cursor-pointer ${
+                        heroWidgetMode === "limbs"
+                          ? "bg-[#05ac60] text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      🦴 {isVi ? "Cơ quan tương đồng" : "Homologous Limbs"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHeroWidgetMode("chromosomes")}
+                      className={`px-2.5 py-1 rounded-full transition cursor-pointer ${
+                        heroWidgetMode === "chromosomes"
+                          ? "bg-[#05ac60] text-white shadow-xs"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      🧬 {isVi ? "NST tương đồng" : "Chromosomes"}
+                    </button>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setPuzzlePieces({
-                        cornerTL: true,
-                        innerSq: true,
-                        innerTR: true,
-                        cornerBL: true,
-                        cornerTR: false,
-                        cornerBR: false,
-                        innerBL: false,
-                        innerBR: false,
-                      })
-                    }
-                    className="text-[11px] font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
+                    onClick={() => setHeroWidgetMode("math")}
+                    className={`px-2 py-1 rounded-full text-[10px] transition cursor-pointer ${
+                      heroWidgetMode === "math"
+                        ? "bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900"
+                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    }`}
+                    title="Chuyển sang bài toán hình học đối xứng"
                   >
-                    {isVi ? "Đặt lại mẫu" : "Reset puzzle"}
+                    📐 {isVi ? "Toán" : "Math"}
                   </button>
+                </div>
+
+                {/* Sub-selector for Species when in Limbs mode */}
+                {heroWidgetMode === "limbs" && (
+                  <div className="w-full flex items-center justify-center gap-1.5 mb-2">
+                    {[
+                      { key: "human", icon: "🧍", label: isVi ? "Người" : "Human", role: isVi ? "Cầm nắm" : "Grasping" },
+                      { key: "bat", icon: "🦇", label: isVi ? "Dơi" : "Bat", role: isVi ? "Bay" : "Flight" },
+                      { key: "whale", icon: "🐋", label: isVi ? "Cá voi" : "Whale", role: isVi ? "Bơi" : "Swimming" },
+                      { key: "cat", icon: "🐾", label: isVi ? "Mèo" : "Cat", role: isVi ? "Chạy" : "Running" },
+                    ].map((sp) => (
+                      <button
+                        key={sp.key}
+                        type="button"
+                        onClick={() => setHomologySpecies(sp.key as any)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 transition cursor-pointer ${
+                          homologySpecies === sp.key
+                            ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs scale-105"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        <span>{sp.icon}</span>
+                        <span>{sp.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* SVG Visual Canvas with Glowing Crosshairs */}
+                <div className="relative w-full aspect-square max-w-[310px] sm:max-w-[330px] flex items-center justify-center">
+                  {/* Mode 1: Homologous Limbs (Cơ quan tương đồng - Chi 5 ngón) */}
+                  {heroWidgetMode === "limbs" && (
+                    <svg viewBox="0 0 300 300" className="w-full h-full drop-shadow-sm overflow-visible">
+                      {/* Background Box with subtle grid */}
+                      <rect
+                        x="20"
+                        y="20"
+                        width="260"
+                        height="260"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="text-slate-200 dark:text-slate-800"
+                        rx="16"
+                      />
+
+                      {/* Glowing Emerald Dotted Alignment Crosshairs */}
+                      <line
+                        x1="10"
+                        y1="150"
+                        x2="290"
+                        y2="150"
+                        stroke="#10B981"
+                        strokeWidth="2"
+                        strokeDasharray="4 4"
+                        style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.8))" }}
+                      />
+                      <line
+                        x1="150"
+                        y1="10"
+                        x2="150"
+                        y2="290"
+                        stroke="#10B981"
+                        strokeWidth="2"
+                        strokeDasharray="4 4"
+                        style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.8))" }}
+                      />
+
+                      {/* ── SPECIES 1: HUMAN ARM (Tay người) ── */}
+                      {homologySpecies === "human" && (
+                        <g className="transition-all duration-300">
+                          {/* Humerus (Xương cánh tay) */}
+                          <rect
+                            x="142"
+                            y="35"
+                            width="16"
+                            height="65"
+                            rx="8"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "humerus" ? "#A78BFA" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            className="cursor-pointer text-slate-900 dark:text-white hover:brightness-110"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "humerus" ? "all" : "humerus")}
+                          />
+
+                          {/* Radius & Ulna (Xương quay & xương trụ) */}
+                          <rect
+                            x="132"
+                            y="110"
+                            width="14"
+                            height="60"
+                            rx="6"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white hover:brightness-110"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+                          <rect
+                            x="154"
+                            y="110"
+                            width="14"
+                            height="60"
+                            rx="6"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white hover:brightness-110"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+
+                          {/* Carpals & Metacarpals (Xương cổ tay & bàn tay) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "carpals" ? "all" : "carpals")}
+                          >
+                            <circle cx="138" cy="180" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            <circle cx="150" cy="178" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            <circle cx="162" cy="180" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            {/* Metacarpals rays */}
+                            <path d="M 125 195 L 115 215 M 138 190 L 135 220 M 150 188 L 150 222 M 162 190 L 165 220 M 175 195 L 180 215" stroke={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#CBD5E1"} strokeWidth="3" strokeLinecap="round" />
+                          </g>
+
+                          {/* Phalanges (5 ngón tay) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "phalanges" ? "all" : "phalanges")}
+                          >
+                            {/* Thumb (Ngón cái đối diện) */}
+                            <path d="M 115 215 L 100 235" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5" strokeLinecap="round" />
+                            {/* 4 Fingers */}
+                            <path d="M 135 220 L 132 258" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 150 222 L 150 268" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 165 220 L 168 258" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 180 215 L 185 245" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4" strokeLinecap="round" />
+                          </g>
+                        </g>
+                      )}
+
+                      {/* ── SPECIES 2: BAT WING (Cánh dơi) ── */}
+                      {homologySpecies === "bat" && (
+                        <g className="transition-all duration-300">
+                          {/* Translucent Wing Membrane Contour */}
+                          <path
+                            d="M 160 45 Q 80 120 40 265 Q 90 280 130 270 Q 180 265 220 240 Q 255 210 275 160 Q 200 80 160 45 Z"
+                            fill="#A78BFA"
+                            fillOpacity="0.08"
+                            stroke="#A78BFA"
+                            strokeWidth="1.5"
+                            strokeDasharray="3 3"
+                          />
+
+                          {/* Humerus (Xương cánh tay ngắn, chếch góc) */}
+                          <path
+                            d="M 160 45 L 125 80"
+                            stroke={activeBoneGroup === "all" || activeBoneGroup === "humerus" ? "#A78BFA" : "#E2E8F0"}
+                            strokeWidth="14"
+                            strokeLinecap="round"
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "humerus" ? "all" : "humerus")}
+                          />
+
+                          {/* Radius & Ulna (Xương cẳng tay dài vươn ra khuỷu) */}
+                          <path
+                            d="M 125 80 L 80 125"
+                            stroke={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+
+                          {/* Carpals (Khớp cổ tay tập trung) */}
+                          <circle
+                            cx="80"
+                            cy="125"
+                            r="9"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "carpals" ? "all" : "carpals")}
+                          />
+
+                          {/* Phalanges (Đốt ngón 2-5 kéo dài cực đại thành nan quạt bay) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "phalanges" ? "all" : "phalanges")}
+                          >
+                            {/* Digit 1: Small Hooked Thumb Claw */}
+                            <path d="M 80 125 L 70 108" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4" strokeLinecap="round" />
+                            {/* Digits 2, 3, 4, 5 (Super elongated struts) */}
+                            <path d="M 80 125 L 45 260" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="3" strokeLinecap="round" />
+                            <path d="M 80 125 L 125 268" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="3" strokeLinecap="round" />
+                            <path d="M 80 125 L 210 238" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="3" strokeLinecap="round" />
+                            <path d="M 80 125 L 265 160" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="3" strokeLinecap="round" />
+                          </g>
+                        </g>
+                      )}
+
+                      {/* ── SPECIES 3: WHALE FLIPPER (Vây cá voi) ── */}
+                      {homologySpecies === "whale" && (
+                        <g className="transition-all duration-300">
+                          {/* Hydrodynamic Flipper Outline */}
+                          <path
+                            d="M 120 40 Q 95 140 105 210 Q 115 270 145 285 Q 185 240 200 160 Q 205 90 180 40 Z"
+                            fill="#10B981"
+                            fillOpacity="0.06"
+                            stroke="#10B981"
+                            strokeWidth="1.5"
+                            strokeDasharray="4 4"
+                          />
+
+                          {/* Humerus (Rất ngắn, bản to mập) */}
+                          <rect
+                            x="132"
+                            y="42"
+                            width="36"
+                            height="40"
+                            rx="12"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "humerus" ? "#A78BFA" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "humerus" ? "all" : "humerus")}
+                          />
+
+                          {/* Radius & Ulna (Ngắn, dẹt) */}
+                          <rect
+                            x="126"
+                            y="92"
+                            width="20"
+                            height="42"
+                            rx="8"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+                          <rect
+                            x="154"
+                            y="92"
+                            width="20"
+                            height="42"
+                            rx="8"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+
+                          {/* Carpals (Cụm đĩa khít dẹt) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "carpals" ? "all" : "carpals")}
+                          >
+                            <circle cx="134" cy="148" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            <circle cx="150" cy="146" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            <circle cx="166" cy="148" r="6" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                          </g>
+
+                          {/* Hyperphalangy (Nhiều đốt ngón xếp khít làm mái chèo) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "phalanges" ? "all" : "phalanges")}
+                          >
+                            <path d="M 122 165 L 118 220" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5.5" strokeDasharray="6 3" strokeLinecap="round" />
+                            <path d="M 136 160 L 132 255" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5.5" strokeDasharray="6 3" strokeLinecap="round" />
+                            <path d="M 150 160 L 148 270" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5.5" strokeDasharray="6 3" strokeLinecap="round" />
+                            <path d="M 164 160 L 168 250" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5.5" strokeDasharray="6 3" strokeLinecap="round" />
+                            <path d="M 178 165 L 184 210" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="5.5" strokeDasharray="6 3" strokeLinecap="round" />
+                          </g>
+                        </g>
+                      )}
+
+                      {/* ── SPECIES 4: CAT FORELEG (Chân mèo) ── */}
+                      {homologySpecies === "cat" && (
+                        <g className="transition-all duration-300">
+                          {/* Humerus (Xương cánh tay thanh mảnh nghiêng) */}
+                          <path
+                            d="M 165 35 L 138 95"
+                            stroke={activeBoneGroup === "all" || activeBoneGroup === "humerus" ? "#A78BFA" : "#E2E8F0"}
+                            strokeWidth="14"
+                            strokeLinecap="round"
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "humerus" ? "all" : "humerus")}
+                          />
+
+                          {/* Radius & Ulna (Xương cẳng tay thẳng đứng dài) */}
+                          <rect
+                            x="134"
+                            y="108"
+                            width="11"
+                            height="75"
+                            rx="5"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+                          <rect
+                            x="151"
+                            y="108"
+                            width="11"
+                            height="75"
+                            rx="5"
+                            fill={activeBoneGroup === "all" || activeBoneGroup === "radiusUlna" ? "#10B981" : "#E2E8F0"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="cursor-pointer text-slate-900 dark:text-white"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          />
+
+                          {/* Carpals (Khớp cổ chân nhấc cao) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "carpals" ? "all" : "carpals")}
+                          >
+                            <circle cx="140" cy="198" r="5" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                            <circle cx="154" cy="198" r="5" fill={activeBoneGroup === "all" || activeBoneGroup === "carpals" ? "#F59E0B" : "#E2E8F0"} stroke="currentColor" strokeWidth="1.5" className="text-slate-900 dark:text-white" />
+                          </g>
+
+                          {/* Metacarpals & Phalanges (Đi trên đầu ngón - Digitigrade với vuốt) */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setActiveBoneGroup(activeBoneGroup === "phalanges" ? "all" : "phalanges")}
+                          >
+                            <path d="M 136 208 L 132 250" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 148 208 L 148 255" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            <path d="M 160 208 L 164 250" stroke={activeBoneGroup === "all" || activeBoneGroup === "phalanges" ? "#3B82F6" : "#E2E8F0"} strokeWidth="4.5" strokeLinecap="round" />
+                            {/* Retractable Claws (Móng vuốt cong) */}
+                            <path d="M 132 250 Q 128 262 136 265 M 148 255 Q 145 268 153 268 M 164 250 Q 168 262 160 265" stroke="currentColor" strokeWidth="2" fill="none" className="text-slate-700 dark:text-slate-300" />
+                          </g>
+                        </g>
+                      )}
+
+                      {/* Iconic Pointer Arrow */}
+                      <g transform="translate(165, 115)" className="pointer-events-none filter drop-shadow-md animate-bounce duration-1000">
+                        <path
+                          d="M 0 0 L 0 22 L 6 16 L 11 26 L 14 24.5 L 9 14.5 L 16 14.5 Z"
+                          fill="#000000"
+                          stroke="#FFFFFF"
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                        />
+                      </g>
+                    </svg>
+                  )}
+
+                  {/* Mode 2: Homologous Chromosomes & Crossing Over (Cặp NST tương đồng) */}
+                  {heroWidgetMode === "chromosomes" && (
+                    <svg viewBox="0 0 300 300" className="w-full h-full drop-shadow-sm overflow-visible">
+                      <rect x="20" y="20" width="260" height="260" rx="16" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-200 dark:text-slate-800" />
+                      
+                      {/* Central Spindle Axis */}
+                      <line x1="150" y1="10" x2="150" y2="290" stroke="#10B981" strokeWidth="2" strokeDasharray="4 4" style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.8))" }} />
+                      <line x1="10" y1="150" x2="290" y2="150" stroke="#10B981" strokeWidth="2" strokeDasharray="4 4" style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.8))" }} />
+
+                      {/* Maternal Chromosome (Từ Mẹ - Tím Lavender) */}
+                      <g className="cursor-pointer" onClick={() => setCrossedOver(!crossedOver)}>
+                        {/* Upper chromatid arm */}
+                        <rect x="95" y="45" width="22" height="90" rx="11" fill="#A78BFA" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        <rect x="120" y="45" width="22" height="90" rx="11" fill="#A78BFA" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        {/* Centromere */}
+                        <circle cx="118" cy="150" r="13" fill="#10B981" stroke="currentColor" strokeWidth="2" className="text-slate-900 dark:text-white" />
+                        {/* Lower chromatid arm (swap segment if crossed over) */}
+                        <rect x="95" y="165" width="22" height="90" rx="11" fill="#A78BFA" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        <rect x="120" y="165" width="22" height="90" rx="11" fill={crossedOver ? "#06B6D4" : "#A78BFA"} stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white transition-colors duration-300" />
+                        {/* Gene loci labels */}
+                        <text x="106" y="80" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">A</text>
+                        <text x="131" y="80" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">A</text>
+                        <text x="106" y="215" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">B</text>
+                        <text x="131" y="215" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">{crossedOver ? "b" : "B"}</text>
+                      </g>
+
+                      {/* Paternal Chromosome (Từ Bố - Xanh Cyan) */}
+                      <g className="cursor-pointer" onClick={() => setCrossedOver(!crossedOver)}>
+                        {/* Upper chromatid arm */}
+                        <rect x="158" y="45" width="22" height="90" rx="11" fill="#06B6D4" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        <rect x="183" y="45" width="22" height="90" rx="11" fill="#06B6D4" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        {/* Centromere */}
+                        <circle cx="182" cy="150" r="13" fill="#10B981" stroke="currentColor" strokeWidth="2" className="text-slate-900 dark:text-white" />
+                        {/* Lower chromatid arm (swap segment if crossed over) */}
+                        <rect x="158" y="165" width="22" height="90" rx="11" fill={crossedOver ? "#A78BFA" : "#06B6D4"} stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white transition-colors duration-300" />
+                        <rect x="183" y="165" width="22" height="90" rx="11" fill="#06B6D4" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white" />
+                        {/* Gene loci labels */}
+                        <text x="169" y="80" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">a</text>
+                        <text x="194" y="80" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">a</text>
+                        <text x="169" y="215" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">{crossedOver ? "B" : "b"}</text>
+                        <text x="194" y="215" fontSize="11" fontWeight="bold" fill="#FFFFFF" textAnchor="middle">b</text>
+                      </g>
+
+                      {/* Pointer */}
+                      <g transform="translate(145, 185)" className="pointer-events-none filter drop-shadow-md animate-bounce duration-1000">
+                        <path d="M 0 0 L 0 22 L 6 16 L 11 26 L 14 24.5 L 9 14.5 L 16 14.5 Z" fill="#000000" stroke="#FFFFFF" strokeWidth="2" strokeLinejoin="round" />
+                      </g>
+                    </svg>
+                  )}
+
+                  {/* Mode 3: Original Math Dissection Puzzle */}
+                  {heroWidgetMode === "math" && (
+                    <svg viewBox="0 0 300 300" className="w-full h-full drop-shadow-sm overflow-visible">
+                      <path d="M 30 30 L 150 30 L 30 150 Z" fill={puzzlePieces.cornerTL ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("cornerTL")} />
+                      <path d="M 150 30 L 270 30 L 270 150 Z" fill={puzzlePieces.cornerTR ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("cornerTR")} />
+                      <path d="M 270 150 L 270 270 L 150 270 Z" fill={puzzlePieces.cornerBR ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("cornerBR")} />
+                      <path d="M 30 150 L 150 270 L 30 270 Z" fill={puzzlePieces.cornerBL ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("cornerBL")} />
+                      <polygon points="150,30 90,90 150,150 210,90" fill={puzzlePieces.innerSq ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("innerSq")} />
+                      <polygon points="150,30 210,90 270,150" fill={puzzlePieces.innerTR ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("innerTR")} />
+                      <polygon points="30,150 90,90 150,270" fill={puzzlePieces.innerBL ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("innerBL")} />
+                      <polygon points="150,150 210,90 270,150 210,210" fill={puzzlePieces.innerBR ? "#A78BFA" : "#FFFFFF"} stroke="currentColor" strokeWidth="2.5" className="cursor-pointer text-slate-900 dark:text-white" onClick={() => togglePiece("innerBR")} />
+                      <rect x="30" y="30" width="240" height="240" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-slate-900 dark:text-white pointer-events-none" />
+                      <line x1="10" y1="150" x2="290" y2="150" stroke="#10B981" strokeWidth="2.5" strokeDasharray="5 5" style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }} className="pointer-events-none" />
+                      <line x1="150" y1="10" x2="150" y2="290" stroke="#10B981" strokeWidth="2.5" strokeDasharray="5 5" style={{ filter: "drop-shadow(0 0 6px rgba(16,185,129,0.9))" }} className="pointer-events-none" />
+                      <g transform="translate(155, 130)" className="pointer-events-none filter drop-shadow-md animate-bounce duration-1000">
+                        <path d="M 0 0 L 0 22 L 6 16 L 11 26 L 14 24.5 L 9 14.5 L 16 14.5 Z" fill="#000000" stroke="#FFFFFF" strokeWidth="2" strokeLinejoin="round" />
+                      </g>
+                    </svg>
+                  )}
+                </div>
+
+                {/* Bottom Interactive Explanation & Controls */}
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 w-full space-y-2">
+                  {/* Bone Color Legend when in Limbs mode */}
+                  {heroWidgetMode === "limbs" && (
+                    <>
+                      <div className="flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setActiveBoneGroup(activeBoneGroup === "humerus" ? "all" : "humerus")}
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition cursor-pointer ${
+                            activeBoneGroup === "humerus" ? "bg-purple-100 text-purple-900 dark:bg-purple-900/60 dark:text-purple-200" : "text-slate-600 dark:text-slate-400"
+                          }`}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-[#A78BFA]" />
+                          <span>{isVi ? "Cánh tay" : "Humerus"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveBoneGroup(activeBoneGroup === "radiusUlna" ? "all" : "radiusUlna")}
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition cursor-pointer ${
+                            activeBoneGroup === "radiusUlna" ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/60 dark:text-emerald-200" : "text-slate-600 dark:text-slate-400"
+                          }`}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+                          <span>{isVi ? "Cẳng tay" : "Radius/Ulna"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveBoneGroup(activeBoneGroup === "carpals" ? "all" : "carpals")}
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition cursor-pointer ${
+                            activeBoneGroup === "carpals" ? "bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200" : "text-slate-600 dark:text-slate-400"
+                          }`}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
+                          <span>{isVi ? "Cổ tay" : "Carpals"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveBoneGroup(activeBoneGroup === "phalanges" ? "all" : "phalanges")}
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition cursor-pointer ${
+                            activeBoneGroup === "phalanges" ? "bg-blue-100 text-blue-900 dark:bg-blue-900/60 dark:text-blue-200" : "text-slate-600 dark:text-slate-400"
+                          }`}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
+                          <span>{isVi ? "Đốt ngón" : "Phalanges"}</span>
+                        </button>
+                      </div>
+
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
+                        {homologySpecies === "human" && (
+                          isVi ? "🧍 Người: Ngón cái đối diện linh hoạt thích nghi cầm nắm & sử dụng công cụ." : "🧍 Human: Opposable thumb adapted for dexterity and tool manipulation."
+                        )}
+                        {homologySpecies === "bat" && (
+                          isVi ? "🦇 Dơi: Đốt ngón 2–5 kéo dài cực đại căng màng bay, ngón 1 thành móng móc." : "🦇 Bat: Digits 2–5 dramatically elongated to support flight wing membrane."
+                        )}
+                        {homologySpecies === "whale" && (
+                          isVi ? "🐋 Cá voi: Xương cánh tay dẹt, tăng đốt ngón tạo thành mái chèo thủy động học." : "🐋 Whale: Shortened stout bones with polyphalangy creating a hydrodynamic paddle."
+                        )}
+                        {homologySpecies === "cat" && (
+                          isVi ? "🐾 Mèo: Đi trên đầu ngón (digitigrade) có vuốt co rút thích nghi chạy & bắt mồi." : "🐾 Cat: Digitigrade limb adapted for high-speed stealth locomotion."
+                        )}
+                      </p>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 pt-1">
+                        <span>💡 Bằng chứng giải phẫu so sánh (Tiến hóa phân ly)</span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveBoneGroup("all")}
+                          className="hover:text-slate-700 dark:hover:text-slate-200 underline cursor-pointer"
+                        >
+                          {isVi ? "Xem tất cả xương" : "View all bones"}
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Explanation when in Chromosomes mode */}
+                  {heroWidgetMode === "chromosomes" && (
+                    <div className="space-y-1.5 text-center">
+                      <p className="text-[11px] text-slate-700 dark:text-slate-200 font-semibold">
+                        {crossedOver
+                          ? (isVi ? "✅ Đã xảy ra trao đổi chéo (Crossing-over)! Tái tổ hợp Alen B ↔ b." : "✅ Crossover completed! Recombined alleles B ↔ b.")
+                          : (isVi ? "Cặp NST tương đồng (1 nguồn gốc Mẹ, 1 nguồn gốc Bố) mang các locus gen A/a, B/b." : "Homologous chromosome pair (maternal & paternal) carrying gene loci.")}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setCrossedOver(!crossedOver)}
+                        className="px-3 py-1 rounded-full bg-[#05ac60] text-white text-[10px] font-bold shadow-xs hover:bg-[#049653] transition cursor-pointer"
+                      >
+                        {crossedOver ? (isVi ? "Hoàn nguyên vị trí gen" : "Reset chromosomes") : (isVi ? "Kích hoạt trao đổi chéo" : "Simulate crossing-over")}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Explanation when in Math mode */}
+                  {heroWidgetMode === "math" && (
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA]" />
+                        <span>
+                          {isVi ? `Diện tích: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)` : `Area: ${filledCount}/8 (${Math.round((filledCount / 8) * 100)}%)`}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPuzzlePieces({
+                            cornerTL: true,
+                            innerSq: true,
+                            innerTR: true,
+                            cornerBL: true,
+                            cornerTR: false,
+                            cornerBR: false,
+                            innerBL: false,
+                            innerBR: false,
+                          })
+                        }
+                        className="text-[11px] font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
+                      >
+                        {isVi ? "Đặt lại mẫu" : "Reset puzzle"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
