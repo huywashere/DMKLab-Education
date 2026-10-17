@@ -84,6 +84,18 @@ public class JwtTokenProvider {
         return claims.get("role", String.class);
     }
 
+    public long getExpirationEpochSeconds(String token) {
+        Claims claims = getClaimsFromToken(token);
+        Date expiration = claims.getExpiration();
+        return expiration != null ? expiration.getTime() / 1000 : 0;
+    }
+
+    public long getIssuedAtEpochSeconds(String token) {
+        Claims claims = getClaimsFromToken(token);
+        Date issuedAt = claims.getIssuedAt();
+        return issuedAt != null ? issuedAt.getTime() / 1000 : 0;
+    }
+
     public long getExpirationMs() {
         return expirationMs;
     }

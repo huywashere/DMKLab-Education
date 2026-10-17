@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import com.example.learning.platform.security.JwtBlacklistService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtTokenProvider tokenProvider;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @PostMapping("/register")
     @Operation(summary = "Đăng ký tài khoản mới và cấp JWT")
@@ -88,5 +90,19 @@ public class AuthController {
         }
         userService.changePassword(principal.getId(), req.getOldPassword(), req.getNewPassword());
         return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công!"));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất an toàn và đưa JWT vào danh sách đen (Blacklist)", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<String>> logout(
+            @RequestHeader(value = "Authorization", required = false) String bearerToken) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            try {
+                long expiration = tokenProvider.getExpirationEpochSeconds(token);
+                jwtBlacklistService.blacklistToken(token, expiration);
+            } catch (Exception ignored) {}
+        }
+        return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công. Phiên làm việc đã được thu hồi an toàn."));
     }
 }

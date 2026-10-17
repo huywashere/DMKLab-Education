@@ -63,7 +63,16 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(rateLimitingFilter, JwtAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+                .contentTypeOptions(content -> {})
+                .httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(63072000)
+                    .preload(true)
+                )
+            );
 
         return http.build();
     }

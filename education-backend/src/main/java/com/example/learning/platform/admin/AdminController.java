@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.example.learning.platform.security.JwtBlacklistService;
+
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class AdminController {
     private final LearningProgressRepository learningProgressRepository;
     private final AuditService auditService;
     private final RateLimiterService rateLimiterService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @GetMapping("/reports/overview")
     @Operation(summary = "Lấy báo cáo tổng quan KPI hệ thống và hạ tầng", security = @SecurityRequirement(name = "bearerAuth"))
@@ -166,6 +169,13 @@ public class AdminController {
             @AuthenticationPrincipal UserPrincipal principal) {
 
         String filename = req.getFilename() != null ? req.getFilename() : "lesson_video.mp4";
+
+        if (!com.example.learning.platform.security.FileSignatureValidator.isSafeFilename(filename)) {
+            UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
+            auditService.logAction(actorId, "MALICIOUS_UPLOAD_BLOCKED", "SECURITY", filename, "Phát hiện tệp tin chứa phần mở rộng thực thi hoặc ký tự nguy hiểm bị cấm", "127.0.0.1");
+            throw new RuntimeException("Tên tệp tin không hợp lệ hoặc chứa định dạng thực thi nguy hiểm bị cấm.");
+        }
+
         String storageKey = "videos/k12/" + UUID.randomUUID() + "/" + filename;
         String presignedUrl = "https://s3.ap-southeast-1.amazonaws.com/k12-education-media/" + storageKey + "?X-Amz-Signature=mock_sign_token_3600s";
         String cdnHlsUrl = "https://cdn.khan-k12.edu.vn/hls/" + storageKey.replace(".mp4", "") + "/master.m3u8";
@@ -205,5 +215,16 @@ public class AdminController {
             return ResponseEntity.ok(ApiResponse.success("Đã mở khóa thành công cho key: " + key));
         }
         return ResponseEntity.ok(ApiResponse.success("Key không bị khóa hoặc đã hết hạn: " + key));
+    }
+
+    @PostMapping("/users/{userId}/revoke-sessions")
+    @Operation(summary = "Thu hồi toàn bộ phiên đăng nhập của người dùng qua JWT Blacklist", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<String>> revokeUserSessions(
+            @PathVariable UUID userId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        jwtBlacklistService.revokeAllSessionsForUser(userId);
+        UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
+        auditService.logAction(actorId, "REVOKE_ALL_SESSIONS", "USER", userId.toString(), "Thu hồi toàn bộ phiên đăng nhập của người dùng qua JWT Blacklist", "127.0.0.1");
+        return ResponseEntity.ok(ApiResponse.success("Đã thu hồi thành công toàn bộ phiên đăng nhập của người dùng."));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.http.MediaType;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
     private final UserRepository userRepository;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -41,6 +43,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 UUID userId = tokenProvider.getUserIdFromToken(jwt);
+                long issuedAt = tokenProvider.getIssuedAtEpochSeconds(jwt);
+
+                // Kiểm tra xem Token này đã bị thu hồi hoặc đưa vào Blacklist chưa
+                if (jwtBlacklistService.isTokenRevoked(jwt, userId, issuedAt)) {
+                    log.warn("[JWT_REJECTED] Token đã bị thu hồi hoặc đăng xuất: userId={}", userId);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write("{\"success\":false,\"message\":\"Phiên đăng nhập đã bị thu hồi hoặc đăng xuất. Vui lòng đăng nhập lại.\"}");
+                    return;
+                }
+
                 Optional<User> userOpt = userRepository.findById(userId);
 
                 if (userOpt.isPresent()) {

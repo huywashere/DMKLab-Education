@@ -70,13 +70,23 @@ public class ContactController {
             return ResponseEntity.ok(ApiResponse.success("Tin nhắn của bạn đã được tiếp nhận. Đội ngũ DMKLab sẽ phản hồi sớm nhất."));
         }
 
-        // 2. Ghi nhận nhật ký liên hệ hợp lệ
+        // 2. Kiểm tra XSS / SQLi Payload và tiến hành khử độc (Input Sanitization)
+        if (com.example.learning.platform.security.InputSanitizer.containsMaliciousPayload(request.getMessage()) ||
+            com.example.learning.platform.security.InputSanitizer.containsMaliciousPayload(request.getFullName())) {
+            log.warn("[XSS_PAYLOAD_DETECTED] Phát hiện mã độc trong form liên hệ từ IP {}: {}", clientIp, request.getEmail());
+            auditService.logAction(null, "XSS_INJECTION_BLOCKED", "SECURITY", request.getEmail(), "Phát hiện và khử độc mã độc XSS trong tin nhắn liên hệ", clientIp);
+        }
+
+        String safeFullName = com.example.learning.platform.security.InputSanitizer.sanitize(request.getFullName());
+        String safeMessage = com.example.learning.platform.security.InputSanitizer.sanitize(request.getMessage());
+
+        // 3. Ghi nhận nhật ký liên hệ hợp lệ
         auditService.logAction(
                 null,
                 "CONTACT_INQUIRY_SUBMITTED",
                 "CONTACT",
                 request.getEmail(),
-                String.format("Học viên/Phụ huynh [%s] gửi yêu cầu: %s", request.getFullName(), request.getSubject()),
+                String.format("Học viên/Phụ huynh [%s] gửi yêu cầu: %s (Nội dung đã khử độc an toàn: %s)", safeFullName, request.getSubject(), safeMessage),
                 clientIp
         );
 
