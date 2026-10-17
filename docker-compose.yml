@@ -34,6 +34,23 @@ services:
     volumes:
       - minio_data:/data
 
+  # Redis 7 In-Memory Caching & Distributed Rate Limiting & JWT Blacklist
+  redis:
+    image: redis:7-alpine
+    container_name: education_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
 volumes:
   postgres_data:
   minio_data:
+  redis_data:

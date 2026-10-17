@@ -54,6 +54,9 @@ public class AdminController {
         long totalQuizzesCompleted = learningProgressRepository.countByIsCompletedTrue();
         long totalEnergyPoints = userRepository.sumEnergyPoints();
 
+        RateLimiterService.RateLimitStats rlStats = rateLimiterService.getStats();
+        String redisStatus = rlStats.isRedisConnected() ? "HEALTHY (Redis 7 Cluster/Standalone)" : "ACTIVE (In-Memory Fallback Mode)";
+
         AdminDto.OverviewReport report = AdminDto.OverviewReport.builder()
                 .totalUsers(totalUsers)
                 .totalStudents(totalStudents)
@@ -70,6 +73,7 @@ public class AdminController {
                 .jvmMemoryMaxMb(maxMemory)
                 .postgresStatus("HEALTHY (HikariCP Active)")
                 .flywayStatus("APPLIED (V3__user_profile_fields)")
+                .redisStatus(redisStatus)
                 .build();
 
         return ResponseEntity.ok(ApiResponse.success(report));

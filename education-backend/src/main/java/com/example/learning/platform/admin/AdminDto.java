@@ -31,6 +31,7 @@ public class AdminDto {
         private long jvmMemoryMaxMb;
         private String postgresStatus;
         private String flywayStatus;
+        private String redisStatus;
     }
 
     @Data

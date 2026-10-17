@@ -125,6 +125,7 @@ export interface AdminOverviewReport {
   jvmMemoryMaxMb: number;
   postgresStatus: string;
   flywayStatus: string;
+  redisStatus?: string;
 }
 
 export interface AdminUserItem {
@@ -171,6 +172,8 @@ export interface BackendRateLimitStats {
     limit: number;
     remainingSeconds: number;
   }[];
+  redisConnected?: boolean;
+  storageType?: string;
 }
 
 export interface ContactFormData {
