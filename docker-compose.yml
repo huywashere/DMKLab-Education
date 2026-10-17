@@ -123,6 +123,27 @@ services:
       redis:
         condition: service_healthy
 
+  # Golang AI Streaming Proxy & Prompt Cache (SSE Multiplexer)
+  ai_proxy:
+    build:
+      context: ./ai-streaming-proxy
+      dockerfile: Dockerfile
+    container_name: education_ai_proxy
+    restart: unless-stopped
+    environment:
+      PORT: 8086
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-mock-key}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      CACHE_TTL_MINUTES: 1440
+      TYPING_CADENCE_MS: 25
+    ports:
+      - "8086:8086"
+    depends_on:
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   minio_data:

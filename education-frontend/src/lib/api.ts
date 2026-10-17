@@ -607,6 +607,88 @@ export const api = {
     return json.data;
   },
 
+  streamLearningChat(
+    message: string,
+    options: {
+      mode?: string;
+      gradeLevel?: number;
+      subject?: string;
+      sessionId?: string;
+      onDelta: (token: string) => void;
+      onDone: (fullReply: string, cached: boolean) => void;
+      onError?: (err: Error) => void;
+    }
+  ): () => void {
+    const controller = new AbortController();
+    const proxyUrl =
+      process.env.NEXT_PUBLIC_AI_PROXY_URL || "http://localhost:8086/api/v1/ai/stream";
+
+    fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        mode: options.mode || "SOCRATIC",
+        gradeLevel: options.gradeLevel || 5,
+        subject: options.subject || "Toán học K-12",
+        sessionId: options.sessionId,
+      }),
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        if (!res.ok || !res.body) {
+          throw new Error(`AI Streaming Proxy returned HTTP ${res.status}`);
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let fullReply = "";
+        let cached = false;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
+
+          for (const block of lines) {
+            const trimmed = block.trim();
+            if (!trimmed) continue;
+            if (trimmed.startsWith("event: delta")) {
+              const dataLine = trimmed.split("\n").find((l) => l.startsWith("data: "));
+              if (dataLine) {
+                try {
+                  const data = JSON.parse(dataLine.substring(6));
+                  if (data.text) {
+                    fullReply += data.text;
+                    options.onDelta(data.text);
+                  }
+                } catch {}
+              }
+            } else if (trimmed.startsWith("event: done")) {
+              const dataLine = trimmed.split("\n").find((l) => l.startsWith("data: "));
+              if (dataLine) {
+                try {
+                  const data = JSON.parse(dataLine.substring(6));
+                  cached = !!data.cached;
+                  if (data.fullReply) fullReply = data.fullReply;
+                } catch {}
+              }
+            }
+          }
+        }
+        options.onDone(fullReply, cached);
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError" && options.onError) {
+          options.onError(err);
+        }
+      });
+
+    return () => controller.abort();
+  },
+
   async sendAdminChat(message: string, sessionId?: string): Promise<SocraticChatResponse> {
     const res = await fetch(`${API_BASE}/ai/admin/chat`, {
       method: "POST",
