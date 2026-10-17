@@ -40,6 +40,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + id));
     }
 
+    @org.springframework.cache.annotation.Cacheable(value = com.example.learning.platform.config.CacheConfig.CACHE_USER_PROFILES, key = "#id.toString()")
     public AuthDto.UserDto getUserProfile(UUID id) {
         return toDto(findById(id));
     }
@@ -120,6 +121,7 @@ public class UserService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = com.example.learning.platform.config.CacheConfig.CACHE_USER_PROFILES, key = "#userId.toString()")
     public AuthDto.UserDto updateProfile(UUID userId, AuthDto.UpdateProfileRequest req) {
         User user = findById(userId);
         if (req.getFullName() != null && !req.getFullName().isBlank()) {
@@ -135,6 +137,7 @@ public class UserService {
     }
 
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = com.example.learning.platform.config.CacheConfig.CACHE_USER_PROFILES, key = "#userId.toString()")
     public void changePassword(UUID userId, String oldPassword, String newPassword) {
         User user = findById(userId);
         if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {

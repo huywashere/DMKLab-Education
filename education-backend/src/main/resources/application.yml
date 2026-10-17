@@ -48,6 +48,14 @@ spring:
           max-idle: 8
           min-idle: 2
 
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000ms # 30 phút mặc định
+      cache-null-values: false
+      key-prefix: "cache:"
+      use-key-prefix: true
+
 springdoc:
   api-docs:
     path: /v3/api-docs

@@ -190,6 +190,14 @@ export interface ContactFormData {
 const apiCache = {
   grades: null as Grade[] | null,
   subjects: new Map<string, Subject[]>(),
+  lessons: new Map<string, Lesson[]>(),
+  quizzes: new Map<string, Question[]>(),
+  clear() {
+    this.grades = null;
+    this.subjects.clear();
+    this.lessons.clear();
+    this.quizzes.clear();
+  },
 };
 
 export const api = {
@@ -439,12 +447,15 @@ export const api = {
   },
 
   async getLessons(subjectId: string): Promise<Lesson[]> {
+    if (apiCache.lessons.has(subjectId)) {
+      return apiCache.lessons.get(subjectId)!;
+    }
     try {
       const res = await fetch(`${API_BASE}/subjects/${subjectId}/lessons`);
       if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        return json.data.map((l: BackendLesson, index: number) => ({
+        const mapped = json.data.map((l: BackendLesson, index: number) => ({
           id: l.id,
           chapterId: "c-live",
           title: l.title,
@@ -457,6 +468,8 @@ export const api = {
           positionSeconds: 0,
           masteryLevel: "FAMILIAR",
         }));
+        apiCache.lessons.set(subjectId, mapped);
+        return mapped;
       }
     } catch {
       // Fallback
@@ -465,12 +478,15 @@ export const api = {
   },
 
   async getLessonQuiz(lessonId: string): Promise<Question[]> {
+    if (apiCache.quizzes.has(lessonId)) {
+      return apiCache.quizzes.get(lessonId)!;
+    }
     try {
       const res = await fetch(`${API_BASE}/lessons/${lessonId}/quiz`);
       if (!res.ok) throw new Error("API failed");
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        return json.data.map((q: BackendQuizQuestion) => ({
+        const mapped = json.data.map((q: BackendQuizQuestion) => ({
           id: q.id,
           questionText: q.question,
           explanation: q.explanation || "",
@@ -486,6 +502,8 @@ export const api = {
               : []),
           ],
         }));
+        apiCache.quizzes.set(lessonId, mapped);
+        return mapped;
       }
     } catch {
       // Fallback
@@ -715,5 +733,35 @@ export const api = {
       throw new Error(json.message || "Không thể mở khóa key");
     }
     return json.data || "Đã mở khóa thành công";
+  },
+
+  // Cache Management APIs (Mục 7 & 12 PDF)
+  async getCacheStats(): Promise<{
+    redisConnected: boolean;
+    cacheType: string;
+    activeNamespaces: string[];
+  } | null> {
+    try {
+      const res = await fetch(`${API_BASE}/admin/cache/stats`, {
+        headers: this.getAuthHeaders(),
+      });
+      const json = await res.json();
+      return json.success ? json.data : null;
+    } catch {
+      return null;
+    }
+  },
+
+  async clearServerCache(namespace = "all"): Promise<string> {
+    apiCache.clear();
+    const res = await fetch(
+      `${API_BASE}/admin/cache/clear?namespace=${encodeURIComponent(namespace)}`,
+      {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+      }
+    );
+    const json = await res.json();
+    return json.data || json.message || "Đã làm mới cache thành công";
   },
 };

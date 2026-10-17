@@ -31,52 +31,19 @@ import com.example.learning.platform.security.JwtBlacklistService;
 @Tag(name = "Admin CMS", description = "Quản trị hệ thống, báo cáo tổng quan, RBAC và cấp S3 Presigned URL")
 public class AdminController {
 
+    private final AdminReportService adminReportService;
     private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
     private final LearningProgressRepository learningProgressRepository;
     private final AuditService auditService;
     private final RateLimiterService rateLimiterService;
     private final JwtBlacklistService jwtBlacklistService;
+    private final org.springframework.cache.CacheManager cacheManager;
 
     @GetMapping("/reports/overview")
-    @Operation(summary = "Lấy báo cáo tổng quan KPI hệ thống và hạ tầng", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Lấy báo cáo tổng quan KPI hệ thống và hạ tầng (Cache 60s)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<AdminDto.OverviewReport>> getOverviewReport() {
-        Runtime runtime = Runtime.getRuntime();
-        long totalMemory = runtime.totalMemory() / (1024 * 1024);
-        long freeMemory = runtime.freeMemory() / (1024 * 1024);
-        long usedMemory = totalMemory - freeMemory;
-        long maxMemory = runtime.maxMemory() / (1024 * 1024);
-
-        long totalUsers = userRepository.count();
-        long totalStudents = userRepository.countByRole(UserRole.STUDENT);
-        long totalTeachers = userRepository.countByRole(UserRole.TEACHER);
-        long totalLessons = lessonRepository.countByPublishedTrue();
-        long totalQuizzesCompleted = learningProgressRepository.countByIsCompletedTrue();
-        long totalEnergyPoints = userRepository.sumEnergyPoints();
-
-        RateLimiterService.RateLimitStats rlStats = rateLimiterService.getStats();
-        String redisStatus = rlStats.isRedisConnected() ? "HEALTHY (Redis 7 Cluster/Standalone)" : "ACTIVE (In-Memory Fallback Mode)";
-
-        AdminDto.OverviewReport report = AdminDto.OverviewReport.builder()
-                .totalUsers(totalUsers)
-                .totalStudents(totalStudents)
-                .totalTeachers(totalTeachers)
-                .totalLessons(totalLessons)
-                .totalQuizzesCompleted(totalQuizzesCompleted)
-                .totalEnergyPoints(totalEnergyPoints)
-                .activeUsersToday(Math.max(1, totalUsers))
-                .storageUsedBytes(52_428_800_000L) // 48.8 GB
-                .cdnCacheHitRate(96.8)
-                .aiMonthlyCostUsd(14.20)
-                .aiMonthlyQuotaUsd(50.00)
-                .jvmMemoryUsedMb(usedMemory)
-                .jvmMemoryMaxMb(maxMemory)
-                .postgresStatus("HEALTHY (HikariCP Active)")
-                .flywayStatus("APPLIED (V3__user_profile_fields)")
-                .redisStatus(redisStatus)
-                .build();
-
-        return ResponseEntity.ok(ApiResponse.success(report));
+        return ResponseEntity.ok(ApiResponse.success(adminReportService.getOverviewReport()));
     }
 
     @GetMapping("/users")
@@ -230,5 +197,43 @@ public class AdminController {
         UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
         auditService.logAction(actorId, "REVOKE_ALL_SESSIONS", "USER", userId.toString(), "Thu hồi toàn bộ phiên đăng nhập của người dùng qua JWT Blacklist", "127.0.0.1");
         return ResponseEntity.ok(ApiResponse.success("Đã thu hồi thành công toàn bộ phiên đăng nhập của người dùng."));
+    }
+
+    @GetMapping("/cache/stats")
+    @Operation(summary = "Lấy trạng thái và danh sách các namespace cache đang hoạt động", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> getCacheStats() {
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        RateLimiterService.RateLimitStats rlStats = rateLimiterService.getStats();
+        stats.put("redisConnected", rlStats.isRedisConnected());
+        stats.put("cacheType", rlStats.isRedisConnected() ? "Redis 7 Phân Tán (Cluster/Standalone)" : "In-Memory RAM Fallback");
+        stats.put("activeNamespaces", cacheManager != null ? cacheManager.getCacheNames() : java.util.List.of());
+        return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+
+    @PostMapping("/cache/clear")
+    @Operation(summary = "Xóa rỗng bộ nhớ đệm cache (toàn bộ hoặc theo namespace)", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<String>> clearCache(
+            @RequestParam(required = false, defaultValue = "all") String namespace,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        if (cacheManager == null) {
+            return ResponseEntity.ok(ApiResponse.success("CacheManager chưa được khởi tạo."));
+        }
+
+        if ("all".equalsIgnoreCase(namespace)) {
+            for (String name : cacheManager.getCacheNames()) {
+                var cache = cacheManager.getCache(name);
+                if (cache != null) cache.clear();
+            }
+            UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
+            auditService.logAction(actorId, "CACHE_FLUSH_ALL", "SYSTEM", "ALL", "Đã xóa toàn bộ bộ đệm cache hệ thống", "127.0.0.1");
+            return ResponseEntity.ok(ApiResponse.success("Đã làm mới thành công toàn bộ cache hệ thống!"));
+        } else {
+            var cache = cacheManager.getCache(namespace);
+            if (cache != null) {
+                cache.clear();
+                return ResponseEntity.ok(ApiResponse.success("Đã làm mới thành công namespace cache: " + namespace));
+            }
+            return ResponseEntity.ok(ApiResponse.error("Không tìm thấy namespace cache: " + namespace));
+        }
     }
 }
