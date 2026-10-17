@@ -254,3 +254,30 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ==========================================================================
+   Hỗ trợ tiếp cận (Accessibility - a11y WCAG 2.1)
+   ========================================================================== */
+.high-contrast {
+  filter: contrast(125%);
+}
+
+.high-contrast body {
+  font-weight: 500 !important;
+}
+
+.high-contrast button:focus-visible,
+.high-contrast a:focus-visible,
+.high-contrast input:focus-visible {
+  outline: 3px solid #FFC700 !important;
+  outline-offset: 3px !important;
+}
+
+html.text-size-large {
+  font-size: 18px;
+}
+
+html.text-size-xlarge {
+  font-size: 20px;
+}
+
+

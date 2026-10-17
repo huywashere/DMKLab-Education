@@ -14,9 +14,14 @@ import {
   Sparkles, 
   Clock,
   ChevronRight,
-  Lightbulb
+  Lightbulb,
+  Bookmark,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { PlyrVideoPlayer, PlyrPlayerHandle } from "@/components/PlyrVideoPlayer";
+import { useBookmarks } from "@/lib/bookmarks/BookmarksContext";
+import { useAccessibility } from "@/lib/a11y/AccessibilityContext";
 
 interface LessonRoomProps {
   currentLesson: Lesson;
@@ -40,6 +45,19 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const [currentTime, setCurrentTime] = useState(activeLesson.positionSeconds || 0);
   const [duration, setDuration] = useState(activeLesson.durationSeconds || 600);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+  // Bookmarks & Personal Notes
+  const { isBookmarked, toggleBookmark, addNote, getNotesForLesson, deleteNote } = useBookmarks();
+  const { subtitlesDefault } = useAccessibility();
+  const [newNoteText, setNewNoteText] = useState("");
+  const lessonNotes = getNotesForLesson(activeLesson.id);
+
+  const handleSaveNote = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNoteText.trim()) return;
+    addNote(activeLesson.id, activeLesson.title, newNoteText.trim(), Math.floor(currentTime));
+    setNewNoteText("");
+  };
 
   // Mốc thời gian chương học (Mục 8.3 PDF)
   const CHAPTERS = [
@@ -167,6 +185,19 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
               {saveStatus}
             </span>
           )}
+          <button
+            onClick={() => toggleBookmark({ id: activeLesson.id, title: activeLesson.title })}
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 text-xs font-bold cursor-pointer border ${
+              isBookmarked(activeLesson.id)
+                ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+            }`}
+            title={isBookmarked(activeLesson.id) ? "Bỏ lưu bài học" : "Lưu vào danh sách cần xem lại"}
+          >
+            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(activeLesson.id) ? 'fill-amber-500 text-amber-500' : ''}`} />
+            <span>{isBookmarked(activeLesson.id) ? 'Đã lưu bài học' : 'Lưu xem lại'}</span>
+          </button>
+
           <span className={`text-xs font-bold px-3 py-1 rounded-full ${
             masteryState === 'MASTERED' ? 'bg-emerald-100 text-emerald-700' :
             masteryState === 'PROFICIENT' ? 'bg-blue-100 text-blue-700' :
@@ -189,7 +220,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             title={activeLesson.title}
             initialTime={activeLesson.positionSeconds || 0}
             chapters={CHAPTERS}
-            defaultSubtitles={false}
+            defaultSubtitles={subtitlesDefault}
             onTimeUpdate={(curTime, dur) => {
               setCurrentTime(curTime);
               if (dur > 0 && dur !== duration) {
@@ -365,22 +396,103 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                   )}
                 </div>
               ) : (
-                /* Tab Notes */
-                <div className="space-y-4 text-slate-700 text-sm leading-relaxed">
-                  <h3 className="font-bold text-base text-slate-900">
-                    Trọng tâm kiến thức: {activeLesson.title}
-                  </h3>
-                  <div className="p-4 bg-blue-50/60 rounded-xl border border-blue-100 space-y-2 text-xs text-blue-900">
-                    <p className="font-bold">Quy tắc vàng cần ghi nhớ:</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Tử số chỉ số phần được lấy ra hoặc đề cập đến.</li>
-                      <li>Mẫu số chỉ tổng số phần bằng nhau được chia ra từ một đơn vị (mẫu số luôn khác 0).</li>
-                      <li>Phân số có tử số nhỏ hơn mẫu số luôn bé hơn 1. Phân số có tử lớn hơn mẫu luôn lớn hơn 1.</li>
-                    </ul>
+                /* Tab Notes & Personal Bookmarks */
+                <div className="space-y-6 text-slate-700 text-sm leading-relaxed">
+                  {/* Trọng tâm kiến thức */}
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center justify-between">
+                      <span>Trọng tâm kiến thức: {activeLesson.title}</span>
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-[#1865F2]">
+                        GDPT 2018
+                      </span>
+                    </h3>
+                    <div className="p-4 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl border border-blue-100 dark:border-blue-900/60 space-y-2 text-xs text-blue-900 dark:text-blue-200">
+                      <p className="font-bold">Quy tắc vàng cần ghi nhớ:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>Tử số chỉ số phần được lấy ra hoặc đề cập đến.</li>
+                        <li>Mẫu số chỉ tổng số phần bằng nhau được chia ra từ một đơn vị (mẫu số luôn khác 0).</li>
+                        <li>Phân số có tử số nhỏ hơn mẫu số luôn bé hơn 1. Phân số có tử lớn hơn mẫu luôn lớn hơn 1.</li>
+                      </ul>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-600">
-                    {activeLesson.description}
-                  </p>
+
+                  {/* Sổ tay ghi chú cá nhân */}
+                  <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-[#1865F2]" />
+                        <span>Sổ tay ghi chú cá nhân của em ({lessonNotes.length})</span>
+                      </h4>
+                      <span className="text-[11px] text-slate-400">
+                        Lưu tự động & đồng bộ đám mây
+                      </span>
+                    </div>
+
+                    {/* New Note Form */}
+                    <form onSubmit={handleSaveNote} className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-slate-600 dark:text-slate-300">
+                          Thêm ghi chú mới:
+                        </span>
+                        <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900 text-[#1865F2] dark:text-blue-300 font-mono text-[10px] font-bold flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          Mốc video: {formatTime(Math.floor(currentTime))}
+                        </span>
+                      </div>
+                      <textarea
+                        value={newNoteText}
+                        onChange={(e) => setNewNoteText(e.target.value)}
+                        placeholder="Nhập ghi chú hoặc công thức quan trọng em vừa nghe thấy trong video..."
+                        rows={2}
+                        className="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none focus:border-[#1865F2]"
+                      />
+                      <div className="flex justify-end">
+                        <button
+                          type="submit"
+                          disabled={!newNoteText.trim()}
+                          className="px-4 py-1.5 rounded-lg bg-[#1865F2] hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Lưu ghi chú này</span>
+                        </button>
+                      </div>
+                    </form>
+
+                    {/* Saved Notes List */}
+                    <div className="space-y-2">
+                      {lessonNotes.map((note) => (
+                        <div
+                          key={note.id}
+                          className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-start justify-between gap-3 text-xs"
+                        >
+                          <div className="space-y-1 flex-1">
+                            {typeof note.timestampSeconds === "number" && (
+                              <button
+                                onClick={() => jumpToChapter(note.timestampSeconds!)}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-[#1865F2] dark:text-blue-300 font-mono text-[10px] font-bold hover:underline cursor-pointer"
+                                title="Nhấp để phát video từ mốc này"
+                              >
+                                <Play className="w-2.5 h-2.5 fill-current" />
+                                <span>{formatTime(note.timestampSeconds)}</span>
+                              </button>
+                            )}
+                            <p className="text-slate-800 dark:text-slate-200 font-medium">
+                              {note.content}
+                            </p>
+                            <span className="text-[10px] text-slate-400 block">{note.createdAt}</span>
+                          </div>
+
+                          <button
+                            onClick={() => deleteNote(note.id)}
+                            className="p-1 text-slate-400 hover:text-rose-500 transition cursor-pointer"
+                            title="Xóa ghi chú"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

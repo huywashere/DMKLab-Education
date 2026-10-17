@@ -3,6 +3,10 @@ import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ThemeProvider } from "@/lib/theme/ThemeContext";
+import { AccessibilityProvider } from "@/lib/a11y/AccessibilityContext";
+import { BookmarksProvider } from "@/lib/bookmarks/BookmarksContext";
+import { KeyboardShortcutsModal } from "@/components/KeyboardShortcutsModal";
+import { BookmarksModal } from "@/components/BookmarksModal";
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -158,7 +162,13 @@ export default function RootLayout({
       <body className={`min-h-full flex flex-col bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-[#F1F5F9] transition-colors duration-200 ${beVietnamPro.className}`}>
         <ThemeProvider>
           <LanguageProvider>
-            {children}
+            <AccessibilityProvider>
+              <BookmarksProvider>
+                {children}
+                <KeyboardShortcutsModal />
+                <BookmarksModal />
+              </BookmarksProvider>
+            </AccessibilityProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>
