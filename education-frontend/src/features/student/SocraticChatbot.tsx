@@ -117,23 +117,33 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     "Mẫu số chung nhỏ nhất của 3 và 4 là gì?",
   ];
 
-  // If chatbot is closed, render floating trigger button at bottom-right corner
+  // If chatbot is closed, render floating circular trigger button at bottom-right corner
   if (!isOpen) {
     if (!onOpen) return null;
     return (
-      <button
-        onClick={onOpen}
-        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#1865F2] to-[#14BF96] text-white shadow-2xl hover:shadow-[#1865F2]/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-white/20"
-        title="Trò chuyện với Gia Sư AI Socratic"
-        aria-label="Mở gia sư AI DMKLab"
-      >
-        <div className="relative">
-          <RiSparklingFill className="w-5 h-5 text-white animate-pulse" />
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-300 rounded-full ring-2 ring-white animate-ping" />
+      <div className="fixed bottom-6 right-6 z-40 group flex items-center">
+        {/* Subtle tooltip on hover */}
+        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-slate-900/90 dark:bg-slate-800/95 text-white text-xs font-semibold whitespace-nowrap shadow-xl border border-white/10 hidden sm:flex items-center gap-1.5 backdrop-blur-xs">
+          <span>Gia sư AI Socratic 24/7</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         </div>
-        <span className="font-extrabold text-xs sm:text-sm tracking-wide">DMK AI Tutor</span>
-        <span className="hidden sm:inline-block text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-bold">24/7</span>
-      </button>
+
+        <button
+          onClick={onOpen}
+          className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-[#1865F2] via-[#1A73E8] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-[#1865F2]/40 hover:scale-108 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-white/25"
+          title="Trò chuyện với Gia Sư AI Socratic 24/7"
+          aria-label="Mở gia sư AI DMKLab"
+        >
+          {/* Subtle pulse effect */}
+          <span className="absolute inset-0 rounded-full bg-[#1865F2] animate-ping opacity-20 pointer-events-none" />
+
+          {/* AI Robot Icon */}
+          <RiRobot2Fill className="w-7 h-7 text-white transition-transform duration-200 group-hover:scale-110 drop-shadow-xs" />
+
+          {/* Online green indicator badge */}
+          <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-[#0B1120]" />
+        </button>
+      </div>
     );
   }
 
