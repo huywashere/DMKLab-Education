@@ -88,8 +88,17 @@ app:
       max-tokens-per-request: 1000
       student-daily-quota: 30
   storage:
+    provider: ${STORAGE_PROVIDER:r2} # 'r2' (Cloudflare R2 - Không phí Egress) hoặc 'minio' / 's3'
+    r2:
+      account-id: ${R2_ACCOUNT_ID:}
+      bucket: ${R2_BUCKET:education-media}
+      access-key: ${R2_ACCESS_KEY_ID:}
+      secret-key: ${R2_SECRET_ACCESS_KEY:}
+      public-url: ${R2_PUBLIC_URL:https://media.dmklab.edu.vn}
+      presigned-expiry-seconds: ${R2_PRESIGNED_EXPIRY:900}
     s3:
       endpoint: ${S3_ENDPOINT:http://localhost:9000}
       bucket: ${S3_BUCKET:education-media}
       access-key: ${S3_ACCESS_KEY:minioadmin}
       secret-key: ${S3_SECRET_KEY:minioadmin}
+      region: ${S3_REGION:us-east-1}

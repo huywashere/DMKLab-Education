@@ -75,8 +75,11 @@ public class AdminDto {
     public static class UploadUrlResponse {
         private String uploadUrl;
         private String storageKey;
+        private String publicCdnUrl;
         private int expiresInSeconds;
         private String hlsStreamingUrl;
+        private String provider;
+        private boolean isLiveConfigured;
         private String message;
     }
 }

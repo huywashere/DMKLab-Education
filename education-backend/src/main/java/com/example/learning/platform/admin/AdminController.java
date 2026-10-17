@@ -24,6 +24,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.example.learning.platform.security.JwtBlacklistService;
+import com.example.learning.platform.storage.StorageDto;
+import com.example.learning.platform.storage.StorageService;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -38,6 +40,7 @@ public class AdminController {
     private final AuditService auditService;
     private final RateLimiterService rateLimiterService;
     private final JwtBlacklistService jwtBlacklistService;
+    private final StorageService storageService;
     private final org.springframework.cache.CacheManager cacheManager;
 
     @GetMapping("/reports/overview")
@@ -134,7 +137,7 @@ public class AdminController {
     }
 
     @PostMapping("/media/upload-url")
-    @Operation(summary = "Cấp URL ký có thời hạn để trình duyệt upload trực tiếp lên Object Storage (PDF Mục 8.2)", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Cấp Presigned URL Cloudflare R2 / S3 để tải tệp tin thẳng lên Edge Object Storage (Miễn phí Egress)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<AdminDto.UploadUrlResponse>> getPresignedUploadUrl(
             @RequestBody AdminDto.UploadUrlRequest req,
             @AuthenticationPrincipal UserPrincipal principal) {
@@ -147,29 +150,41 @@ public class AdminController {
             throw new RuntimeException("Tên tệp tin không hợp lệ hoặc chứa định dạng thực thi nguy hiểm bị cấm.");
         }
 
-        String storageKey = "videos/k12/" + UUID.randomUUID() + "/" + filename;
-        String presignedUrl = "https://s3.ap-southeast-1.amazonaws.com/k12-education-media/" + storageKey + "?X-Amz-Signature=mock_sign_token_3600s";
-        String cdnHlsUrl = "https://cdn.khan-k12.edu.vn/hls/" + storageKey.replace(".mp4", "") + "/master.m3u8";
+        StorageDto.PresignedUploadResponse r2Res = storageService.createPresignedUploadUrl(
+                filename,
+                req.getContentType(),
+                req.getFileSizeBytes() != null ? req.getFileSizeBytes() : 0L,
+                "videos/k12"
+        );
 
         UUID actorId = principal != null ? principal.getId() : UUID.fromString("11111111-1111-1111-1111-111111111111");
         auditService.logAction(
                 actorId,
                 "REQUEST_UPLOAD_URL",
                 "MEDIA_ASSET",
-                storageKey,
-                "Yêu cầu Presigned S3 Upload URL cho video: " + filename + " (" + req.getFileSizeBytes() + " bytes)",
+                r2Res.getStorageKey(),
+                "Yêu cầu Presigned Upload URL qua " + r2Res.getProvider() + " cho video: " + filename + " (" + req.getFileSizeBytes() + " bytes)",
                 "127.0.0.1"
         );
 
         AdminDto.UploadUrlResponse response = AdminDto.UploadUrlResponse.builder()
-                .uploadUrl(presignedUrl)
-                .storageKey(storageKey)
-                .expiresInSeconds(900)
-                .hlsStreamingUrl(cdnHlsUrl)
-                .message("Đã cấp URL ký thành công. Trình duyệt tải thẳng lên S3 mà không qua CPU Spring Boot.")
+                .uploadUrl(r2Res.getUploadUrl())
+                .storageKey(r2Res.getStorageKey())
+                .publicCdnUrl(r2Res.getPublicCdnUrl())
+                .hlsStreamingUrl(r2Res.getHlsStreamingUrl())
+                .expiresInSeconds(r2Res.getExpiresInSeconds())
+                .provider(r2Res.getProvider())
+                .isLiveConfigured(r2Res.isLiveConfigured())
+                .message(r2Res.getMessage())
                 .build();
 
         return ResponseEntity.ok(ApiResponse.success("Presigned URL đã sẵn sàng", response));
+    }
+
+    @GetMapping("/storage/status")
+    @Operation(summary = "Kiểm tra cấu hình và trạng thái kết nối Cloudflare R2 / S3", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<ApiResponse<StorageDto.StorageProviderInfo>> getStorageStatus() {
+        return ResponseEntity.ok(ApiResponse.success(storageService.getProviderInfo()));
     }
 
     @GetMapping("/security/ratelimit-stats")
