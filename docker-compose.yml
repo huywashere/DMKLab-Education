@@ -50,6 +50,47 @@ services:
       timeout: 3s
       retries: 5
 
+  # Spring Boot 3.3.4 (Java 21) Modular Monolith Backend
+  backend:
+    build:
+      context: ./education-backend
+      dockerfile: Dockerfile
+    container_name: education_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: learning_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      S3_ENDPOINT: http://minio:9000
+      JWT_SECRET: KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-mock-key}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Next.js 16 (App Router + Turbopack) Frontend
+  frontend:
+    build:
+      context: ./education-frontend
+      dockerfile: Dockerfile
+    container_name: education_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api/v1
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
   minio_data:

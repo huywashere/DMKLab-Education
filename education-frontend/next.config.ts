@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   /* Performance & Optimization Options */
   compress: true,
   poweredByHeader: false,

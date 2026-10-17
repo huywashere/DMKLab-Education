@@ -1,0 +1,76 @@
+name: DMKLab Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, thu-nghiem ]
+  pull_request:
+    branches: [ main, thu-nghiem ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Spring Boot 3.3.4 (Java 21) Backend CI
+  # ---------------------------------------------------------------------------
+  backend-ci:
+    name: Backend Build & Automated Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Eclipse Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Maven Tests (Unit & Integration)
+        run: mvn clean test -B
+        working-directory: education-backend
+
+      - name: Build Fat JAR Package
+        run: mvn package -DskipTests -B
+        working-directory: education-backend
+
+      - name: Verify Artifact Creation
+        run: ls -lh education-backend/target/*.jar
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Next.js 16 (TypeScript / PNPM) Frontend CI
+  # ---------------------------------------------------------------------------
+  frontend-ci:
+    name: Frontend Lint, Prettier & Production Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install PNPM Package Manager
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Set up Node.js 22 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Prettier Code Formatting
+        run: pnpm format:check
+
+      - name: Build Next.js Production Standalone Bundle
+        run: pnpm --filter education-frontend build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NODE_ENV: production
