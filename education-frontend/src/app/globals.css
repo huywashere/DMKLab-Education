@@ -6,30 +6,36 @@
   --background: #FFFFFF;
   --foreground: #21242C;
 
-  /* Khan Academy Official Palette */
+  /* Official Khan Academy Wonder Blocks Palette */
   --khan-blue: #1865F2;
   --khan-blue-hover: #0B4ED7;
+  --khan-blue-light: #EBF2FF;
   --khan-green: #14BF96;
-  --khan-green-dark: #0B6A56;
-  --khan-navy: #0A2540;
+  --khan-green-dark: #008272;
+  --khan-green-light: #E6FAF6;
+  --khan-navy: #0B2149;
+  --khan-navy-dark: #081C3D;
   --khan-charcoal: #21242C;
   --khan-gold: #FFC700;
+  --khan-orange: #FF5A36;
+  --khan-purple: #7433FF;
+  --khan-coral: #EA580C;
   --khan-warm-bg: #FEF8E7;
+  --khan-warm-border: #E8E3D0;
   --khan-slate-bg: #F7F8FA;
-
-  --border: #E2E8F0;
+  --khan-border: #E4E7EB;
   --card: #FFFFFF;
 }
 
 .dark {
-  --background: #0B1120;
+  --background: #081C3D;
   --foreground: #F1F5F9;
 
   /* Dark mode overrides */
-  --khan-warm-bg: #0F1A30;
-  --khan-slate-bg: #0E172B;
-  --border: #1E2D4A;
-  --card: #131E35;
+  --khan-warm-bg: #0B2149;
+  --khan-slate-bg: #0F2753;
+  --khan-border: #1B3560;
+  --card: #0D2650;
 }
 
 body {

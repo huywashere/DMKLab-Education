@@ -196,23 +196,30 @@ export const Header: React.FC<HeaderProps> = ({
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* DMKLab Brand Logo (Click to Home) */}
+          {/* DMKLab + Khan Academy Brand Logo (Click to Home) */}
           <button
             onClick={() => onChangeView('student')}
-            className="flex items-center gap-2 group cursor-pointer shrink-0"
-            title="DMKLab Education - Về Trang Chủ"
+            className="flex items-center gap-2.5 group cursor-pointer shrink-0"
+            title="DMKLab Khan Academy - Về Trang Chủ"
           >
-            <img
-              src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
-              alt="DMKLab Education"
-              className="h-8 w-auto object-contain transition-transform group-hover:scale-102"
-            />
-            <div className="hidden sm:flex flex-col text-left border-l border-slate-200 dark:border-slate-750 pl-2">
-              <span className="text-xs font-black text-[#1865F2] dark:text-blue-400 uppercase tracking-wider leading-none">
-                Education
-              </span>
-              <span className="text-[9px] text-slate-400 dark:text-slate-500 tracking-wider font-semibold uppercase mt-0.5">
-                K–12 Platform
+            {/* Authentic Khan Academy Green Sprout Icon */}
+            <div className="w-8 h-8 rounded-lg bg-[#14BF96]/15 flex items-center justify-center text-[#14BF96] group-hover:scale-105 transition-transform shadow-xs">
+              <svg className="w-5 h-5 text-[#14BF96]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.5 2 5.5 4.5 4.5 8c2.5-.5 5.5.5 7.5 2.5 2-2 5-3 7.5-2.5C18.5 4.5 15.5 2 12 2zm0 8.5c-2-2-5-3-7.5-2.5C4.2 9.5 4 11.5 4 14c0 4.5 4 8 8 8s8-3.5 8-8c0-2.5-.2-4.5-.5-6-2.5-.5-5.5.5-7.5 2.5z"/>
+              </svg>
+            </div>
+            
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-1.5 leading-none">
+                <span className="text-base font-extrabold text-[#0B2149] dark:text-white tracking-tight">
+                  DMKLab
+                </span>
+                <span className="text-sm font-bold text-[#1865F2] dark:text-blue-400">
+                  Khan Academy
+                </span>
+              </div>
+              <span className="text-[9px] text-slate-500 dark:text-slate-400 tracking-wider font-semibold uppercase mt-0.5">
+                K–12 Việt Nam
               </span>
             </div>
           </button>

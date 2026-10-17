@@ -238,25 +238,204 @@ export const KhanHomepage: React.FC<KhanHomepageProps> = ({
       </section>
 
       {/* ────────────────────────────────────────────────
-          COURSES SECTION — "Explore our courses"
-          Exact Khan Academy pill-badge layout
+          COURSES DIRECTORY — Official Khan Academy 4-Domain Grid
       ──────────────────────────────────────────────── */}
-      <section className="bg-white dark:bg-[#080E1A] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
-        <div className="max-w-5xl mx-auto px-4 text-center space-y-8">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#21242C] dark:text-white">
-            {t("courses_heading", "Khám phá các môn học")}
-          </h2>
+      <section className="bg-white dark:bg-[#08182D] py-16 border-b border-slate-100 dark:border-slate-800 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1865F2]/10 text-[#1865F2] dark:text-blue-400 text-xs font-bold">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Chương Trình Học K–12 Chuẩn Quốc Tế</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B2149] dark:text-white tracking-tight">
+              {t("courses_heading", "Khám phá các khóa học theo lĩnh vực")}
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Hàng nghìn bài giảng video, bài tập thực hành thích ứng và bài kiểm tra tinh thông theo từng khối lớp.
+            </p>
+          </div>
 
-          <div className="flex flex-wrap justify-center gap-3">
+          {/* 4 Major Khan Academy Domains */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Domain 1: Toán học (Khan Royal Blue #1865F2) */}
+            <div className="bg-white dark:bg-[#0D2650] rounded-2xl border-2 border-[#1865F2]/20 hover:border-[#1865F2] hover:shadow-xl transition-all duration-200 p-6 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-[#EBF2FF] dark:bg-blue-900/40 text-[#1865F2] flex items-center justify-center font-bold shadow-xs">
+                  <TbMathFunction className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0B2149] dark:text-white group-hover:text-[#1865F2] transition-colors">
+                    Toán học K–12
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Từ số học cơ bản đến đại số, hình học, lượng giác và giải tích vi phân ôn thi THPT Quốc gia.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-xs font-medium text-slate-700 dark:text-slate-200">
+                  <div className="flex items-center gap-1.5 hover:text-[#1865F2] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1865F2]" />
+                    <span>Toán Tiểu học (Lớp 1 – Lớp 5)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#1865F2] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1865F2]" />
+                    <span>Toán THCS (Lớp 6 – Lớp 9)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#1865F2] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1865F2]" />
+                    <span>Toán THPT (Lớp 10 – Lớp 12)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#1865F2] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1865F2]" />
+                    <span>Đại số & Luyện thi THPTQG</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => onOpenLesson(MOCK_LESSONS[0])}
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#EBF2FF] hover:bg-[#1865F2] text-[#1865F2] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Học môn Toán</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Domain 2: Khoa học & Tự nhiên (Khan Green #14BF96) */}
+            <div className="bg-white dark:bg-[#0D2650] rounded-2xl border-2 border-[#14BF96]/20 hover:border-[#14BF96] hover:shadow-xl transition-all duration-200 p-6 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-[#E6FAF6] dark:bg-emerald-950/50 text-[#14BF96] flex items-center justify-center font-bold shadow-xs">
+                  <TbAtom className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0B2149] dark:text-white group-hover:text-[#14BF96] transition-colors">
+                    Khoa học & STEM
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Khám phá thế giới qua các bài học tương tác: Vật lý, Hóa học, Sinh học và Khoa học Tự nhiên.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-xs font-medium text-slate-700 dark:text-slate-200">
+                  <div className="flex items-center gap-1.5 hover:text-[#14BF96] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
+                    <span>Khoa học Tự nhiên THCS</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#14BF96] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
+                    <span>Vật lý lý thuyết & Thí nghiệm</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#14BF96] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
+                    <span>Hóa học: Phản ứng & Hợp chất</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#14BF96] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#14BF96]" />
+                    <span>Sinh học tế bào & Di truyền</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => onOpenLesson(MOCK_LESSONS[2] || MOCK_LESSONS[0])}
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#E6FAF6] hover:bg-[#14BF96] text-[#008272] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Học Khoa học</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Domain 3: Máy tính & AI (Khan Purple #7433FF) */}
+            <div className="bg-white dark:bg-[#0D2650] rounded-2xl border-2 border-[#7433FF]/20 hover:border-[#7433FF] hover:shadow-xl transition-all duration-200 p-6 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-[#F3F0FF] dark:bg-purple-950/50 text-[#7433FF] flex items-center justify-center font-bold shadow-xs">
+                  <RiRobot2Fill className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0B2149] dark:text-white group-hover:text-[#7433FF] transition-colors">
+                    Lập trình & Tin học
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Xây dựng tư duy logic qua Scratch, Python, thuật toán và nhập môn Trí tuệ nhân tạo (AI).
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-xs font-medium text-slate-700 dark:text-slate-200">
+                  <div className="flex items-center gap-1.5 hover:text-[#7433FF] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#7433FF]" />
+                    <span>Lập trình Scratch cho thiếu nhi</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#7433FF] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#7433FF]" />
+                    <span>Python căn bản & Dự án</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#7433FF] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#7433FF]" />
+                    <span>Thuật toán & Tư duy máy tính</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#7433FF] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#7433FF]" />
+                    <span>Nhập môn Trí Tuệ Nhân Tạo (AI)</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => onOpenLesson(MOCK_LESSONS[1] || MOCK_LESSONS[0])}
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#F3F0FF] hover:bg-[#7433FF] text-[#7433FF] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Học Lập trình & AI</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Domain 4: Ngôn ngữ & Xã hội (Khan Coral #EA580C) */}
+            <div className="bg-white dark:bg-[#0D2650] rounded-2xl border-2 border-[#EA580C]/20 hover:border-[#EA580C] hover:shadow-xl transition-all duration-200 p-6 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-xl bg-[#FFF7ED] dark:bg-orange-950/50 text-[#EA580C] flex items-center justify-center font-bold shadow-xs">
+                  <RiBookOpenFill className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#0B2149] dark:text-white group-hover:text-[#EA580C] transition-colors">
+                    Ngôn ngữ & Xã hội
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                    Trau dồi cảm thụ Ngữ Văn, Tiếng Anh giao tiếp K–12, Lịch sử và Địa lý quê hương Việt Nam.
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-xs font-medium text-slate-700 dark:text-slate-200">
+                  <div className="flex items-center gap-1.5 hover:text-[#EA580C] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]" />
+                    <span>Ngữ Văn: Đọc hiểu & Cảm thụ</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#EA580C] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]" />
+                    <span>Tiếng Anh K–12 chuẩn CEFR</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#EA580C] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]" />
+                    <span>Lịch sử & Văn hóa Việt Nam</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 hover:text-[#EA580C] cursor-pointer">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]" />
+                    <span>Kinh tế & Giáo dục tài chính</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => onOpenLesson(MOCK_LESSONS[0])}
+                className="mt-6 w-full py-2.5 rounded-xl bg-[#FFF7ED] hover:bg-[#EA580C] text-[#EA580C] hover:text-white font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Học Nhân văn</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Filter Pill Badges */}
+          <div className="pt-4 flex flex-wrap justify-center gap-2.5">
             {SUBJECT_ITEMS.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => onOpenLesson(MOCK_LESSONS[idx % MOCK_LESSONS.length])}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm bg-white dark:bg-slate-800/90 transition cursor-pointer"
-                style={{ color: item.color }}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border border-[#E4E7EB] dark:border-slate-700 hover:border-[#1865F2] hover:shadow-xs bg-[#F7F8FA] dark:bg-slate-800/80 transition-all cursor-pointer"
               >
                 <span
-                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs"
                   style={{ backgroundColor: item.bg, color: item.color }}
                 >
                   {item.icon}

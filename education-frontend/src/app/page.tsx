@@ -158,23 +158,36 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Real-time Backend + DB Status Banner */}
-      <div className="bg-[#0B2138] text-white text-xs py-1.5 border-b border-slate-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <span className="font-medium text-slate-200">
-              {isBackendConnected 
-                ? 'DMKLab Education K–12: Spring Boot 3.3 + PostgreSQL 17 + Prisma ORM (Bảo mật JWT HMAC-512)' 
-                : 'Đang kết nối API Backend & Database...'}
+      {/* Khan Academy Official Top Announcement & Mission Bar */}
+      <div className="bg-[#0B2149] text-white text-xs py-2 border-b border-[#183664] transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="w-2 h-2 rounded-full bg-[#14BF96] shrink-0 animate-pulse" />
+            <span className="font-medium text-slate-100 truncate">
+              Sứ mệnh của chúng tôi: Cung cấp nền giáo dục chuẩn quốc tế, hoàn toàn miễn phí cho mọi học sinh K–12 Việt Nam.
             </span>
           </div>
-          <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-300">
-            <a href="http://localhost:8080/swagger-ui.html" target="_blank" rel="noreferrer" className="hover:text-emerald-400 underline transition">
-              Swagger API Docs ↗
+          <div className="hidden md:flex items-center gap-3 text-[11px] text-slate-300 shrink-0">
+            <button
+              onClick={() => setActiveView('about')}
+              className="text-[#14BF96] hover:underline font-bold transition cursor-pointer"
+            >
+              Tìm hiểu sứ mệnh ↗
+            </button>
+            <span className="text-slate-600">|</span>
+            <span className="inline-flex items-center gap-1.5 text-slate-300 font-medium">
+              <span className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+              {isBackendConnected ? 'Hệ thống trực tuyến' : 'Sẵn sàng'}
+            </span>
+            <a
+              href="http://localhost:8080/swagger-ui.html"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-400 hover:text-white transition underline"
+              title="OpenAPI Documentation"
+            >
+              OpenAPI
             </a>
-            <span>•</span>
-            <span className="bg-slate-800 px-2 py-0.5 rounded text-emerald-400 font-mono">DB: learning_db</span>
           </div>
         </div>
       </div>

@@ -27,11 +27,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setThemeState(saved);
         applyTheme(saved);
       } else {
-        // Check system preference
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const initialTheme: Theme = prefersDark ? "dark" : "light";
-        setThemeState(initialTheme);
-        applyTheme(initialTheme);
+        // Default to Khan Academy signature light theme unless user explicitly chose dark
+        setThemeState("light");
+        applyTheme("light");
       }
     } catch {
       // fallback
