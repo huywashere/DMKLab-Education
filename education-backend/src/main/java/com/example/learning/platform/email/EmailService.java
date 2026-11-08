@@ -264,3 +264,4 @@ public class EmailService {
         return sendEmail(studentEmail, subject, html);
     }
 }
+

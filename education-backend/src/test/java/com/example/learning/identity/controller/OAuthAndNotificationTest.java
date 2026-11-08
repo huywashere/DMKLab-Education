@@ -208,3 +208,4 @@ class OAuthAndNotificationTest {
                 .andExpect(jsonPath("$.data").value(org.hamcrest.Matchers.containsString("7")));
     }
 }
+
