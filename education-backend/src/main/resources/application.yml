@@ -114,3 +114,8 @@ app:
       access-key: ${S3_ACCESS_KEY:minioadmin}
       secret-key: ${S3_SECRET_KEY:minioadmin}
       region: ${S3_REGION:us-east-1}
+  mail:
+    provider: ${EMAIL_PROVIDER:resend} # 'resend' hoặc 'console' (sandbox emulation)
+    resend:
+      api-key: ${RESEND_API_KEY:}
+      from: ${RESEND_FROM:DMKLab Education <onboarding@resend.dev>}

@@ -60,6 +60,39 @@ public class AuthDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    public static class OAuthLoginRequest {
+        @NotBlank(message = "Nhà cung cấp OAuth không được để trống (GOOGLE hoặc MICROSOFT)")
+        private String provider; // GOOGLE hoặc MICROSOFT
+
+        private String token; // ID Token / Credential từ Google hoặc Microsoft
+
+        @NotBlank(message = "Email không được để trống")
+        @Email(message = "Email không đúng định dạng")
+        private String email;
+
+        private String fullName;
+        private String avatarUrl;
+        private String role; // STUDENT, TEACHER, PARENT
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OAuthAuthResponse {
+        private String accessToken;
+        private String tokenType;
+        private long expiresIn;
+        private UserDto user;
+        private boolean isNewUser;
+        private String provider;
+        private String schoolDomain;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class UserDto {
         private String id;
         private String username;

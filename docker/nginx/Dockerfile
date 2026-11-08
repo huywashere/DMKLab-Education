@@ -16,3 +16,4 @@ RUN chmod +x /docker-entrypoint.d/40-ssl-fallback.sh
 EXPOSE 80 443
 
 CMD ["nginx", "-g", "daemon off;"]
+

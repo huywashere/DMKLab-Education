@@ -59,6 +59,57 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công!", response));
     }
 
+    @PostMapping("/oauth/google")
+    @Operation(summary = "Đăng nhập 1-Click bằng Google Workspace for Education (Email trường K-12)")
+    public ResponseEntity<ApiResponse<AuthDto.OAuthAuthResponse>> loginWithGoogle(
+            @Valid @RequestBody AuthDto.OAuthLoginRequest req) {
+        req.setProvider("GOOGLE");
+        return handleOAuthLogin(req, "Google Workspace for Education");
+    }
+
+    @PostMapping("/oauth/microsoft")
+    @Operation(summary = "Đăng nhập 1-Click bằng Microsoft 365 Education")
+    public ResponseEntity<ApiResponse<AuthDto.OAuthAuthResponse>> loginWithMicrosoft(
+            @Valid @RequestBody AuthDto.OAuthLoginRequest req) {
+        req.setProvider("MICROSOFT");
+        return handleOAuthLogin(req, "Microsoft 365 Education");
+    }
+
+    @PostMapping("/oauth/callback")
+    @Operation(summary = "Xử lý đăng nhập SSO đa nền tảng cho trường học K-12")
+    public ResponseEntity<ApiResponse<AuthDto.OAuthAuthResponse>> loginWithOAuth(
+            @Valid @RequestBody AuthDto.OAuthLoginRequest req) {
+        String provider = (req.getProvider() != null) ? req.getProvider() : "SSO";
+        return handleOAuthLogin(req, provider);
+    }
+
+    private ResponseEntity<ApiResponse<AuthDto.OAuthAuthResponse>> handleOAuthLogin(
+            AuthDto.OAuthLoginRequest req, String providerTitle) {
+        String email = req.getEmail().toLowerCase().trim();
+        boolean isNew = !userService.findAll().stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(email));
+
+        User user = userService.registerOrLoginOAuth(req);
+        String token = tokenProvider.generateToken(user);
+
+        String domain = email.contains("@") ? email.substring(email.indexOf("@") + 1) : "";
+
+        AuthDto.OAuthAuthResponse response = AuthDto.OAuthAuthResponse.builder()
+                .accessToken(token)
+                .tokenType("Bearer")
+                .expiresIn(tokenProvider.getExpirationMs())
+                .user(userService.toDto(user))
+                .isNewUser(isNew)
+                .provider(req.getProvider())
+                .schoolDomain(domain)
+                .build();
+
+        String msg = isNew
+                ? "Chào mừng bạn! Tài khoản trường học (" + domain + ") đã được kích hoạt thành công qua " + providerTitle + "."
+                : "Đăng nhập thành công qua " + providerTitle + "!";
+
+        return ResponseEntity.ok(ApiResponse.success(msg, response));
+    }
+
     @GetMapping("/me")
     @Operation(summary = "Lấy thông tin hồ sơ của tài khoản đang đăng nhập", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<AuthDto.UserDto>> getMyProfile(

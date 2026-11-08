@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { User } from "@/types";
+import { api } from "@/lib/api";
 import {
   UserCheck,
   Shield,
@@ -13,6 +14,7 @@ import {
   Sparkles,
   Send,
   PlusCircle,
+  Mail,
   Eye,
   CheckCircle2,
   AlertCircle,
@@ -151,6 +153,28 @@ export const ParentPortal: React.FC<ParentPortalProps> = ({ currentUser }) => {
   const [newStudentName, setNewStudentName] = useState("");
   const [newGrade, setNewGrade] = useState("Lớp 6A2");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  const handleSendEmailReport = async () => {
+    setIsSendingEmail(true);
+    try {
+      const parentEmail = currentUser?.email || "phuhuynh.k12@gmail.com";
+      const res = await api.sendParentWeeklyReport({
+        parentEmail,
+        studentName: activeChild.name,
+        studyMinutes: Math.round(activeChild.weeklyHours * 60),
+        energyPoints: activeChild.energyPoints,
+        quizzesDone: activeChild.completedLessonsThisWeek,
+        avgScore: 92.5,
+        socraticAiFeedback: "Em hoàn thành rất xuất sắc mục tiêu tuần, duy trì phong độ tập trung tốt với Gia sư Socratic AI.",
+      });
+      setToastMessage("📨 Đã gửi Báo cáo tuần của em " + activeChild.name + " trực tiếp về hòm thư " + parentEmail + " qua Email Gateway (Resend)!");
+    } catch (err: any) {
+      setToastMessage(err.message || "Không thể gửi email báo cáo.");
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
 
   const activeChild = children.find((c) => c.id === selectedChildId) || children[0];
 

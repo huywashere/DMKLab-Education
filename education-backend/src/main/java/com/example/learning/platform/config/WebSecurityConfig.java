@@ -56,7 +56,8 @@ public class WebSecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
+                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password", "/api/v1/auth/oauth/**").permitAll()
+                .requestMatchers("/api/v1/notifications/**").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/v1/grades/**", "/api/v1/subjects/**", "/api/v1/courses/**", "/api/v1/lessons/**").permitAll()
                 .requestMatchers("/api/v1/quizzes/**").permitAll()

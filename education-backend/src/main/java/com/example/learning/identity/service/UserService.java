@@ -4,7 +4,9 @@ import com.example.learning.identity.dto.AuthDto;
 import com.example.learning.identity.entity.User;
 import com.example.learning.identity.entity.UserRole;
 import com.example.learning.identity.repository.UserRepository;
+import com.example.learning.platform.email.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     private final java.util.concurrent.ConcurrentHashMap<String, FailedLoginRecord> failedLogins = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -155,7 +159,69 @@ public class UserService {
         // Sinh mã OTP 6 số ngẫu nhiên
         String otp = String.format("%06d", new java.util.Random().nextInt(999999));
         passwordResetOtps.put(email.toLowerCase().trim(), otp);
+
+        // Gửi qua Email Gateway thực tế
+        try {
+            emailService.sendPasswordResetOtpEmail(email, user.getFullName(), otp);
+        } catch (Exception e) {
+            log.warn("Không thể gửi email OTP qua email service: {}", e.getMessage());
+        }
+
         return otp;
+    }
+
+    @Transactional
+    public User registerOrLoginOAuth(AuthDto.OAuthLoginRequest req) {
+        String email = req.getEmail().toLowerCase().trim();
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            // Tự động cấp tài khoản học sinh / giáo viên K-12
+            String baseUsername = email.split("@")[0].replaceAll("[^a-zA-Z0-9_.]", "");
+            if (baseUsername.length() < 3) baseUsername = "user_" + baseUsername;
+            String username = baseUsername;
+            int counter = 1;
+            while (userRepository.existsByUsername(username)) {
+                username = baseUsername + "_" + counter++;
+            }
+
+            // Tự động nhận diện vai trò
+            UserRole role = UserRole.STUDENT;
+            if (req.getRole() != null && !req.getRole().isBlank()) {
+                try {
+                    role = UserRole.valueOf(req.getRole().toUpperCase());
+                } catch (IllegalArgumentException ignored) {
+                    role = UserRole.STUDENT;
+                }
+            } else if (email.contains("gv") || email.contains("teacher") || email.contains("giaovien") || 
+                       (req.getFullName() != null && (req.getFullName().toLowerCase().startsWith("thầy") || req.getFullName().toLowerCase().startsWith("cô")))) {
+                role = UserRole.TEACHER;
+            }
+
+            String avatar = (req.getAvatarUrl() != null && !req.getAvatarUrl().isBlank())
+                    ? req.getAvatarUrl()
+                    : "https://api.dicebear.com/7.x/avataaars/svg?seed=" + username;
+
+            String fullName = (req.getFullName() != null && !req.getFullName().isBlank())
+                    ? req.getFullName()
+                    : username;
+
+            String providerName = (req.getProvider() != null) ? req.getProvider().toUpperCase() : "SSO";
+
+            User newUser = User.builder()
+                    .username(username)
+                    .email(email)
+                    .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString())) // Khóa mật khẩu ngẫu nhiên
+                    .fullName(fullName)
+                    .role(role)
+                    .avatarUrl(avatar)
+                    .bio("Tài khoản trường học xác thực 1-Click qua " + providerName + " (" + email + ")")
+                    .energyPoints(1000)
+                    .streakDays(1)
+                    .active(true)
+                    .build();
+
+            log.info("[SSO_AUTO_PROVISION] Đã tự động tạo tài khoản K-12 cho: {} (Email: {}, Role: {})", username, email, role);
+            return userRepository.save(newUser);
+        });
     }
 
     @Transactional

@@ -486,6 +486,92 @@ export const api = {
     return json.data || json.message || "Đặt lại mật khẩu thành công!";
   },
 
+  // 1-Click SSO OAuth2 (Google Workspace for Education & Microsoft 365)
+  async loginWithOAuth(data: {
+    provider: "GOOGLE" | "MICROSOFT";
+    email: string;
+    fullName?: string;
+    avatarUrl?: string;
+    role?: string;
+    token?: string;
+  }): Promise<{ user: User; token: string; isNewUser: boolean; schoolDomain: string }> {
+    const endpoint =
+      data.provider === "GOOGLE" ? `${API_BASE}/auth/oauth/google` : `${API_BASE}/auth/oauth/microsoft`;
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Đăng nhập SSO không thành công.");
+    }
+
+    const { accessToken, user: rawUser, newUser, schoolDomain } = json.data;
+    this.setToken(accessToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("dmk_refresh_token", accessToken);
+    }
+
+    const user: User = {
+      id: rawUser.id,
+      username: rawUser.username,
+      fullName: rawUser.fullName,
+      email: rawUser.email,
+      role: rawUser.role,
+      avatarUrl:
+        rawUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${rawUser.username}`,
+      bio: rawUser.bio || "Học viên DMKLab Education K-12",
+      energyPoints: rawUser.energyPoints || 1000,
+      streakDays: rawUser.streakDays || 1,
+      createdAt: rawUser.createdAt,
+    };
+
+    return { user, token: accessToken, isNewUser: Boolean(newUser), schoolDomain: schoolDomain || "" };
+  },
+
+  // Dịch vụ thông báo: Gửi báo cáo tuần cho phụ huynh K-12
+  async sendParentWeeklyReport(data: {
+    parentEmail: string;
+    studentName: string;
+    studyMinutes?: number;
+    energyPoints?: number;
+    quizzesDone?: number;
+    avgScore?: number;
+    socraticAiFeedback?: string;
+  }): Promise<string> {
+    const res = await fetch(`${API_BASE}/notifications/parent/weekly-report`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Không thể gửi báo cáo tuần cho phụ huynh");
+    }
+    return json.data || json.message;
+  },
+
+  // Dịch vụ thông báo: Gửi email nhắc học giữ chuỗi Streak
+  async sendStudyReminder(data: {
+    studentEmail: string;
+    studentName: string;
+    streakDays?: number;
+  }): Promise<string> {
+    const res = await fetch(`${API_BASE}/notifications/study-reminder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || "Không thể gửi email nhắc nhở học tập");
+    }
+    return json.data || json.message;
+  },
+
   // Academics & Content (With in-memory caching to optimize network roundtrips)
   async getGrades(): Promise<Grade[]> {
     if (apiCache.grades && apiCache.grades.length > 0) {

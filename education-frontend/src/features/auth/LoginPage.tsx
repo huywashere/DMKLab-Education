@@ -38,6 +38,42 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const [lockoutRemainingSec, setLockoutRemainingSec] = useState(0);
 
+  // 4. Đăng nhập SSO 1-Click (Google Workspace for Education & Microsoft 365)
+  const [isSsoModalOpen, setIsSsoModalOpen] = useState(false);
+  const [ssoProvider, setSsoProvider] = useState<"GOOGLE" | "MICROSOFT">("GOOGLE");
+  const [ssoLoading, setSsoLoading] = useState(false);
+  const [ssoError, setSsoError] = useState<string | null>(null);
+  const [customSsoEmail, setCustomSsoEmail] = useState("");
+  const [customSsoFullName, setCustomSsoFullName] = useState("");
+  const [customSsoRole, setCustomSsoRole] = useState<"STUDENT" | "TEACHER" | "PARENT">("STUDENT");
+
+  const handleSsoLogin = async (
+    provider: "GOOGLE" | "MICROSOFT",
+    email: string,
+    fullName: string,
+    role: "STUDENT" | "TEACHER" | "PARENT"
+  ) => {
+    setSsoLoading(true);
+    setSsoError(null);
+    try {
+      const { user } = await api.loginWithOAuth({
+        provider,
+        email,
+        fullName,
+        role,
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=" + encodeURIComponent(email.split("@")[0]),
+      });
+
+      setFailedAttempts(0);
+      setIsSsoModalOpen(false);
+      onSuccess(user);
+    } catch (err: any) {
+      setSsoError(err.message || "Đăng nhập SSO thất bại. Vui lòng kiểm tra lại kết nối.");
+    } finally {
+      setSsoLoading(false);
+    }
+  };
+
   // 3. Quên mật khẩu & Đặt lại mật khẩu với OTP
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [forgotStep, setForgotStep] = useState<1 | 2>(1);

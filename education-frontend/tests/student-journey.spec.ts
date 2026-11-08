@@ -73,4 +73,19 @@ test.describe("Student Learning Flow E2E - Hành Trình Học Tập K-12 Hoàn C
       await expect(modalHeader).toBeVisible();
     }
   });
+
+  test("6. Đăng nhập 1-Click bằng Google Workspace for Education / Microsoft 365", async ({ page }) => {
+    await page.goto("/");
+    const loginButton = page.getByRole("button", { name: /đăng nhập/i });
+    if (await loginButton.isVisible()) {
+      await loginButton.click();
+      const googleSsoBtn = page.getByText(/Google Workspace for Education/i);
+      if (await googleSsoBtn.isVisible()) {
+        await googleSsoBtn.click();
+        const modalTitle = page.getByText(/Chọn tài khoản trường K-12/i);
+        await expect(modalTitle).toBeVisible();
+      }
+    }
+  });
 });
+
