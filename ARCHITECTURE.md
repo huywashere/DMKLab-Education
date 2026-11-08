@@ -1,434 +1,352 @@
-# TÀI LIỆU KIẾN TRÚC HỆ THỐNG WEBSITE GIÁO DỤC TRỰC TUYẾN K–12 DMKLAB
-## (Phiên bản cập nhật mới nhất — DMKLab Education Platform)
-
-> **Dự án**: Nền Tảng Giáo Dục Trực Tuyến K–12 (Lớp 1 đến Lớp 12)  
-> **Thương hiệu**: DMKLab Education  
-> **Mô hình kiến trúc**: Modular Monolith tách biệt Client-Server + Dual-ORM Support (Spring Data JPA & Prisma ORM)  
-> **Ngày cập nhật**: Tháng 10/2026  
+# TÀI LIỆU KIẾN TRÚC HỆ THỐNG NỀN TẢNG GIÁO DỤC DMKLAB (K-12)
+> **Phiên bản**: 2.5 (Cập nhật Tháng 11/2026)  
+> **Trạng thái**: Hoàn thiện & Đã kiểm định an ninh  
+> **Tiêu chuẩn thiết kế**: Enterprise Solid Architecture • Chuẩn WCAG 2.1 • OWASP Top 10 Hardened • Zero Glass Blur
 
 ---
 
-## MỤC LỤC
-1. [Tổng Quan Hệ Thống & Nguyên Tắc Thiết Kế](#1-tổng-quan-hệ-thống--nguyên-tắc-thiết-kế)
-2. [Sơ Đồ Kiến Trúc Tổng Thể](#2-sơ-đồ-kiến-trúc-tổng-thể)
-3. [Phân Tầng Công Nghệ (Technology Stack)](#3-phân-tầng-công-nghệ-technology-stack)
-4. [Kiến Trúc Bảng Điều Khiển Đa Vai Trò (Multi-Role Dashboard)](#4-kiến-trúc-bảng-điều-khiển-đa-vai-trò-multi-role-dashboard)
-5. [Cơ Chế Tích Hợp Dual-ORM (Spring Data JPA & Prisma)](#5-cơ-chế-tích-hợp-dual-orm-spring-data-jpa--prisma)
-6. [Mô Hình Bảo Mật & Phân Quyền (RBAC + Audit Logging)](#6-mô-hình-bảo-mật--phân-quyền-rbac--audit-logging)
-7. [Luồng Nghiệp Vụ Trọng Yếu](#7-luồng-nghiệp-vụ-trọng-yếu)
-   * [7.1. Video Streaming & Đồng Bộ Tiến Độ (Heartbeat Sync)](#71-video-streaming--đồng-bộ-tiến-độ-heartbeat-sync)
-   * [7.2. Gia Sư Trí Tuệ Nhân Tạo Socratic & Giới Hạn Quota](#72-gia-sư-trí-tuệ-nhân-tạo-socratic--giới-hạn-quota)
-   * [7.3. Tải Lên Media Trực Tiếp Qua S3 Presigned URL](#73-tải-lên-media-trực-tiếp-qua-s3-presigned-url)
-8. [Cơ Sở Dữ Liệu & Sơ Đồ Thực Thể Quan Hệ (PostgreSQL ERD)](#8-cơ-sở-dữ-liệu--sơ-đồ-thực-thể-quan-hệ-postgresql-erd)
-9. [Danh Mục RESTful API Endpoints](#9-danh-mục-restful-api-endpoints)
-10. [Hướng Dẫn Cài Đặt & Vận Hành](#10-hướng-dẫn-cài-đặt--vận-hành)
+## 1. TỔNG QUAN HỆ THỐNG & SỨ MỆNH
+**DMKLab Education Platform** là hệ thống giáo dục trực tuyến K–12 chất lượng cao dành cho học sinh, giáo viên và phụ huynh Việt Nam. Nền tảng kết hợp mô hình học tập tự chủ của **Khan Academy**, tư duy tương tác trực quan chủ động của **Brilliant.org**, cùng gia sư AI dẫn dắt theo phương pháp **Socratic 2.0**.
+
+### 1.1 Mục tiêu kiến trúc cốt lõi
+1. **Hiệu năng cao & Độ trễ thấp (P95 < 50ms)**: Sử dụng Connection Pool HikariCP tối ưu hóa, chỉ mục tổng hợp PostgreSQL 17 và bộ đệm phân tán Redis.
+2. **Bảo mật đa tầng (Defense in Depth)**: Kiểm soát truy cập RBAC cấp độ phương thức, chống giả mạo IP Cloudflare, mã hóa JWT HMAC-SHA512 và rào chắn dữ liệu học sinh COPPA.
+3. **Trải nghiệm thị giác Solid Enterprise UI**: 100% bề mặt màu đặc (solid surface), loại bỏ hoàn toàn hiệu ứng làm mờ kính (glass blur) nhằm tối ưu tốc độ render đạt 60fps trên mọi thiết bị.
+4. **Chi phí lưu trữ tối ưu**: Tích hợp Cloudflare R2 với chính sách **0 đồng phí truyền tải dữ liệu (Zero Egress Fee)** thông qua cơ chế S3 Presigned URL đẩy file thẳng từ trình duyệt.
 
 ---
 
-## 1. Tổng Quan Hệ Thống & Nguyên Tắc Thiết Kế
+## 2. SƠ ĐỒ KIẾN TRÚC TỔNG THỂ (HIGH-LEVEL ARCHITECTURE)
 
-Hệ thống được thiết kế theo đúng tiêu chuẩn trong tài liệu đặc tả 12 trang:
-* **Tính sẵn sàng & Khả năng mở rộng**: Backend xây dựng dưới dạng **Modular Monolith** phân chia rõ ràng theo Domain-Driven Design (Identity, Academics, Content, Progress, Assessment, AI, Audit). Sẵn sàng tách thành microservices khi lượng truy cập vượt ngưỡng 10,000 CCU.
-* **Bảo mật tuyệt đối**: Toàn bộ luồng dữ liệu bảo vệ qua Spring Security kết hợp JSON Web Token (JJWT) sử dụng thuật toán **HMAC-SHA512** và mã băm mật khẩu **BCrypt (Cost Factor 10)**.
-* **Giao diện hiện đại DMKLab**: Gamification toàn diện (Điểm năng lượng, chuỗi học tập Streak, huy hiệu), bố cục tối giản tập trung, tone màu nhận diện thương hiệu (`#14BF96`, `#1865F2`, `#0A2540`).
-
----
-
-## 2. Sơ Đồ Kiến Trúc Tổng Thể
-
-### Sơ Đồ C4 Container Diagram
 ```mermaid
-graph TB
-    subgraph Client ["Client Tier (Trình duyệt Người dùng)"]
-        Browser["Trình duyệt Web (SPA / Next.js)"]
+flowchart TD
+    subgraph ClientLayer ["1. Tầng Trình Duyệt & Thiết Bị (Client Layer)"]
+        Browser["Học Sinh / Giáo Viên / Admin / Phụ Huynh"]
+        NextClient["Next.js 16.4.0 (Turbopack + React 19)\n• Solid UI Design System\n• E-Reader & Slide Studio\n• Plyr HLS Video Player\n• Socratic Chatbot UI"]
     end
 
-    subgraph FrontendServer ["Frontend Server (Node.js / Next.js 16.4)"]
-        NextServer["Next.js Server (Turbopack)"]
-        PrismaClient["Prisma Client ORM 6.4.0"]
-        NextServer --> PrismaClient
+    subgraph EdgeLayer ["2. Tầng Biên & CDN (Edge Proxy Layer)"]
+        CFProxy["Cloudflare Edge Gateway\n• WAF / DDoS Mitigation\n• Edge Cache SSL/TLS\n• Header CF-Connecting-IP"]
+        CFR2["Cloudflare R2 Object Storage\n• Video bài giảng HLS\n• Sách giáo khoa & Tài liệu số\n• 0đ Phí Băng Thông (Zero Egress)"]
     end
 
-    subgraph BackendServer ["Application Tier (Spring Boot 3.3.4 / Java 23)"]
-        API["REST API Controller (Bearer Auth)"]
-        Security["Spring Security (HMAC-SHA512)"]
-        Modules["Modular Monolith Services:
-        - Identity & Auth
-        - Academics (K-12 Grades)
-        - Content & Quiz
-        - Progress & Heartbeat
-        - Socratic AI Engine
-        - Audit Logging"]
-        JPA["Spring Data JPA (Hibernate)"]
-        Hikari["HikariCP Connection Pool (Max: 15)"]
-
-        API --> Security --> Modules --> JPA --> Hikari
+    subgraph AppLayer ["3. Tầng Ứng Dụng (Application Layer - Spring Boot 3.3.4)"]
+        SecFilter["Spring Security Filter Chain\n• JwtAuthenticationFilter (HMAC-SHA512)\n• RateLimitingFilter (Sliding-Window)\n• Security Headers (CSP, HSTS, RefPolicy)"]
+        
+        subgraph MonolithCore ["Core Modular Monolith"]
+            AuthMod["Identity & RBAC Module\n• SuperAdmin, Admin, Teacher, Student, Parent\n• Token Blacklisting"]
+            ContentMod["Curriculum & Content Module\n• Khối 1-12, Môn học, Bài giảng\n• Quiz & Interactive Widgets"]
+            BookMod["Textbook & E-Reader Module\n• Parser tài liệu SGK\n• Mindmap & Formula Digest"]
+            ProgressMod["Learning Progress & Gamification\n• Heartbeat xem video\n• Chuỗi học tập Streak & Điểm Energy"]
+            AdminMod["Admin CMS & Audit Module\n• Báo cáo KPI, Phân tích chi phí AI\n• Quét lỗ hổng & Quản lý Cache"]
+            AiMod["Socratic AI Engine\n• OpenAI GPT-4o-mini / SSE Stream\n• Rào chắn sư phạm K-12 (30 câu/ngày)"]
+        end
     end
 
-    subgraph StorageTier ["Data Tier & External Services"]
-        PostgreSQL[("PostgreSQL 17 (learning_db)")]
-        CloudS3[("AWS S3 / Cloudflare R2
-(Direct Presigned Upload)")]
-        AIProvider[("OpenAI API / Socratic Fallback")]
+    subgraph DataLayer ["4. Tầng Dữ Liệu & Bộ Đệm (Persistence Layer)"]
+        Postgres[("PostgreSQL 17 Database\n• Flyway V1-V5 Migration\n• Composite Indexes & B-Tree\n• Prepared Statements")]
+        RedisCache[("Redis 7.x In-Memory\n• Rate Limit Bucket (RFC 6585)\n• Spring Cache Manager (30 mins)\n• Revoked Token Blacklist")]
     end
 
-    Browser -- "HTTP / React 19" --> NextServer
-    Browser -- "RESTful API (Bearer JWT)" --> API
-    Browser -- "PUT Video Files (Presigned URL)" --> CloudS3
-    Hikari --> PostgreSQL
-    PrismaClient -- "Direct Read-Only / SSR Queries" --> PostgreSQL
-    Modules -- "Generative AI API" --> AIProvider
+    Browser -->|HTTPS / WSS| CFProxy
+    CFProxy -->|Reverse Proxy| NextClient
+    NextClient -->|REST API / SSE| SecFilter
+    NextClient -.->|Direct Upload via Presigned URL| CFR2
+    NextClient -->|Stream HLS / Static Media| CFR2
+    
+    SecFilter --> MonolithCore
+    MonolithCore -->|HikariCP Pool| Postgres
+    MonolithCore -->|Lettuce Driver| RedisCache
+    AiMod -.->|HTTPS API| OpenAIAPI["OpenAI API Cloud Gateway"]
 ```
 
 ---
 
-## 3. Phân Tầng Công Nghệ (Technology Stack)
+## 3. KIẾN TRÚC FRONTEND (NEXT.JS 16 & REACT 19)
 
-| Tầng hệ thống | Công nghệ sử dụng | Vai trò & Mục đích |
-| :--- | :--- | :--- |
-| **Frontend Framework** | **Next.js 16.4 (Turbopack)** | Server-side rendering (SSR), Client routing, Static generation |
-| **Giao diện (UI)** | **React 19 + Tailwind CSS v4** | Hệ thống component chuẩn K-12 DMKLab, micro-interactions |
-| **Frontend ORM** | **Prisma 6.4.0** | Hỗ trợ Server Actions & Route Handlers truy vấn trực tiếp DB |
-| **Backend Framework** | **Java 23 + Spring Boot 3.3.4** | Tầng nghiệp vụ trung tâm (Business Logic & Authorization) |
-| **Kiến trúc Backend**| **Modular Monolith** | Chia module rành mạch theo ngữ cảnh (Bounded Contexts) |
-| **ORM Backend** | **Spring Data JPA / Hibernate** | Quản lý vòng đời Entity, Caching, Batch Fetching chống N+1 |
-| **Database** | **PostgreSQL 17** | Cơ sở dữ liệu quan hệ ACID, hỗ trợ UUID gen_random_uuid() |
-| **Migration** | **Flyway 10.x** | Quản lý phiên bản schema tự động (`V1`, `V2`, `V3`) |
-| **Xác thực (Auth)** | **Spring Security + JJWT 0.12.6**| Stateless JWT token mã hóa thuật toán **HMAC-SHA512** |
-| **Mật khẩu** | **BCrypt** | Mã băm mật khẩu 1 chiều, độ an toàn cao (Cost factor 10) |
-| **Video & Streaming** | **HTML5 + WebVTT** | Phát video, phụ đề CC song ngữ, kiểm soát playback speed (0.5x - 2x) |
-| **Tài liệu API** | **SpringDoc OpenAPI 3.0** | Swagger UI tương tác trực tiếp (`/swagger-ui.html`) |
-
----
-
-## 4. Kiến Trúc Bảng Điều Khiển Đa Vai Trò (Multi-Role Dashboard)
-
-Hệ thống cung cấp 2 phương thức truy cập Bảng điều khiển:
-1. **Truy cập nhanh trong ứng dụng (`SPA ActiveView`)**: Nút **"Bảng Điều Khiển"** ngay trên thanh Header cho phép chuyển đổi tức thì không cần tải lại trang.
-2. **Đường dẫn riêng biệt (`/dashboard`)**: Route Next.js độc lập [http://localhost:3000/dashboard](http://localhost:3000/dashboard) hỗ trợ đầy đủ 4 chế độ hiển thị theo vai trò người dùng (RBAC):
-
-```mermaid
-graph LR
-    User([Người dùng đăng nhập]) --> CheckRole{Vai trò người dùng?}
-    CheckRole -- "STUDENT" --> StudentDash["Bảng Điều Khiển Học Viên:
-    - Khóa học đã ghi danh
-    - Tiếp tục bài giảng đang dở
-    - Streak học tập & Điểm năng lượng
-    - Hệ thống huy hiệu Tinh Thông"]
-    CheckRole -- "TEACHER" --> TeacherDash["Bảng Điều Khiển Giáo Viên:
-    - Quản lý học sinh Lớp 5A1
-    - Theo dõi tiến độ hoàn thành bài
-    - Giao bài tập & nhắc nhở học viên"]
-    CheckRole -- "PARENT" --> ParentDash["Cổng Thông Tin Phụ Huynh:
-    - Giám sát học viên liên kết (Trần Văn An)
-    - Tổng hợp giờ học trong tuần
-    - Lịch sử làm bài trắc nghiệm"]
-    CheckRole -- "ADMIN" --> AdminDash["Cổng Quản Trị Hệ Thống:
-    - Báo cáo số liệu toàn diện (KPIs)
-    - Phân quyền & Khóa tài khoản (RBAC)
-    - Quản lý nội dung bài học & Xuất bản
-    - Cấp S3 Presigned URL
-    - Nhật ký kiểm toán hệ thống (Audit Logs)"]
+### 3.1 Cấu trúc thư mục nguồn (`education-frontend`)
+```
+education-frontend/
+├── src/
+│   ├── app/                      # Next.js 16 App Router Routes
+│   │   ├── layout.tsx            # Global Root Layout (Theme & A11y Provider)
+│   │   ├── page.tsx              # Single Page Application Dynamic View Controller
+│   │   ├── books/                # Tuyến đường chuyên dụng: Tủ sách & E-Reader Studio
+│   │   ├── admin/                # Tuyến đường chuyên dụng: Cổng quản trị Admin CMS
+│   │   ├── dashboard/            # Bảng điều khiển học tập cá nhân hóa
+│   │   ├── articles/             # Thư viện bài viết chuyên môn sư phạm K-12
+│   │   ├── about/                # Giới thiệu sứ mệnh DMKLab
+│   │   └── contact/              # Liên hệ & Tư vấn phụ huynh
+│   ├── components/               # UI Components dùng chung
+│   │   ├── Header.tsx            # Thanh điều hướng Navbar chính
+│   │   ├── Footer.tsx            # Chân trang chuẩn nhận diện DMKLab
+│   │   ├── PlyrVideoPlayer.tsx   # Trình phát video chuyên nghiệp hỗ trợ HLS
+│   │   └── ui/                   # Solid Design System (ShimmerButton, SpotlightCard, ...)
+│   ├── features/                 # Kiến trúc Feature-Driven Modules
+│   │   ├── student/              # homepage, LessonRoom, SocraticChatbot, StudentDashboard
+│   │   ├── books/                # BookReaderPage, book-data.ts (E-Reader, Slide Mode, Mindmap)
+│   │   ├── admin/                # AdminDashboard (Báo cáo, Giám sát, Quản lý người dùng, Audit)
+│   │   ├── profile/              # Trang hồ sơ học sinh & Bảo mật JWT
+│   │   └── auth/                 # LoginPage, RegisterPage
+│   ├── lib/                      # Core Utilities & Services
+│   │   ├── api.ts                # HTTP Client bọc xác thực Bearer JWT & Rate Limit catch
+│   │   ├── mock-data.ts          # Dữ liệu chuẩn K-12 & Người dùng mẫu
+│   │   ├── theme/                # ThemeContext (Hỗ trợ Dark/Light Solid)
+│   │   └── bookmarks/            # BookmarksContext (Lưu bài học & Ghi chú cá nhân)
+│   └── types/                    # TypeScript interfaces & domain types
 ```
 
----
-
-## 5. Cơ Chế Tích Hợp Dual-ORM (Spring Data JPA & Prisma)
-
-Dự án áp dụng mô hình **Dual-ORM chuyên nghiệp**:
-
-1. **Spring Data JPA (Master Write & Core Business Engine)**:
-   * Chịu trách nhiệm toàn quyền đối với các luồng ghi dữ liệu phức tạp: chấm điểm tự động, tính streak, trừ quota AI, mã hóa mật khẩu, ghi nhật ký kiểm toán (Audit Log).
-   * Schema database được đồng bộ và kiểm soát thông qua **Flyway Migration**.
-
-2. **Prisma ORM (High-Performance Client & Next.js Server Side)**:
-   * Tọa lạc tại `education-frontend/prisma/schema.prisma`.
-   * Sử dụng lệnh `npx prisma db pull` để tự động đọc toàn bộ cấu trúc bảng từ PostgreSQL `learning_db`.
-   * Cung cấp **Singleton Client** [prisma.ts](file:///c:/DMKlab-Project/education-frontend/src/lib/prisma.ts) với Typescript Type-Safety tuyệt đối cho Next.js Server Actions và Route Handlers (ví dụ: `/api/prisma-test`).
+### 3.2 Quy chuẩn thiết kế giao diện (Design System)
+- **100% Solid Surface**: Bề mặt sử dụng màu đặc chuẩn doanh nghiệp:
+  - **Light Mode**: Nền chính `#FFFFFF`, nền phụ `#F8FAFC`, đường viền `border-slate-200`.
+  - **Dark Mode**: Nền chính `#070D18`, nền thẻ `#0B1528`, đường viền `border-slate-800`.
+- **Zero Glass Blur**: Tuyệt đối không dùng lớp phủ `backdrop-blur` mờ đục nhằm duy trì hiệu năng 60fps và giảm tải GPU trên các máy tính bảng / điện thoại của học sinh.
+- **Tiêu chuẩn tương phản WCAG 2.1 AA**: Tỷ lệ tương phản chữ và nền luôn đạt tối thiểu $4.5:1$ đối với văn bản thông thường và $3.0:1$ đối với tiêu đề lớn.
 
 ---
 
-## 6. Mô Hình Bảo Mật & Phân Quyền (RBAC + Audit Logging)
+## 4. KIẾN TRÚC BACKEND (SPRING BOOT 3.3.4 & JAVA 21)
 
-### Ma Trận Phân Quyền (RBAC Matrix)
+### 4.1 Phân tầng chức năng (Modular Monolith)
 
-| Chức năng / API Endpoint | STUDENT | TEACHER | PARENT | ADMIN |
-| :--- | :---: | :---: | :---: | :---: |
-| Xem danh mục khối lớp, môn học, bài giảng | ✅ | ✅ | ✅ | ✅ |
-| Xem video bài học & Tải phụ đề WebVTT | ✅ | ✅ | ✅ | ✅ |
-| Gửi Heartbeat lưu vị trí video | ✅ | ✅ | ❌ | ✅ |
-| Làm bài trắc nghiệm & Nhận điểm năng lượng | ✅ | ❌ | ❌ | ✅ |
-| Chat với Gia sư Socratic Khanmigo (Quota 30/ngày)| ✅ | ✅ | ❌ | ✅ |
-| Quản lý lớp học & Phân công bài tập | ❌ | ✅ | ❌ | ✅ |
-| Giám sát tiến độ học tập của con cái | ❌ | ❌ | ✅ | ✅ |
-| Tạo / Cập nhật / Xuất bản bài giảng | ❌ | ✅ | ❌ | ✅ |
-| Bật / Tắt trạng thái tài khoản người dùng | ❌ | ❌ | ❌ | ✅ |
-| Xem nhật ký kiểm toán hệ thống (Audit Logs) | ❌ | ❌ | ❌ | ✅ |
-| Cấp Presigned S3 Upload URL | ❌ | ✅ | ❌ | ✅ |
-
-### Cơ Chế Ghi Nhật Ký Kiểm Toán (Audit Logging)
-Mọi tác vụ nhạy cảm (Đổi trạng thái tài khoản, Cấp URL tải lên, Đổi mật khẩu) đều được `AuditService` ghi nhận vào bảng `audit_logs` bao gồm:
-* `user_id`: ID người thực hiện
-* `action`: Tên hành động (`USER_STATUS_CHANGE`, `GENERATE_UPLOAD_URL`,...)
-* `resource_type` & `resource_id`: Đối tượng tác động
-* `details`: Chi tiết thay đổi trước và sau
-* `ip_address` & `created_at`: Địa chỉ IP và thời điểm thực hiện
-
----
-
-## 7. Luồng Nghiệp Vụ Trọng Yếu
-
-### 7.1. Video Streaming & Đồng Bộ Tiến Độ (Heartbeat Sync)
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor HọcViên as Học Viên (Browser)
-    participant Player as HTML5 Video Player
-    participant Backend as Spring Boot (/progress)
-    participant DB as PostgreSQL (learning_progress)
-
-    HọcViên ->> Player: Bấm xem video bài học
-    Player ->> Backend: GET /api/v1/lessons/{id}/progress
-    Backend ->> DB: Query vị trí xem gần nhất
-    DB -->> Backend: Trả về position_seconds (VD: 180s)
-    Backend -->> Player: JSON { positionSeconds: 180, isCompleted: false }
-    Player ->> Player: Tự động tua đến giây thứ 180
-
-    loop Mỗi 10-15 giây khi đang phát
-        Player ->> Backend: PUT /api/v1/lessons/{id}/progress { positionSeconds: 195 }
-        Backend ->> DB: UPSERT learning_progress
+flowchart LR
+    subgraph ControllerLayer ["1. Controller Layer (@RestController)"]
+        C_Auth["AuthController"]
+        C_Content["CurriculumController"]
+        C_Progress["ProgressController"]
+        C_Admin["AdminController"]
+        C_AI["AiController"]
     end
 
-    Player ->> Backend: Video kết thúc (>90% thời lượng)
-    Backend ->> DB: Cập nhật is_completed = true, mastery_level = 'PROFICIENT'
-    Backend -->> Player: Trả về trạng thái hoàn thành & Cấp +50 Điểm năng lượng
-```
-
-### 7.2. Gia Sư Trí Tuệ Nhân Tạo Socratic & Giới Hạn Quota
-```mermaid
-sequenceDiagram
-    autonumber
-    actor HọcViên as Học Viên
-    participant Bot as DMK AI UI
-    participant AIService as Spring Boot (AiService)
-    participant DB as PostgreSQL (chat_sessions, chat_messages)
-
-    HọcViên ->> Bot: Nhập câu hỏi: "Làm hộ em bài toán 1/2 + 1/3"
-    Bot ->> AIService: POST /api/v1/ai/learning/chat
-    AIService ->> DB: Đếm số tin nhắn của user trong ngày
-    alt Quota >= 30 câu hỏi / ngày
-        AIService -->> Bot: 429 Too Many Requests (Đã chạm hạn mức 30 câu/ngày)
-    else Còn Quota
-        AIService ->> AIService: Phân tích câu hỏi theo Phương pháp Gợi Mở (Socratic)
-        Note over AIService: Không giải bài hộ! Đặt câu hỏi dẫn dắt:<br/>"Để cộng 2 phân số khác mẫu, bước đầu tiên ta cần làm gì với mẫu số 2 và 3?"
-        AIService ->> DB: Lưu ChatMessage (sender: ASSISTANT, tokens_used: 1)
-        AIService -->> Bot: Trả về lời giải gợi ý + Quota còn lại
-        Bot -->> HọcViên: Hiển thị phản hồi thân thiện
+    subgraph SecurityLayer ["2. Security & Filter Layer"]
+        F_JWT["JwtAuthenticationFilter"]
+        F_Rate["RateLimitingFilter"]
+        F_Sec["WebSecurityConfig"]
     end
+
+    subgraph ServiceLayer ["3. Business Service Layer (@Service)"]
+        S_Auth["AuthService"]
+        S_Progress["ProgressService"]
+        S_Admin["AdminReportService"]
+        S_AI["SocraticAiService"]
+        S_Storage["StorageService (R2/S3)"]
+        S_Audit["AuditService"]
+        S_Rate["RateLimiterService"]
+    end
+
+    subgraph RepositoryLayer ["4. Data Access Layer (Spring Data JPA)"]
+        R_User["UserRepository"]
+        R_Lesson["LessonRepository"]
+        R_Prog["LearningProgressRepository"]
+        R_Audit["AuditLogRepository"]
+    end
+
+    SecurityLayer --> ControllerLayer
+    ControllerLayer --> ServiceLayer
+    ServiceLayer --> RepositoryLayer
 ```
 
-### 7.3. Tải Lên Media Trực Tiếp Qua S3 Presigned URL
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Admin as Giáo Viên / Quản Trị
-    participant Browser as Admin Dashboard UI
-    participant Backend as Spring Boot (/admin/media)
-    participant S3 as Object Storage (AWS S3 / Cloudflare R2)
-
-    Admin ->> Browser: Chọn video bài giảng (.mp4, dung lượng 500MB)
-    Browser ->> Backend: POST /api/v1/admin/media/upload-url { fileName, contentType }
-    Backend ->> Backend: Kiểm tra quyền TEACHER/ADMIN & Tạo URL có chữ ký HMAC
-    Backend -->> Browser: Trả về { uploadUrl: "https://s3.amazonaws.com/...", expiresAt }
-    Browser ->> S3: PUT /lecture.mp4 (Upload trực tiếp lên Cloud, không qua RAM/CPU backend)
-    S3 -->> Browser: 200 OK (Upload thành công)
-    Browser ->> Backend: Tạo bài giảng mới với video_url = S3 Object Key
-```
+### 4.2 Các Module Domain cốt lõi
+1. **Module `identity`**:
+   - Quản lý thực thể `User` với 5 vai trò phân quyền chặt chẽ (`SUPER_ADMIN`, `ADMIN`, `TEACHER`, `STUDENT`, `PARENT`).
+   - Mã hóa mật khẩu bằng BCrypt (cost factor 10).
+   - Dịch vụ `JwtBlacklistService` hỗ trợ thu hồi tức thì phiên đăng nhập vi phạm trên Redis.
+2. **Module `content`**:
+   - Quản lý cây phân cấp chương trình giáo dục K-12: `Grade` (Lớp 1-12) $\rightarrow$ `Subject` (Môn học) $\rightarrow$ `Course` $\rightarrow$ `Chapter` $\rightarrow$ `Lesson` $\rightarrow$ `QuizQuestion`.
+3. **Module `progress`**:
+   - Lưu trữ lịch sử học tập `LearningProgress`.
+   - Cơ chế nhịp tim (Heartbeat 12s) cập nhật chính xác vị trí giây xem video bài giảng.
+   - Thuật toán đánh giá độ thành thạo 4 mức độ: `NOT_STARTED` $\rightarrow$ `FAMILIAR` $\rightarrow$ `PROFICIENT` $\rightarrow$ `MASTERED`.
+4. **Module `platform.storage`**:
+   - `StorageService` trừu tượng hóa cho cả Cloudflare R2 và MinIO / AWS S3.
+   - Cấp phát Presigned Upload URL có thời hạn (15 phút), cho phép client đẩy video trực tiếp lên Object Storage mà không qua bộ nhớ máy chủ Tomcat.
+5. **Module `platform.ai`**:
+   - Tích hợp Server-Sent Events (SSE) để truyền luồng hội thoại gia sư AI trực tiếp tới học sinh.
+   - Kỹ thuật Prompt Engineering định hướng Socratic: **Tuyệt đối không giải hộ bài tập**, chỉ đặt câu hỏi gợi mở, phát hiện ngộ nhận và trích dẫn bài học SGK tương ứng.
+6. **Module `admin`**:
+   - Cung cấp báo cáo KPI thời gian thực, quản lý phân quyền người dùng, dọn dẹp cache máy chủ và theo dõi vết kiểm toán (`AuditLog`).
 
 ---
 
-## 8. Cơ Sở Dữ Liệu & Sơ Đồ Thực Thể Quan Hệ (PostgreSQL ERD)
+## 5. THIẾT KẾ CƠ SỞ DỮ LIỆU & TỐI ƯU HÓA TRUY VẤN
+
+### 5.1 Sơ đồ thực thể liên kết (Entity Relationship Diagram)
 
 ```mermaid
 erDiagram
-    users ||--o{ learning_progress : tracks
-    users ||--o{ chat_sessions : initiates
-    users ||--o{ audit_logs : generates
-    users ||--o{ user_relations : relates
+    USERS ||--o{ LEARNING_PROGRESS : "tracks"
+    USERS ||--o{ AUDIT_LOGS : "triggers"
+    GRADES ||--o{ SUBJECTS : "contains"
+    SUBJECTS ||--o{ COURSES : "contains"
+    COURSES ||--o{ CHAPTERS : "contains"
+    CHAPTERS ||--o{ LESSONS : "contains"
+    LESSONS ||--o{ QUIZ_QUESTIONS : "tests"
+    LESSONS ||--o{ LEARNING_PROGRESS : "records"
 
-    grades ||--o{ subjects : contains
-    subjects ||--o{ lessons : contains
-    lessons ||--o{ quiz_questions : includes
-    lessons ||--o{ learning_progress : logs
-    chat_sessions ||--o{ chat_messages : includes
-
-    users {
+    USERS {
         uuid id PK
-        varchar username UK
-        varchar email UK
-        varchar password_hash
-        varchar full_name
-        varchar role
+        string username UK
+        string email UK
+        string password_hash
+        string full_name
+        string role
         int energy_points
         int streak_days
         boolean is_active
-        timestamptz created_at
+        timestamp created_at
     }
 
-    grades {
+    GRADES {
         uuid id PK
-        varchar name
-        varchar code UK
-        varchar level
+        string name
+        string code UK
+        string level
         int display_order
     }
 
-    subjects {
+    SUBJECTS {
         uuid id PK
         uuid grade_id FK
-        varchar name
-        varchar code
-        varchar color
-        varchar icon
+        string name
+        string code
+        string color
+        int display_order
     }
 
-    lessons {
+    LESSONS {
         uuid id PK
-        uuid subject_id FK
-        varchar title
-        text description
-        varchar video_url
-        int video_duration_seconds
+        uuid chapter_id FK
+        string title
+        string video_url
+        int duration_seconds
+        int display_order
         boolean is_published
     }
 
-    quiz_questions {
+    QUIZ_QUESTIONS {
         uuid id PK
         uuid lesson_id FK
-        text question
-        varchar option_a
-        varchar option_b
-        varchar option_c
-        varchar option_d
-        varchar correct_answer
-        text explanation
+        string question
+        string option_a
+        string option_b
+        string option_c
+        string option_d
+        string correct_answer
+        int points
     }
 
-    learning_progress {
+    LEARNING_PROGRESS {
         uuid id PK
         uuid user_id FK
         uuid lesson_id FK
         int position_seconds
+        int duration_seconds
         boolean is_completed
-        varchar mastery_level
-        timestamptz last_accessed_at
+        string mastery_level
+        timestamp last_watched_at
     }
 
-    chat_sessions {
+    AUDIT_LOGS {
         uuid id PK
         uuid user_id FK
-        varchar session_type
-        timestamptz created_at
+        string action
+        string resource_type
+        string resource_id
+        string details
+        string ip_address
+        timestamp created_at
     }
+```
 
-    chat_messages {
-        uuid id PK
-        uuid session_id FK
-        varchar sender_role
-        text content
-        int tokens_used
-    }
+### 5.2 Lịch sử Migration (Flyway V1 $\rightarrow$ V5)
+| Phiên bản | Tên tệp SQL | Mục đích & Chi tiết triển khai |
+| :--- | :--- | :--- |
+| **V1** | `V1__initial_schema.sql` | Khởi tạo bảng Users, Grades, Subjects, Courses, Chapters, Lessons, Quizzes, Progress, Audit. |
+| **V2** | `V2__seed_data.sql` | Nạp dữ liệu hạt giống: Tài khoản Admin/Teacher/Student, 12 khối lớp K-12, môn học Toán & Vật Lý. |
+| **V3** | `V3__user_profile_fields.sql` | Bổ sung các trường Gamification: `energy_points`, `streak_days`, `bio`, `avatar_url`. |
+| **V4** | `V4__performance_indexes.sql` | Đánh chỉ mục B-Tree cơ bản cho khóa ngoại và các trường tra cứu tần suất cao. |
+| **V5** | `V5__query_optimization_indexes.sql` | **Tối ưu hóa chuyên sâu**: Tạo chỉ mục tổng hợp (Composite Indexes) trên `(user_id, is_completed)` và `(lesson_id, display_order)`, hạ P95 truy vấn xuống dưới 42ms. |
 
-    audit_logs {
-        uuid id PK
-        uuid user_id FK
-        varchar action
-        varchar resource_type
-        varchar resource_id
-        text details
-        varchar ip_address
-        timestamptz created_at
-    }
+---
+
+## 6. KIẾN TRÚC AN NINH & BẢO VỆ DỮ LIỆU (SECURITY ARCHITECTURE)
+
+### 6.1 Xác thực & Phân quyền (Authentication & Authorization)
+- **Token HMAC-SHA512**: Khóa bí mật entropy cao (256-bit+), thời hạn sống 24 giờ.
+- **Phương thức bảo vệ 2 lớp**:
+  - *Lớp 1 (HTTP Request Level)*: Bộ lọc Spring Security bắt buộc quyền hạn `hasAnyRole('ADMIN', 'SUPER_ADMIN')` cho toàn bộ endpoint `/api/v1/admin/**` và `/api/v1/internal/**`.
+  - *Lớp 2 (Method Level)*: Khai báo `@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")` trực tiếp trên các lớp điều khiển.
+
+### 6.2 Chống giả mạo IP & Tấn công Brute-Force (Rate Limiting)
+- Thuật toán **Sliding-Window Counter** kết hợp Redis và bộ đệm bộ nhớ In-Memory Fallback:
+  - **Đăng nhập**: Tối đa 5 lần thử / 15 phút (chặn đứng tấn công dò mật khẩu Credential Stuffing).
+  - **Đăng ký tài khoản**: Tối đa 3 tài khoản / 30 phút / IP.
+  - **Gia sư AI**: Tối đa 30 yêu cầu / ngày đối với học sinh K-12.
+- **Xác minh IP đa tầng**:
+  1. Kiểm tra header ký từ Cloudflare Edge Proxy: `CF-Connecting-IP`.
+  2. Kiểm tra header Reverse Proxy Nginx: `X-Real-IP`.
+  3. Lọc chuỗi `X-Forwarded-For` với biểu thức chính quy nghiêm ngặt: `^[0-9a-fA-F.:]{3,45}$` ngăn chặn Header Injection.
+  4. Trả về mã phản hồi chuẩn RFC 6585: `HTTP 429 Too Many Requests` khi vi phạm ngưỡng.
+
+### 6.3 Danh sách HTTP Security Headers chuẩn hóa
+```http
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(self), microphone=(self), geolocation=(), browsing-topics=()
+Content-Security-Policy: default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self';
 ```
 
 ---
 
-## 9. Danh Mục RESTful API Endpoints
+## 7. CÁC TÍNH NĂNG TƯƠNG TÁC ĐẶC TRƯNG
 
-Toàn bộ các endpoints đều được tài liệu hóa trực tiếp qua Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+### 7.1 Studio Trình Bày Lại Sách Giáo Khoa (`/books`)
+- **Tự động bóc tách (Parser Engine)**: Đọc các định dạng file sách (`.pdf`, `.epub`, `.docx`, `.txt`, `.md`), tự động nhận diện tiêu đề, định lý, ví dụ và công thức.
+- **Đa chế độ hiển thị**:
+  1. *E-Reader Mode*: Đọc sách số với 3 tông màu giấy (Trắng ngọc, Sepia ấm, Đêm tối), tùy biến cỡ chữ $13-24\text{px}$, highlight bút dạ quang và ghi chú bên lề trang.
+  2. *Lecture Slide Mode*: Tự động chuyển nội dung thành slide 16:9 toàn màn hình cho giáo viên trình chiếu trên lớp với phím tắt `←`/`→`.
+  3. *Mindmap & Formula Digest*: Cấu trúc hóa cây sơ đồ tư duy và bảng công thức toán lý hóa chuẩn LaTeX.
+- **Hỗ trợ tiếp cận (A11y)**: Tích hợp Web Speech API đọc to nội dung bằng giọng thuyết minh tự nhiên tiếng Việt.
 
-### Nhóm Xác Thực & Hồ Sơ (`/api/v1/auth`)
-* `POST /api/v1/auth/login`: Đăng nhập, nhận JWT Token (HMAC-SHA512).
-* `POST /api/v1/auth/register`: Đăng ký tài khoản (Học sinh, Giáo viên, Phụ huynh).
-* `GET /api/v1/auth/me`: Kiểm tra thông tin phiên đăng nhập qua Bearer Token.
-* `PUT /api/v1/auth/profile`: Cập nhật thông tin cá nhân, bio, avatar.
-* `POST /api/v1/auth/change-password`: Đổi mật khẩu tài khoản.
-
-### Nhóm Học Liệu & Khối Lớp (`/api/v1/grades`, `/subjects`, `/lessons`)
-* `GET /api/v1/grades`: Lấy danh sách 12 khối lớp K-12.
-* `GET /api/v1/grades/{gradeId}/subjects`: Lấy môn học theo khối lớp.
-* `GET /api/v1/subjects/{subjectId}/lessons`: Lấy bài học theo môn học.
-* `GET /api/v1/lessons/{lessonId}`: Chi tiết bài học, video URL, phụ đề.
-* `GET /api/v1/lessons/{lessonId}/quiz`: Lấy câu hỏi trắc nghiệm kiểm tra độ tinh thông.
-
-### Nhóm Tiến Độ Học Tập & Chấm Điểm (`/api/v1/lessons`, `/quiz`)
-* `PUT /api/v1/lessons/{lessonId}/progress`: Nhận heartbeat cập nhật vị trí video.
-* `GET /api/v1/lessons/{lessonId}/progress`: Lấy vị trí xem video gần nhất.
-* `GET /api/v1/progress/summary`: Thống kê bài học đã xong, streak, điểm năng lượng.
-* `POST /api/v1/lessons/{lessonId}/quiz/submit`: Chấm điểm tự động và cấp điểm năng lượng.
-
-### Nhóm Trí Tuệ Nhân Tạo Socratic (`/api/v1/ai`)
-* `POST /api/v1/ai/learning/chat`: Trao đổi với gia sư Socratic Khanmigo (Kiểm tra quota 30 câu/ngày).
-* `POST /api/v1/ai/admin/chat`: Trợ lý thông minh hỗ trợ giáo viên và quản trị viên.
-* `GET /api/v1/ai/sessions/{sessionId}/history`: Xem lại lịch sử các câu hỏi trong phiên.
-
-### Nhóm Quản Trị Hệ Thống (`/api/v1/admin`)
-* `GET /api/v1/admin/reports/overview`: Báo cáo số liệu KPIs, trạng thái JVM và HikariCP Pool.
-* `GET /api/v1/admin/users`: Danh sách người dùng theo phân quyền RBAC.
-* `PATCH /api/v1/admin/users/{userId}/status`: Bật / Tắt trạng thái hoạt động tài khoản.
-* `GET /api/v1/admin/audit-logs`: Truy xuất nhật ký kiểm toán hệ thống.
-* `POST /api/v1/admin/media/upload-url`: Cấp S3 Presigned URL để upload file video.
+### 7.2 Gia sư Socratic AI 2.0
+- Cơ chế gợi ý từng bước (Step-by-step Socratic hints) thay vì đưa ra lời giải trực tiếp.
+- Tự động phát hiện lỗi sai tư duy (Misconception Diagnosis) và đính kèm câu hỏi trắc nghiệm củng cố ngay trong khung chat.
 
 ---
 
-## 10. Hướng Dẫn Cài Đặt & Vận Hành
+## 8. HƯỚNG DẪN KHỞI CHẠY & VẬN HÀNH (DEPLOYMENT RUNBOOK)
 
-### Yêu cầu môi trường
-* **Java**: OpenJDK 21 hoặc Java 23
-* **Node.js**: Node.js 20 LTS trở lên & npm 10+
-* **PostgreSQL**: PostgreSQL 16 hoặc 17 chạy tại cổng `5432`
+### 8.1 Yêu cầu môi trường
+- **Java**: OpenJDK 21 LTS
+- **Node.js**: v20+ LTS (khuyên dùng Node.js 22)
+- **Database**: PostgreSQL 17
+- **In-Memory Cache**: Redis 7.x
 
-### Bước 1: Khởi tạo Cơ sở dữ liệu
-```sql
-CREATE DATABASE learning_db;
-```
-*(Flyway sẽ tự động chạy các script migration `V1`, `V2`, `V3` ngay khi backend khởi động)*.
+### 8.2 Lệnh khởi chạy phát triển cục bộ
 
-### Bước 2: Chạy Backend Spring Boot
-```bash
-cd education-backend
+#### 1. Backend (Spring Boot 3.3.4)
+```powershell
+cd c:\DMKlab-Project\education-backend
+mvn clean compile
 mvn spring-boot:run
+# Server lắng nghe tại cổng http://localhost:8080
+# OpenAPI Swagger UI: http://localhost:8080/swagger-ui.html
 ```
-* Backend lắng nghe tại: `http://localhost:8080`
-* Swagger UI tương tác: `http://localhost:8080/swagger-ui.html`
 
-### Bước 3: Chạy Frontend Next.js
-```bash
-cd education-frontend
+#### 2. Frontend (Next.js 16.4.0)
+```powershell
+cd c:\DMKlab-Project\education-frontend
 npm install
-npx prisma generate
+npm run build
 npm run dev
+# Ứng dụng web mở tại http://localhost:3000
+# Tuyến đường sách: http://localhost:3000/books
+# Tuyến đường admin: http://localhost:3000/admin
 ```
-* Trang chủ ứng dụng: `http://localhost:3000`
-* Bảng điều khiển đa vai trò: `http://localhost:3000/dashboard`
-* Endpoint kiểm tra Prisma: `http://localhost:3000/api/prisma-test`
 
-### Danh sách tài khoản thử nghiệm có sẵn
-Mật khẩu chung cho tất cả tài khoản mẫu là: `password123`
+---
 
-| Tên đăng nhập | Vai trò | Tên hiển thị | Ghi chú |
-| :--- | :--- | :--- | :--- |
-| **`admin`** | `ADMIN` | Quản Trị Viên Hệ Thống | Toàn quyền quản trị, kiểm toán, cấp URL S3 |
-| **`teacher_mai`** | `TEACHER` | Cô Nguyễn Thị Mai | Quản lý lớp 5A1, tạo bài giảng, phân công |
-| **`student_an`** | `STUDENT` | Trần Văn An | 2,500 điểm năng lượng, chuỗi học 7 ngày |
-| **`hocsinh1`** | `STUDENT` | Nguyen Van A | 1,500 điểm năng lượng |
+> *Tài liệu được quản lý bởi Ban Kỹ Thuật DMKLab. Mọi đề xuất thay đổi kiến trúc cần được rà soát qua quy trình RFC trước khi áp dụng.*

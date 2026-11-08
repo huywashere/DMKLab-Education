@@ -24,6 +24,7 @@ interface RegisterPageProps {
   onSuccess: (user: User) => void;
   onGoToLogin: () => void;
   onBackToHome: () => void;
+  onOpenAiChat?: () => void;
 }
 
 export const RegisterPage: React.FC<RegisterPageProps> = ({

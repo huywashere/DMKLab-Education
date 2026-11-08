@@ -147,6 +147,33 @@ public class UserService {
         userRepository.save(user);
     }
 
+    private final java.util.concurrent.ConcurrentHashMap<String, String> passwordResetOtps = new java.util.concurrent.ConcurrentHashMap<>();
+
+    public String generatePasswordResetOtp(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản với email: " + email));
+        // Sinh mã OTP 6 số ngẫu nhiên
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        passwordResetOtps.put(email.toLowerCase().trim(), otp);
+        return otp;
+    }
+
+    @Transactional
+    public void resetPasswordWithOtp(String email, String otp, String newPassword) {
+        String key = email.toLowerCase().trim();
+        String validOtp = passwordResetOtps.get(key);
+        if (validOtp == null || !validOtp.equals(otp.trim())) {
+            throw new RuntimeException("Mã OTP không hợp lệ hoặc đã hết hạn!");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        passwordResetOtps.remove(key);
+    }
+
     public AuthDto.UserDto toDto(User user) {
         return AuthDto.UserDto.builder()
                 .id(user.getId().toString())

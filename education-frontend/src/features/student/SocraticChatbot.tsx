@@ -3,40 +3,46 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage, User } from "@/types";
 import {
-  X,
-  Send,
-  Sparkles,
-  Lightbulb,
-  User as UserIcon,
-  Minus,
-  BookOpen,
-  GraduationCap,
-  HelpCircle,
-  CheckCircle2,
-  XCircle,
-  ShieldCheck,
-  AlertTriangle,
-  RotateCcw,
-  Check,
-  ArrowRight,
-  BookmarkCheck,
-  ChevronDown,
-  Layers,
-  Cpu,
-  WifiOff,
-  Wifi,
-  Coins,
-  ShieldAlert,
-  Clock,
-  AlertCircle,
-} from "lucide-react";
-import { RiSparklingFill, RiRobot2Fill } from "react-icons/ri";
-import { FaShieldHalved } from "react-icons/fa6";
+  PiRobotDuotone,
+  PiSparkleDuotone,
+  PiMicrophoneDuotone,
+  PiCameraDuotone,
+  PiSpeakerHighDuotone,
+  PiSpeakerSimpleXDuotone,
+  PiTrashDuotone,
+  PiPaperPlaneRightFill,
+  PiShieldCheckDuotone,
+  PiLightbulbDuotone,
+  PiArrowsOutSimpleBold,
+  PiArrowsInSimpleBold,
+  PiMinusBold,
+  PiXBold,
+  PiCheckCircleDuotone,
+  PiXCircleDuotone,
+  PiGraduationCapDuotone,
+  PiArrowsClockwiseDuotone,
+  PiInfoDuotone,
+  PiBookBookmarkDuotone,
+  PiQuestionDuotone,
+  PiWarningCircleDuotone,
+  PiCpuDuotone,
+  PiWifiHighDuotone,
+  PiUserCircleDuotone,
+  PiThumbsUpDuotone,
+  PiCopyDuotone,
+  PiCaretDownBold,
+  PiClockCountdownDuotone,
+  PiImagesDuotone,
+} from "react-icons/pi";
 import confetti from "canvas-confetti";
 import { api, SocraticChatResponse, InteractiveQuizData, CitationData } from "@/lib/api";
 
 export type TutorMode =
-  "SOCRATIC" | "GRADE_ADAPTED" | "PRACTICE" | "ERROR_DIAGNOSIS" | "CITE_LESSON";
+  | "SOCRATIC"
+  | "GRADE_ADAPTED"
+  | "PRACTICE"
+  | "ERROR_DIAGNOSIS"
+  | "CITE_LESSON";
 
 interface SocraticChatbotProps {
   currentUser: User;
@@ -47,36 +53,49 @@ interface SocraticChatbotProps {
   onNavigateToLesson?: (lessonId: string) => void;
 }
 
-const TUTOR_MODES: { id: TutorMode; name: string; icon: React.ReactNode; desc: string }[] = [
+interface TutorModeItem {
+  id: TutorMode;
+  name: string;
+  shortName: string;
+  icon: React.ReactNode;
+  desc: string;
+}
+
+const TUTOR_MODES: TutorModeItem[] = [
   {
     id: "SOCRATIC",
     name: "Gợi ý từng bước",
-    icon: <Lightbulb className="w-3.5 h-3.5" />,
-    desc: "Gợi mở tư duy, không giải hộ",
+    shortName: "Gợi ý",
+    icon: <PiLightbulbDuotone className="w-4 h-4" />,
+    desc: "Gợi mở tư duy sư phạm, không làm hộ bài",
   },
   {
     id: "GRADE_ADAPTED",
     name: "Theo lớp học",
-    icon: <GraduationCap className="w-3.5 h-3.5" />,
-    desc: "Ngôn ngữ phù hợp lứa tuổi",
+    shortName: "Lớp học",
+    icon: <PiGraduationCapDuotone className="w-4 h-4" />,
+    desc: "Giải thích trực quan phù hợp tâm lý lứa tuổi",
   },
   {
     id: "PRACTICE",
     name: "Tạo bài luyện tập",
-    icon: <HelpCircle className="w-3.5 h-3.5" />,
-    desc: "Trắc nghiệm tương tác tức thì",
+    shortName: "Luyện tập",
+    icon: <PiQuestionDuotone className="w-4 h-4" />,
+    desc: "Trắc nghiệm tương tác tức thì có tính điểm",
   },
   {
     id: "ERROR_DIAGNOSIS",
     name: "Vì sao em sai?",
-    icon: <RotateCcw className="w-3.5 h-3.5" />,
-    desc: "Chẩn đoán bẫy sai lầm",
+    shortName: "Chẩn đoán",
+    icon: <PiArrowsClockwiseDuotone className="w-4 h-4" />,
+    desc: "Phân tích bẫy tư duy và cách sửa sai",
   },
   {
     id: "CITE_LESSON",
-    name: "Căn cứ SGK & Video",
-    icon: <BookOpen className="w-3.5 h-3.5" />,
-    desc: "Trích dẫn chương trình GDPT",
+    name: "Căn cứ SGK",
+    shortName: "SGK & Video",
+    icon: <PiBookBookmarkDuotone className="w-4 h-4" />,
+    desc: "Trích dẫn chương trình GDPT 2018 & video bài giảng",
   },
 ];
 
@@ -91,14 +110,21 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [selectedMode, setSelectedMode] = useState<TutorMode>("SOCRATIC");
   const [selectedGrade, setSelectedGrade] = useState<number>(currentUser.gradeLevel || 5);
   const [isGradeDropdownOpen, setIsGradeDropdownOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isDevMetricsOpen, setIsDevMetricsOpen] = useState(false);
+  const [isPhotoMenuOpen, setIsPhotoMenuOpen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
+  const [likedMsgIds, setLikedMsgIds] = useState<Set<string>>(new Set());
 
-  // Danh sách tin nhắn khởi tạo
+  // Tin nhắn ban đầu thân thiện với học sinh
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "msg-01",
       role: "assistant",
-      content: `Chào ${currentUser.fullName}! Thầy là Gia sư AI đồng hành cùng em theo phương pháp Socratic. Thay vì chỉ đưa đáp án, thầy sẽ gợi ý từng bước, tạo bài luyện tập, chỉ rõ vì sao em sai và trích dẫn chuẩn SGK Lớp ${selectedGrade}. Em đang băn khoăn ở phần nào nào?`,
-      timestamp: "10:30",
+      content: `Chào ${currentUser.fullName || "em"}! Thầy là Gia sư AI đồng hành cùng em theo phương pháp Socratic.\n\nThay vì giải hộ đáp án, thầy sẽ gợi ý từng bước, lấy ví dụ thực tế và tạo bài tập luyện tập để em tự tin nắm chắc bài. Em đang cần thầy hỗ trợ ở câu hỏi hay bài tập nào?`,
+      timestamp: "Vừa xong",
       isSocraticHint: true,
       mode: "SOCRATIC",
       gradeLevel: selectedGrade,
@@ -111,37 +137,34 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [piiWarning, setPiiWarning] = useState<string | null>(null);
 
-  // 1. Chống lạm dụng AI: Giới hạn lượt hỏi, Token & Chi phí
+  // Giới hạn an toàn & Chống lạm dụng
   const [tokensUsedToday, setTokensUsedToday] = useState(3420);
   const [estimatedCostUsd, setEstimatedCostUsd] = useState(0.007);
   const [cooldownSec, setCooldownSec] = useState(0);
   const [rateLimitAlert, setRateLimitAlert] = useState<string | null>(null);
-  const [isAiMonitorOpen, setIsAiMonitorOpen] = useState(true);
-
-  // 2. Chống lạm dụng AI: Theo dõi hành vi bất thường (Prompt Injection / Jailbreak)
   const [abnormalAlert, setAbnormalAlert] = useState<string | null>(null);
 
-  // 3. Phương án dự phòng khi dịch vụ AI lỗi (Graceful Offline Socratic Engine)
+  // Động cơ AI (OpenAI Cloud API hoặc Offline Fallback)
   const [aiEngineMode, setAiEngineMode] = useState<"CLOUD_OPENAI" | "OFFLINE_FALLBACK">(
     "CLOUD_OPENAI"
   );
   const [fallbackActiveToast, setFallbackActiveToast] = useState<string | null>(null);
 
-  // Lưu đáp án học sinh đã chọn cho các câu hỏi luyện tập tương tác trong khung chat
+  // Lưu đáp án trắc nghiệm tương tác
   const [quizAnswers, setQuizAnswers] = useState<
     Record<string, { selected: string; isCorrect: boolean }>
   >({});
 
-  const maxQuota = 30; // Daily quota chuẩn Khanmigo K-12
-  const maxTokens = 10000; // Giới hạn token học sinh/ngày
-  const maxDailyCost = 0.05; // $0.05 USD / học sinh / ngày
+  const maxQuota = 30; // Giới hạn lượt hỏi/ngày
+  const maxTokens = 10000;
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Cooldown timer cho Sliding-window rate limiter
+  // Đếm ngược cooldown chống spam
   useEffect(() => {
     if (cooldownSec <= 0) return;
     const timer = setInterval(() => {
@@ -156,8 +179,16 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     return () => clearInterval(timer);
   }, [cooldownSec]);
 
-  // Kiểm tra thông tin cá nhân (PII) theo thời gian thực khi học sinh gõ
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Dừng đọc tiếng khi đóng chat
+  useEffect(() => {
+    if (!isOpen && typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      setSpeakingMsgId(null);
+    }
+  }, [isOpen]);
+
+  // Kiểm tra thông tin cá nhân (PII Protection)
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     setInput(val);
 
@@ -167,42 +198,148 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
     if (phoneRegex.test(val)) {
       setPiiWarning(
-        "🛡️ Phát hiện số điện thoại! Để bảo vệ quyền riêng tư, vui lòng không gửi thông tin liên lạc cá nhân."
+        "🛡️ Phát hiện số điện thoại! Để bảo vệ quyền riêng tư, vui lòng không chia sẻ số điện thoại cá nhân."
       );
     } else if (emailRegex.test(val)) {
       setPiiWarning(
-        "🛡️ Vui lòng không chia sẻ địa chỉ email cá nhân trên khung trò chuyện học tập."
+        "🛡️ Vui lòng không gửi địa chỉ email cá nhân trong khung học tập này."
       );
     } else if (cccdRegex.test(val)) {
-      setPiiWarning("🛡️ Phát hiện dãy số định danh! Tuyệt đối không gửi số CCCD/CMND trên mạng.");
+      setPiiWarning("🛡️ Phát hiện dãy số định danh! Tuyệt đối không chia sẻ số CCCD/CMND.");
     } else {
       setPiiWarning(null);
     }
   };
 
+  // Tính năng đọc to văn bản hỗ trợ học sinh tiểu học (Text-to-Speech)
+  const handleSpeakText = (msgId: string, text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    if (speakingMsgId === msgId) {
+      window.speechSynthesis.cancel();
+      setSpeakingMsgId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    // Loại bỏ markdown và ký tự đặc biệt
+    const cleanText = text.replace(/[*#_`]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "vi-VN";
+    utterance.rate = 0.95;
+
+    utterance.onend = () => setSpeakingMsgId(null);
+    utterance.onerror = () => setSpeakingMsgId(null);
+
+    setSpeakingMsgId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Sao chép tin nhắn
+  const handleCopyText = (msgId: string, text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedMsgId(msgId);
+      setTimeout(() => setCopiedMsgId(null), 2000);
+    }
+  };
+
+  // Thích phản hồi
+  const handleToggleLike = (msgId: string) => {
+    setLikedMsgIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(msgId)) next.delete(msgId);
+      else next.add(msgId);
+      return next;
+    });
+  };
+
+  // Làm mới cuộc trò chuyện
+  const handleResetChat = () => {
+    if (window.confirm("Bắt đầu cuộc trò chuyện mới với Gia Sư AI?")) {
+      setMessages([
+        {
+          id: `msg-${Date.now()}`,
+          role: "assistant",
+          content: `Chào ${currentUser.fullName || "em"}! Thầy đã sẵn sàng cho câu hỏi tiếp theo. Em đang muốn học hay làm bài tập về chủ đề gì nào?`,
+          timestamp: "Vừa xong",
+          isSocraticHint: true,
+          mode: selectedMode,
+          gradeLevel: selectedGrade,
+        },
+      ]);
+      setQuizAnswers({});
+      setInput("");
+      setPiiWarning(null);
+    }
+  };
+
+  // Giả lập quét ảnh đề bài bài tập
+  const handleSimulatePhotoUpload = (promptText: string) => {
+    setIsPhotoMenuOpen(false);
+    setInput(promptText);
+    inputRef.current?.focus();
+  };
+
+  // Giả lập nhận diện giọng nói
+  const handleToggleVoiceInput = () => {
+    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+      try {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = "vi-VN";
+        recognition.interimResults = false;
+
+        if (!isListening) {
+          setIsListening(true);
+          recognition.start();
+
+          recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+            setIsListening(false);
+          };
+
+          recognition.onerror = () => setIsListening(false);
+          recognition.onend = () => setIsListening(false);
+        } else {
+          setIsListening(false);
+          recognition.stop();
+        }
+        return;
+      } catch {
+        // Fallback
+      }
+    }
+
+    // Fallback nếu trình duyệt không hỗ trợ Web Speech API
+    setIsListening(true);
+    setTimeout(() => {
+      setIsListening(false);
+      setInput("Thầy ơi, giải thích giúp em tính chất cơ bản của phân số với ạ!");
+      inputRef.current?.focus();
+    }, 1200);
+  };
+
+  // Xử lý gửi tin nhắn
   const handleSend = async (textToSend?: string, customMode?: TutorMode) => {
     const text = textToSend || input;
     if (!text.trim()) return;
 
-    // 1. Sliding Window Rate Limiting Cooldown Check (Chống spam prompt)
     if (cooldownSec > 0) {
-      setRateLimitAlert(
-        `Thao tác quá nhanh! Vui lòng suy ngẫm gợi ý trong ${cooldownSec}s trước khi gửi tiếp.`
-      );
+      setRateLimitAlert(`Thao tác nhanh quá! Hãy dành ${cooldownSec}s đọc kĩ gợi ý trước nhé.`);
       setTimeout(() => setRateLimitAlert(null), 3000);
       return;
     }
 
-    // 2. Kiểm tra hành vi bất thường / Prompt Injection / Jailbreak
+    // Kiểm tra Prompt Injection
     const injectionRegex =
-      /(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter|tiết lộ prompt)/i;
-    const isSuspicious = injectionRegex.test(text);
-    if (isSuspicious) {
+      /(ignore previous instructions|bỏ qua hướng dẫn|bỏ qua quy tắc|jailbreak|DAN mode|system prompt|hack hệ thống|đưa luôn đáp án không cần giải thích|bypass filter)/i;
+    if (injectionRegex.test(text)) {
       setAbnormalAlert(
-        "⚠️ CẢNH BÁO AN TOÀN AI: Phát hiện câu lệnh bất thường (Prompt Injection/Jailbreak attempt). Gia sư AI tuân thủ nguyên tắc sư phạm K-12 và đã ghi lại sự kiện vào Nhật ký kiểm toán bảo mật!"
+        "⚠️ CẢNH BÁO AN TOÀN K-12: Gia sư AI tuân thủ nguyên tắc sư phạm chỉ dẫn gợi mở, không giải hộ hay tiết lộ đáp án trực tiếp."
       );
-    } else {
-      setAbnormalAlert(null);
+      setTimeout(() => setAbnormalAlert(null), 5000);
     }
 
     const currentMode = customMode || selectedMode;
@@ -219,16 +356,14 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     setIsTyping(true);
     setPiiWarning(null);
     setRateLimitAlert(null);
+    setCooldownSec(4); // Cooldown 4 giây thân thiện
 
-    // Kích hoạt cooldown 5s phòng chống spam
-    setCooldownSec(5);
-
-    // Cập nhật ước lượng Token và Chi phí
+    // Cập nhật token & chi phí ước tính
     const promptTokens = Math.max(15, Math.ceil(text.length / 3));
-    setTokensUsedToday((prev) => Math.min(prev + promptTokens + 120, maxTokens));
+    setTokensUsedToday((prev) => Math.min(prev + promptTokens + 110, maxTokens));
     setEstimatedCostUsd((prev) => Number((prev + 0.0002).toFixed(4)));
 
-    // Nếu học sinh hoặc admin đang chọn Chế độ Dự Phòng Offline
+    // Chế độ Offline Fallback
     if (aiEngineMode === "OFFLINE_FALLBACK") {
       setTimeout(() => {
         const botMsg = generateLocalTutorResponse(
@@ -240,7 +375,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         setMessages((prev) => [...prev, botMsg]);
         setIsTyping(false);
         setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
-      }, 600);
+      }, 500);
       return;
     }
 
@@ -277,29 +412,12 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         setIsTyping(false);
         return;
       }
-    } catch (err: any) {
-      if (
-        err?.message &&
-        (err.message.includes("429") ||
-          err.message.toLowerCase().includes("rate limit") ||
-          err.message.includes("quá nhanh"))
-      ) {
-        setRateLimitAlert(
-          err.message ||
-            "Giới hạn tốc độ: Bạn đang gửi câu hỏi quá nhanh. Vui lòng đợi 15 giây trước khi hỏi tiếp."
-        );
-        setCooldownSec(15);
-        setIsTyping(false);
-        return;
-      }
-      // Dịch vụ Cloud lỗi -> Chuyển sang Graceful Offline Socratic Engine
-      setFallbackActiveToast(
-        "⚡ Cloud AI API gặp sự cố. Hệ thống tự động chuyển sang Động cơ Gia sư Socratic Offline dự phòng!"
-      );
-      setTimeout(() => setFallbackActiveToast(null), 4000);
+    } catch {
+      // Graceful offline fallback khi mạng gián đoạn
+      setFallbackActiveToast("⚡ Đã tự động kích hoạt Động cơ Gia sư Socratic Offline dự phòng.");
+      setTimeout(() => setFallbackActiveToast(null), 3500);
     }
 
-    // Fallback Client-side Socratic Engine
     setTimeout(() => {
       const botMsg = generateLocalTutorResponse(
         text,
@@ -310,271 +428,253 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
       setUsedQuota((prev) => Math.min(prev + 1, maxQuota));
-    }, 600);
+    }, 500);
   };
 
-  // Trình sinh phản hồi sư phạm Offline khi backend gián đoạn
+  // Trình sinh phản hồi sư phạm Offline chất lượng cao
   const generateLocalTutorResponse = (
     text: string,
     mode: TutorMode,
     grade: number,
     lesson: string
   ): ChatMessage => {
-    const qLower = text.toLowerCase();
-    const timeNow = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
     let reply = "";
     let hints: string[] | undefined = undefined;
     let quiz: InteractiveQuizData | undefined = undefined;
     let citations: CitationData[] | undefined = undefined;
     let misconception: string | undefined = undefined;
 
-    // Căn cứ SGK
     citations = [
       {
         title: "Bài 3: Khái niệm phân số và phân số bằng nhau",
         chapter: "Chương 1: Ôn tập và Bổ sung về Phân số",
-        sourceBook: `SGK Toán ${grade} - Bộ sách Kết nối tri thức với cuộc sống (Trang 10-14)`,
+        sourceBook: `SGK Toán ${grade} - Bộ Kết nối tri thức với cuộc sống (Trang 10-14)`,
         videoTime: "02:30 (Mục 1: Khái niệm Tử số và Mẫu số)",
       },
       {
         title: "Bài 4: Tính chất cơ bản & Rút gọn phân số",
         chapter: "Chương 1: Phân số & Phép tính",
         sourceBook: `Vở bài tập Toán ${grade} Tập 1 (Trang 8-11)`,
-        videoTime: "05:30 (Mục 2: Ví dụ minh họa cắt bánh)",
+        videoTime: "05:30 (Mục 2: Ví dụ minh họa trực quan)",
       },
     ];
 
     if (mode === "GRADE_ADAPTED") {
       if (grade <= 5) {
-        reply = `Chào em! Ở cấp Tiểu học (Lớp ${grade}), chúng ta hình dung thật trực quan nhé: "Em có 1 chiếc bánh pizza chia đều cho 4 bạn. Nếu em lấy 1 miếng, phân số biểu diễn là 1/4 (1 là tử số chỉ số miếng lấy, 4 là mẫu số chỉ tổng số miếng). Hãy nhớ: Tử ở trên, Mẫu ở dưới!"`;
+        reply = `Chào em! Ở cấp Tiểu học (Lớp ${grade}), chúng ta cùng hình dung thật gần gũi nhé:\n\n"Em có 1 chiếc bánh pizza tròn chia đều cho 4 bạn. Nếu em lấy 1 miếng, phân số biểu diễn phần bánh của em là 1/4. Số 1 ở trên gọi là Tử số (số phần đã lấy), số 4 ở dưới gọi là Mẫu số (tổng số phần bằng nhau)."`;
         hints = [
           "Bước 1: Đếm xem đồ vật được chia thành bao nhiêu phần bằng nhau (đây là Mẫu số).",
           "Bước 2: Đếm số phần được lấy ra hoặc tô màu (đây là Tử số).",
           "Bước 3: Viết phân số: Tử số ở trên, dấu gạch ngang, Mẫu số ở dưới.",
         ];
       } else if (grade <= 9) {
-        reply = `Chào bạn! Ở cấp THCS (Lớp ${grade}), ta tiếp cận dưới góc độ đại số và tính chất tổng quát: Phân số a/b (b ≠ 0) biểu diễn phép chia a : b. Khi cộng trừ phân số khác mẫu, ta tìm Bội chung nhỏ nhất (BCNN) của các mẫu số để quy đồng.`;
+        reply = `Chào bạn! Ở cấp THCS (Lớp ${grade}), ta tiếp cận phân số dưới dạng thương đại số a/b (b ≠ 0). Khi quy đồng hai phân số khác mẫu, ta tìm Bội chung nhỏ nhất (BCNN) của các mẫu số để chọn làm mẫu thức chung.`;
         hints = [
           "Bước 1: Phân tích các mẫu số ra thừa số nguyên tố.",
-          "Bước 2: Tìm Mẫu thức chung = BCNN của các mẫu.",
+          "Bước 2: Tìm Mẫu số chung = BCNN của các mẫu.",
           "Bước 3: Nhân cả tử và mẫu với thừa số phụ tương ứng.",
         ];
       } else {
-        reply = `Chào bạn! Ở bậc THPT (Lớp ${grade}), bài học liên quan đến mở rộng trường số hữu tỉ Q sang trường số thực R, biểu thức phân thức đại số và điều kiện xác định của phương trình, đồ thị hàm số.`;
+        reply = `Chào bạn! Ở bậc THPT (Lớp ${grade}), biểu thức phân thức yêu cầu tìm Tập xác định (ĐKXĐ: mẫu số khác 0) trước khi rút gọn hoặc giải phương trình.`;
         hints = [
           "Bước 1: Luôn đặt ĐKXĐ (Mẫu thức khác 0).",
-          "Bước 2: Biến đổi tương đương hoặc lập bảng biến thiên.",
+          "Bước 2: Biến đổi tương đương hoặc phân tích đa thức thành nhân tử.",
           "Bước 3: Đối chiếu nghiệm với ĐKXĐ ban đầu.",
         ];
       }
     } else if (mode === "PRACTICE") {
-      reply = `Tuyệt vời! Sau khi xem lý thuyết bài "${lesson}", thầy đã tạo sẵn câu hỏi luyện tập trắc nghiệm dành cho Lớp ${grade} để em thử sức ngay:`;
+      reply = `Thầy có một câu hỏi trắc nghiệm tương tác rất thú vị liên quan đến "${lesson}" cho Lớp ${grade}. Em chọn đáp án đúng bên dưới nhé:`;
       if (grade <= 5) {
         quiz = {
           id: `quiz-${Date.now()}`,
           question:
-            "Một chiếc bánh pizza được chia đều thành 8 miếng. Bạn Minh ăn 3 miếng. Phân số chỉ số phần bánh Minh đã ăn là bao nhiêu?",
+            "Một chiếc bánh pizza được cắt đều thành 8 miếng bằng nhau. Bạn Nam đã ăn 3 miếng. Phân số chỉ số phần bánh bạn Nam đã ăn là:",
           options: ["A. 3/8", "B. 8/3", "C. 5/8", "D. 3/5"],
           correctAnswer: "A. 3/8",
           explanation:
-            "Tổng số phần chia đều là 8 (Mẫu số), số phần đã ăn là 3 (Tử số). Do đó phân số biểu diễn là 3/8.",
+            "Tổng số miếng chia đều là 8 (Mẫu số), số miếng Nam đã ăn là 3 (Tử số). Vậy phân số đúng là 3/8.",
           points: 10,
         };
-      } else if (grade <= 9) {
+      } else {
         quiz = {
           id: `quiz-${Date.now()}`,
           question: "Mẫu số chung nhỏ nhất của hai phân số 5/12 và 7/18 là số nào?",
           options: ["A. 216", "B. 72", "C. 36", "D. 48"],
           correctAnswer: "C. 36",
           explanation:
-            "12 = 2² × 3; 18 = 2 × 3². BCNN(12, 18) = 2² × 3² = 36. Mẫu chung nhỏ nhất là 36.",
-          points: 10,
-        };
-      } else {
-        quiz = {
-          id: `quiz-${Date.now()}`,
-          question: "Tập xác định của hàm phân thức y = (2x - 3) / (x² - 9) là:",
-          options: ["A. D = R", "B. D = R \\ {3}", "C. D = R \\ {-3; 3}", "D. D = (-3; 3)"],
-          correctAnswer: "C. D = R \\ {-3; 3}",
-          explanation: "Điều kiện mẫu khác 0: x² - 9 ≠ 0 ⇔ x ≠ 3 và x ≠ -3. Vậy D = R \\ {-3; 3}.",
+            "12 = 2² × 3; 18 = 2 × 3². BCNN(12, 18) = 2² × 3² = 36. Vậy mẫu số chung nhỏ nhất là 36.",
           points: 10,
         };
       }
     } else if (mode === "ERROR_DIAGNOSIS") {
-      reply =
-        "Thầy đã phân tích câu trả lời của em. Sai sót là một phần tự nhiên của việc học hỏi! Dưới đây là phân tích chi tiết nguyên nhân:";
+      reply = `Thầy hiểu chỗ em đang băn khoăn! Đây là bẫy sai lầm mà nhiều bạn học sinh thường gặp:`;
       misconception =
-        "Bẫy sai lầm phổ biến: Em đã vô tình cộng gộp cả hai mẫu số với nhau (ví dụ: 2/3 + 3/4 = (2+3)/(3+4) = 5/7). Đây là sai lầm rất thường gặp! Mẫu số chỉ đơn vị phân chia, không được phép cộng trực tiếp mà bắt buộc phải quy đồng mẫu trước.";
+        "Sai lầm phổ biến: Cộng trực tiếp cả tử số và mẫu số khi chưa quy đồng (ví dụ: 1/2 + 1/3 = 2/5 là SAI!). Quy tắc đúng: Phải quy đồng về cùng mẫu số chung rồi mới cộng các tử số với nhau: 3/6 + 2/6 = 5/6.";
       hints = [
-        "Quy tắc vàng 1: Tuyệt đối không cộng mẫu số với nhau.",
-        "Quy tắc vàng 2: Quy đồng về cùng mẫu số chung.",
-        "Quy tắc vàng 3: Giữ nguyên mẫu số chung, chỉ cộng các tử số.",
+        "Nhớ kiểm tra: Mẫu số đã giống nhau chưa?",
+        "Nếu khác mẫu: Quy đồng về mẫu số chung trước.",
+        "Giữ nguyên mẫu số chung, chỉ cộng trừ các tử số.",
       ];
     } else if (mode === "CITE_LESSON") {
-      reply = `Dưới đây là căn cứ tài liệu chính thức theo Chương trình Giáo dục Phổ thông 2018 và bài giảng trực tuyến của DMKLab cho chủ đề "${lesson}":`;
+      reply = `Kiến thức này được quy định chuẩn trong Chương trình Giáo dục Phổ thông 2018. Em có thể tham khảo trực tiếp các tài liệu học tập sau:`;
     } else {
-      // Socratic default
-      if (qLower.includes("đáp án") || qLower.includes("kết quả") || qLower.includes("giải hộ")) {
-        reply =
-          "Thầy hiểu em đang rất muốn biết kết quả ngay! Nhưng nếu thầy đưa luôn đáp án, em sẽ không rèn luyện được tư duy của chính mình. Em hãy đọc lại đề bài và cho thầy biết: Bước đầu tiên em đã thử làm là gì?";
-      } else if (qLower.includes("quy đồng")) {
-        reply =
-          "Quy đồng mẫu số nghĩa là biến đổi các phân số về cùng một mẫu số chung mà giá trị không thay đổi. Ví dụ với hai mẫu số 3 và 4, số nhỏ nhất nào chia hết cho cả 3 và 4 nhỉ?";
-      } else {
-        reply = `Câu hỏi rất hay! Để giải quyết vấn đề trong bài học "${lesson}", theo em khái niệm cốt lõi nào chúng ta vừa xem trong video có thể áp dụng đầu tiên?`;
-      }
+      reply = `Thầy gợi mở để em tự tìm ra hướng giải nhé! Đối với bài toán "${lesson}":\n\nEm hãy quan sát xem bài toán cho chúng ta những dữ kiện gì, và yêu cầu tìm điều gì trước tiên?`;
       hints = [
-        "Gợi ý 1: Đọc kỹ câu hỏi và xác định dữ kiện đã cho.",
-        "Gợi ý 2: Kiểm tra xem mẫu số của các phân số đã bằng nhau chưa.",
-        "Gợi ý 3: Tự nhẩm thử một đáp án và đối chiếu lại với định nghĩa trong bài học.",
+        "Gợi ý 1: Xác định đại lượng đã biết và đại lượng cần tìm.",
+        "Gợi ý 2: Vẽ sơ đồ đoạn thẳng hoặc hình tròn mô phỏng nếu bài toán có phân số.",
+        "Gợi ý 3: Thực hiện từng phép tính một cách tuần tự và rút gọn kết quả về phân số tối giản.",
       ];
     }
 
     return {
-      id: `msg-${Date.now() + 1}`,
+      id: `msg-${Date.now()}`,
       role: "assistant",
       content: reply,
-      timestamp: timeNow,
-      mode: mode,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      mode,
       gradeLevel: grade,
       stepByStepHints: hints,
       interactiveQuiz: quiz,
-      citations: citations,
+      citations,
       misconceptionReason: misconception,
     };
   };
 
-  // Xử lý khi học sinh chọn một đáp án trong câu hỏi trắc nghiệm tương tác
-  const handleSelectQuizOption = (quizId: string, optionText: string, correctAnswer: string) => {
-    if (quizAnswers[quizId]) return; // Không cho chọn lại sau khi đã submit
-
+  // Chọn đáp án trắc nghiệm tương tác
+  const handleSelectQuizOption = (quizId: string, selectedOption: string, correctAnswer: string) => {
     const isCorrect =
-      optionText.trim().startsWith(correctAnswer.slice(0, 2)) || optionText.includes(correctAnswer);
+      selectedOption.includes(correctAnswer) ||
+      selectedOption.startsWith(correctAnswer.slice(0, 2));
+
     setQuizAnswers((prev) => ({
       ...prev,
-      [quizId]: { selected: optionText, isCorrect },
+      [quizId]: { selected: selectedOption, isCorrect },
     }));
 
     if (isCorrect) {
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ["#14BF96", "#1865F2", "#FFC700"],
-      });
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.8 },
+          colors: ["#1865F2", "#14BF96", "#F59E0B"],
+        });
+      } catch {
+        // Safe fail
+      }
     }
   };
 
-  // Gợi ý câu hỏi nhanh thay đổi theo từng chế độ
+  // Gợi ý câu hỏi nhanh theo từng chế độ
   const getPromptSuggestions = () => {
     switch (selectedMode) {
-      case "GRADE_ADAPTED":
-        return [
-          `Giải thích bài này cho học sinh Lớp ${selectedGrade} dễ hiểu`,
-          "Cho ví dụ thực tế liên quan đến cuộc sống",
-          `Khái niệm này lên cấp trên sẽ học nâng cao ra sao?`,
-        ];
       case "PRACTICE":
         return [
-          "Tạo một câu hỏi trắc nghiệm mới về bài học này",
-          "Cho em một bài tập nâng cao tư duy",
-          "Thử thách bài tập phân số có lời văn",
+          "🎯 Cho em 1 bài tập trắc nghiệm phân số",
+          "⚡ Luyện tập tính nhanh phân số",
+          "🏆 Thử thách bài toán thực tế K-12",
         ];
       case "ERROR_DIAGNOSIS":
         return [
-          "Tại sao 2/3 + 3/4 không bằng 5/7?",
-          "Em tính ra kết quả khác đáp án, em sai ở đâu?",
-          "Những bẫy sai lầm học sinh hay gặp nhất ở bài này?",
+          "❓ Vì sao 1/2 + 1/3 không bằng 2/5?",
+          "🔍 Kiểm tra giúp em: 3/4 quy đồng mẫu 12 bằng bao nhiêu?",
+          "⚠️ Những lỗi hay gặp khi rút gọn phân số là gì?",
+        ];
+      case "GRADE_ADAPTED":
+        return [
+          "🍕 Lấy ví dụ chiếc bánh pizza cho em dễ hiểu",
+          "🍎 Minh họa phân số bằng hình vẽ trực quan",
+          "✏️ Giải thích như đang nói chuyện với bạn Lớp " + selectedGrade,
         ];
       case "CITE_LESSON":
         return [
-          "Bài học này thuộc chương nào trong SGK?",
-          "Cho em biết mốc thời gian video bài giảng liên quan",
-          "Trích dẫn định nghĩa chính thức trong sách giáo khoa",
+          "📖 Trích dẫn bài học này trong SGK Toán " + selectedGrade,
+          "🎥 Cho em xem mốc thời gian video bài giảng",
+          "📝 Yêu cầu cần đạt theo chuẩn GDPT 2018",
         ];
-      case "SOCRATIC":
       default:
         return [
-          "Gợi ý cho em bước đầu tiên của bài tập này",
-          "Quy đồng mẫu số là gì vậy thầy?",
-          "Cho em một gợi ý về ví dụ chiếc bánh pizza",
+          "💡 Cho em gợi ý bước đầu tiên của bài tập này",
+          "📐 Quy đồng mẫu số là làm như thế nào?",
+          "🍕 Giải thích phân số qua ví dụ thực tế",
         ];
     }
   };
 
-  // If chatbot is closed, render floating circular trigger button at bottom-right corner
+  // Nếu chatbot chưa mở, hiển thị nút tròn nổi ở góc dưới bên phải
   if (!isOpen) {
     if (!onOpen) return null;
     return (
       <div className="fixed bottom-6 right-6 z-40 group flex items-center">
-        {/* Subtle tooltip on hover */}
-        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-[#1E293B] text-white text-xs font-bold whitespace-nowrap shadow-xl border border-slate-700 hidden sm:flex items-center gap-1.5">
+        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-[#0B1528] text-white text-xs font-bold shadow-xl border border-slate-700 hidden sm:flex items-center gap-2">
+          <PiRobotDuotone className="w-4 h-4 text-emerald-400" />
           <span>Gia sư AI Socratic 24/7</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         </div>
 
         <button
           onClick={onOpen}
-          className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-[#1865F2] via-[#1A73E8] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-[#1865F2]/40 hover:scale-108 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-white/25"
+          className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1865F2] via-[#1253cc] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-white/20"
           title="Trò chuyện với Gia Sư AI Socratic 24/7"
           aria-label="Mở gia sư AI DMKLab"
         >
-          {/* Subtle pulse effect */}
-          <span className="absolute inset-0 rounded-full bg-[#1865F2] animate-ping opacity-20 pointer-events-none" />
-
-          {/* AI Robot Icon */}
-          <RiRobot2Fill className="w-7 h-7 text-white transition-transform duration-200 group-hover:scale-110 drop-shadow-xs" />
-
-          {/* Online green indicator badge */}
-          <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-[#0B1120]" />
+          <PiSparkleDuotone className="w-7 h-7 text-white" />
+          <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-[#0B1528]" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] h-[640px] max-h-[calc(100vh-4.5rem)] bg-white dark:bg-[#0F172A] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-      {/* Top Header */}
-      <div className="bg-gradient-to-r from-[#0B2147] via-[#102A54] to-[#0D3B66] text-white p-3.5 sm:p-4 flex items-center justify-between shadow-md shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shadow-sm shrink-0">
-            <RiSparklingFill className="w-5 h-5 text-white" />
+    <div
+      className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 bg-white dark:bg-[#0B1528] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-200 animate-in fade-in zoom-in-95 ${
+        isExpanded
+          ? "w-[calc(100vw-2rem)] sm:w-[720px] h-[720px] max-h-[calc(100vh-4rem)]"
+          : "w-[calc(100vw-2rem)] sm:w-[460px] h-[640px] max-h-[calc(100vh-4.5rem)]"
+      }`}
+    >
+      {/* 1. TOP HEADER: Thanh tiêu đề thông minh, hiện đại */}
+      <div className="bg-[#0A1A36] dark:bg-[#070F1E] text-white px-4 py-3 sm:py-3.5 flex items-center justify-between border-b border-slate-800 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shadow-md shrink-0 border border-white/20">
+            <PiRobotDuotone className="w-6 h-6" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full ring-2 ring-[#0A1A36]" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-sm leading-tight">Gia Sư AI Học Tập</h3>
-              <span className="text-[10px] bg-[#14BF96] px-1.5 py-0.5 rounded-full font-black text-white">
-                Socratic 2.0
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-black text-sm text-white tracking-tight truncate">
+                Gia Sư AI Socratic
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
+                v2.5
               </span>
             </div>
-            <p className="text-[10px] sm:text-[11px] text-slate-300 flex items-center gap-1 mt-0.5">
-              <FaShieldHalved className="w-2.5 h-2.5 text-emerald-400" />
-              <span>Bảo vệ quyền riêng tư K-12 · Không giải hộ</span>
+            <p className="text-[11px] text-slate-300 flex items-center gap-1.5 truncate mt-0.5">
+              <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="truncate">Gợi mở tư duy · Không giải hộ · Chuẩn GDPT</span>
             </p>
           </div>
         </div>
 
-        {/* Grade level picker button & window actions */}
-        <div className="flex items-center gap-1.5">
-          {/* Grade Dropdown Trigger */}
+        {/* Header Action Buttons */}
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          {/* Grade Selector Dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsGradeDropdownOpen(!isGradeDropdownOpen)}
-              className="px-2 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 transition cursor-pointer border border-white/15"
+              className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer border border-white/15"
               title="Đổi trình độ lớp học"
             >
               <span>Lớp {selectedGrade}</span>
-              <ChevronDown className="w-3 h-3 opacity-70" />
+              <PiCaretDownBold className="w-3 h-3 opacity-80" />
             </button>
 
-            {/* Dropdown Menu */}
             {isGradeDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 text-slate-800 dark:text-slate-100">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">
-                  Chọn trình độ lớp:
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0B1528] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2.5 z-50 text-slate-800 dark:text-slate-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 px-2 py-1">
+                  Chọn trình độ lớp học:
                 </div>
-                <div className="grid grid-cols-3 gap-1 pt-1">
+                <div className="grid grid-cols-3 gap-1.5 pt-1">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
                     <button
                       key={g}
@@ -582,10 +682,10 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                         setSelectedGrade(g);
                         setIsGradeDropdownOpen(false);
                       }}
-                      className={`py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+                      className={`py-1.5 text-xs font-bold rounded-xl transition cursor-pointer ${
                         selectedGrade === g
                           ? "bg-[#1865F2] text-white shadow-xs"
-                          : "hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300"
+                          : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
                       }`}
                     >
                       Lớp {g}
@@ -596,119 +696,157 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             )}
           </div>
 
+          {/* Reset chat */}
+          <button
+            onClick={handleResetChat}
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            title="Làm mới cuộc trò chuyện"
+          >
+            <PiTrashDuotone className="w-4 h-4" />
+          </button>
+
+          {/* Expand/Collapse window */}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer hidden sm:block"
+            title={isExpanded ? "Thu nhỏ cửa sổ" : "Mở rộng cửa sổ"}
+          >
+            {isExpanded ? (
+              <PiArrowsInSimpleBold className="w-4 h-4" />
+            ) : (
+              <PiArrowsOutSimpleBold className="w-4 h-4" />
+            )}
+          </button>
+
+          {/* Minimize */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
             title="Thu nhỏ"
           >
-            <Minus className="w-4 h-4" />
+            <PiMinusBold className="w-4 h-4" />
           </button>
+
+          {/* Close */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
             title="Đóng chatbox"
           >
-            <X className="w-4 h-4" />
+            <PiXBold className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* 5 Tutor Mode Navigation Tabs */}
-      <div className="bg-slate-100/90 dark:bg-slate-800/90 p-1.5 border-b border-slate-200 dark:border-slate-700 flex gap-1 overflow-x-auto no-scrollbar shrink-0">
-        {TUTOR_MODES.map((mode) => {
-          const isActive = selectedMode === mode.id;
-          return (
-            <button
-              key={mode.id}
-              onClick={() => setSelectedMode(mode.id)}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                isActive
-                  ? "bg-white dark:bg-slate-900 text-[#1865F2] dark:text-blue-400 shadow-xs font-bold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/50"
-              }`}
-              title={mode.desc}
-            >
-              <span className={isActive ? "text-[#1865F2] dark:text-blue-400" : "text-slate-400"}>
-                {mode.icon}
-              </span>
-              <span>{mode.name}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Chống lạm dụng AI & Quota Header */}
-      <div className="bg-slate-50 dark:bg-slate-900/90 px-3.5 py-2 border-b border-slate-200 dark:border-slate-800 text-[11px] shrink-0">
-        <div className="flex items-center justify-between gap-2">
-          {/* Quota & Cost indicators */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-[#1865F2] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-900">
-              Quota: {usedQuota}/{maxQuota} câu
-            </span>
-            <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
-              ~{tokensUsedToday.toLocaleString()} tokens
-            </span>
-            <span className="text-emerald-700 dark:text-emerald-400 font-semibold hidden sm:inline">
-              ${estimatedCostUsd} / $0.05
-            </span>
-          </div>
-
-          {/* AI Engine & Fallback Switcher */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                const next = aiEngineMode === "CLOUD_OPENAI" ? "OFFLINE_FALLBACK" : "CLOUD_OPENAI";
-                setAiEngineMode(next);
-              }}
-              className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition cursor-pointer border ${
-                aiEngineMode === "CLOUD_OPENAI"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300"
-                  : "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300"
-              }`}
-              title="Click để chuyển đổi giữa OpenAI API và Động cơ Socratic Offline dự phòng"
-            >
-              {aiEngineMode === "CLOUD_OPENAI" ? (
-                <>
-                  <Wifi className="w-3 h-3 text-emerald-600" />
-                  <span>OpenAI Cloud API</span>
-                </>
-              ) : (
-                <>
-                  <Cpu className="w-3 h-3 text-amber-600" />
-                  <span>Offline Dự Phòng</span>
-                </>
-              )}
-            </button>
-          </div>
+      {/* 2. SUB-HEADER: Thanh Chế Độ Sư Phạm & Quota Thân Thiện Học Sinh */}
+      <div className="bg-slate-50 dark:bg-[#071120] px-3.5 py-2 border-b border-slate-200/90 dark:border-slate-800 flex items-center justify-between gap-2 shrink-0">
+        {/* Scrollable Mode Selector Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+          {TUTOR_MODES.map((mode) => {
+            const isActive = selectedMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                onClick={() => setSelectedMode(mode.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                  isActive
+                    ? "bg-[#1865F2] text-white shadow-xs"
+                    : "bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300"
+                }`}
+                title={mode.desc}
+              >
+                <span>{mode.icon}</span>
+                <span>{isExpanded ? mode.name : mode.shortName}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Sliding Window Cooldown Notice */}
-        {cooldownSec > 0 && (
-          <div className="mt-1.5 flex items-center justify-between text-[10px] text-blue-700 dark:text-blue-300 bg-blue-50/80 dark:bg-blue-950/40 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-900 animate-pulse">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              <span>
-                Chống lạm dụng (Sliding window): Vui lòng suy ngẫm gợi ý trước khi hỏi tiếp...
-              </span>
-            </span>
-            <span className="font-mono font-bold">{cooldownSec}s</span>
+        {/* Student-friendly Quota Capsule & Technical Info Toggle */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 border border-blue-200/70 dark:border-blue-900/60 flex items-center gap-1">
+            <span>Còn {maxQuota - usedQuota}/{maxQuota} câu</span>
           </div>
-        )}
+
+          <button
+            onClick={() => setIsDevMetricsOpen(!isDevMetricsOpen)}
+            className={`p-1.5 rounded-xl border transition cursor-pointer ${
+              isDevMetricsOpen
+                ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600"
+                : "bg-white dark:bg-[#0E1B31] text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-slate-200/80 dark:border-slate-800"
+            }`}
+            title="Thông tin kỹ thuật & Giám sát chi phí API"
+          >
+            <PiInfoDuotone className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Fallback Active Toast */}
-      {fallbackActiveToast && (
-        <div className="bg-amber-500 text-white p-2 text-xs flex items-center gap-2 shrink-0 animate-in fade-in duration-200">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span className="font-medium text-[11px]">{fallbackActiveToast}</span>
+      {/* 2b. Collapsible Technical / Admin Metrics Panel */}
+      {isDevMetricsOpen && (
+        <div className="bg-slate-100 dark:bg-[#0A1629] p-3 border-b border-slate-200 dark:border-slate-800 text-xs space-y-2 animate-in fade-in slide-in-from-top-1 duration-150 shrink-0">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
+            <span>QUẢN TRỊ HẠN MỨC & ĐỘNG CƠ AI</span>
+            <span>Mô hình: GPT-4o-mini</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
+            <div className="p-2 rounded-xl bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800">
+              <span className="text-slate-400 block text-[10px]">Tokens hôm nay</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200">
+                {tokensUsedToday.toLocaleString()} / {maxTokens.toLocaleString()}
+              </span>
+            </div>
+            <div className="p-2 rounded-xl bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800">
+              <span className="text-slate-400 block text-[10px]">Chi phí ước tính</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                ${estimatedCostUsd} / $0.05
+              </span>
+            </div>
+            <div className="col-span-2 sm:col-span-1 p-2 rounded-xl bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <span className="text-slate-400 block text-[10px]">Động cơ hiện tại</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  {aiEngineMode === "CLOUD_OPENAI" ? "OpenAI Cloud" : "Offline Socratic"}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setAiEngineMode(
+                    aiEngineMode === "CLOUD_OPENAI" ? "OFFLINE_FALLBACK" : "CLOUD_OPENAI"
+                  )
+                }
+                className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-[10px] font-bold text-blue-600 dark:text-blue-400 transition cursor-pointer"
+              >
+                Đổi chế độ
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Abnormal Behavior / Prompt Injection Alert Banner */}
+      {/* Cooldown Timer Bar */}
+      {cooldownSec > 0 && (
+        <div className="bg-blue-50/90 dark:bg-blue-950/60 px-3.5 py-1.5 border-b border-blue-200/80 dark:border-blue-900/60 flex items-center justify-between text-[11px] text-blue-800 dark:text-blue-200 shrink-0">
+          <span className="flex items-center gap-1.5">
+            <PiClockCountdownDuotone className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
+            <span>Hãy suy ngẫm gợi ý của thầy trước khi gửi câu tiếp theo nhé...</span>
+          </span>
+          <span className="font-mono font-black">{cooldownSec}s</span>
+        </div>
+      )}
+
+      {/* Alerts & Warnings */}
+      {fallbackActiveToast && (
+        <div className="bg-amber-500 text-white px-3.5 py-2 text-xs flex items-center gap-2 shrink-0 animate-in fade-in duration-200 font-medium">
+          <PiWarningCircleDuotone className="w-4 h-4 shrink-0" />
+          <span>{fallbackActiveToast}</span>
+        </div>
+      )}
+
       {abnormalAlert && (
-        <div className="bg-rose-50 dark:bg-rose-950/80 border-b border-rose-200 dark:border-rose-900 p-2.5 text-xs text-rose-800 dark:text-rose-200 flex items-start gap-2 shrink-0 animate-in fade-in duration-200">
-          <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+        <div className="bg-rose-50 dark:bg-rose-950/80 border-b border-rose-200 dark:border-rose-900 px-3.5 py-2 text-xs text-rose-800 dark:text-rose-200 flex items-start gap-2 shrink-0 animate-in fade-in duration-200">
+          <PiWarningCircleDuotone className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <div className="flex-1 text-[11px] leading-snug">{abnormalAlert}</div>
           <button
             onClick={() => setAbnormalAlert(null)}
@@ -719,48 +857,50 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         </div>
       )}
 
-      {/* Rate limit alert */}
       {rateLimitAlert && (
-        <div className="bg-amber-50 dark:bg-amber-950/80 border-b border-amber-200 p-2 text-xs text-amber-800 flex items-center gap-1.5 shrink-0">
-          <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+        <div className="bg-amber-50 dark:bg-amber-950/80 border-b border-amber-200 px-3.5 py-2 text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2 shrink-0">
+          <PiWarningCircleDuotone className="w-4 h-4 text-amber-600 shrink-0" />
           <span className="text-[11px] font-medium">{rateLimitAlert}</span>
         </div>
       )}
 
-      {/* Real-time PII Alert if student enters phone/email */}
       {piiWarning && (
-        <div className="bg-amber-50 dark:bg-amber-950/60 border-b border-amber-200 dark:border-amber-800/60 p-2.5 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-200 shrink-0">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="flex-1 leading-snug">{piiWarning}</p>
+        <div className="bg-amber-50 dark:bg-amber-950/60 border-b border-amber-200 dark:border-amber-800/60 px-3.5 py-2 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2 shrink-0 animate-in fade-in duration-200">
+          <PiShieldCheckDuotone className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="flex-1 leading-snug text-[11px]">{piiWarning}</p>
         </div>
       )}
 
-      {/* Chat Messages Scroll Container */}
-      <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-4 bg-slate-50/50 dark:bg-[#070D18]/60">
+      {/* 3. CHAT MESSAGES SCROLL CONTAINER */}
+      <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-4 bg-slate-50/70 dark:bg-[#070E1C]">
         {messages.map((m) => {
           const isBot = m.role === "assistant";
+          const isLiked = likedMsgIds.has(m.id);
+          const isCopied = copiedMsgId === m.id;
+          const isSpeaking = speakingMsgId === m.id;
+
           return (
             <div
               key={m.id}
               className={`flex gap-2.5 ${isBot ? "items-start" : "items-end justify-end"}`}
             >
               {isBot && (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-xs">
-                  <RiRobot2Fill className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm border border-white/20">
+                  <PiRobotDuotone className="w-5 h-5" />
                 </div>
               )}
 
               <div
-                className={`max-w-[88%] rounded-2xl text-xs sm:text-sm leading-relaxed space-y-3 ${
+                className={`max-w-[88%] sm:max-w-[82%] rounded-2xl text-xs sm:text-sm leading-relaxed space-y-3 ${
                   isBot
-                    ? "bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-3.5 text-slate-800 dark:text-slate-100 shadow-xs rounded-tl-xs"
-                    : "bg-[#1865F2] text-white p-3 font-medium rounded-tr-xs shadow-xs"
+                    ? "bg-white dark:bg-[#0D1A30] border border-slate-200/90 dark:border-slate-800 p-4 text-slate-800 dark:text-slate-100 shadow-sm rounded-tl-sm"
+                    : "bg-[#1865F2] text-white p-3.5 font-medium rounded-tr-sm shadow-md"
                 }`}
               >
-                {/* Mode Tag if available on Assistant message */}
+                {/* Assistant Mode Tag */}
                 {isBot && m.mode && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-400 pb-1 border-b border-slate-100 dark:border-slate-700/60">
-                    <Sparkles className="w-3 h-3 text-[#1865F2]" />
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <PiSparkleDuotone className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
                     <span>
                       {m.mode === "GRADE_ADAPTED"
                         ? `Giải thích chuẩn Lớp ${m.gradeLevel || selectedGrade}`
@@ -775,48 +915,48 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                   </div>
                 )}
 
-                {/* Main Message Content */}
-                <p className="whitespace-pre-line">{m.content}</p>
+                {/* Message Body */}
+                <p className="whitespace-pre-line leading-relaxed">{m.content}</p>
 
-                {/* 1. Step-by-Step Guidance Box (Gợi ý từng bước) */}
+                {/* Step-by-Step Guidance Box */}
                 {isBot && m.stepByStepHints && m.stepByStepHints.length > 0 && (
-                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-900/50 space-y-2.5">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-200">
-                      <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <PiLightbulbDuotone className="w-4 h-4 text-amber-500 shrink-0" />
                       <span>Hướng dẫn gợi mở từng bước:</span>
                     </div>
-                    <div className="space-y-1.5 text-xs text-blue-950 dark:text-blue-100">
+                    <div className="space-y-2 text-xs text-blue-950 dark:text-blue-100">
                       {m.stepByStepHints.map((hint, hIdx) => (
-                        <div key={hIdx} className="flex items-start gap-2 leading-relaxed">
-                          <span className="w-4 h-4 rounded-full bg-blue-200 dark:bg-blue-800 text-blue-900 dark:text-blue-100 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        <div key={hIdx} className="flex items-start gap-2.5 leading-relaxed">
+                          <span className="w-5 h-5 rounded-lg bg-blue-200 dark:bg-blue-800 text-blue-950 dark:text-blue-100 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">
                             {hIdx + 1}
                           </span>
-                          <span className="flex-1">{hint}</span>
+                          <span className="flex-1 font-medium">{hint}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* 2. Interactive Practice Question (Tạo câu hỏi luyện tập) */}
+                {/* Interactive Practice Quiz */}
                 {isBot && m.interactiveQuiz && (
-                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#071120] border border-slate-200 dark:border-slate-800 space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1">
-                        <HelpCircle className="w-3.5 h-3.5 text-[#14BF96]" />
-                        <span>Câu hỏi luyện tập nhanh</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <PiQuestionDuotone className="w-4 h-4 text-[#14BF96]" />
+                        <span>Câu hỏi luyện tập tương tác</span>
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                        +{m.interactiveQuiz.points} Điểm
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                        +{m.interactiveQuiz.points} Điểm Năng Lượng
                       </span>
                     </div>
 
-                    <p className="font-semibold text-xs text-slate-800 dark:text-slate-200">
+                    <p className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
                       {m.interactiveQuiz.question}
                     </p>
 
-                    {/* Options Grid */}
-                    <div className="space-y-1.5">
+                    {/* Quiz Options */}
+                    <div className="space-y-2">
                       {m.interactiveQuiz.options.map((opt, oIdx) => {
                         const answerState = quizAnswers[m.interactiveQuiz!.id];
                         const isSelected = answerState?.selected === opt;
@@ -825,14 +965,14 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                           opt.startsWith(m.interactiveQuiz!.correctAnswer.slice(0, 2));
 
                         let btnClass =
-                          "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#1865F2] text-slate-700 dark:text-slate-200";
+                          "bg-white dark:bg-[#0D1A30] border-slate-200 dark:border-slate-700 hover:border-[#1865F2] text-slate-700 dark:text-slate-200";
                         if (answerState) {
                           if (isCorrectOption) {
                             btnClass =
                               "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-900 dark:text-emerald-100 font-bold";
                           } else if (isSelected && !answerState.isCorrect) {
                             btnClass =
-                              "bg-rose-50 dark:bg-rose-950/60 border-rose-400 text-rose-800 dark:text-rose-200";
+                              "bg-rose-50 dark:bg-rose-950/60 border-rose-400 text-rose-800 dark:text-rose-200 font-medium";
                           }
                         }
 
@@ -847,14 +987,14 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                                 m.interactiveQuiz!.correctAnswer
                               )
                             }
-                            className={`w-full p-2.5 rounded-xl border text-left text-xs transition flex items-center justify-between cursor-pointer ${btnClass}`}
+                            className={`w-full p-3 rounded-xl border text-left text-xs transition flex items-center justify-between cursor-pointer ${btnClass}`}
                           >
                             <span>{opt}</span>
                             {answerState && isCorrectOption && (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <PiCheckCircleDuotone className="w-5 h-5 text-emerald-600 shrink-0" />
                             )}
                             {answerState && isSelected && !answerState.isCorrect && (
-                              <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                              <PiXCircleDuotone className="w-5 h-5 text-rose-500 shrink-0" />
                             )}
                           </button>
                         );
@@ -863,19 +1003,16 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
                     {/* Quiz Result Feedback */}
                     {quizAnswers[m.interactiveQuiz.id] && (
-                      <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-in fade-in duration-200">
+                      <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-900 dark:text-emerald-200 space-y-1 animate-in fade-in duration-200">
                         <p className="font-bold flex items-center gap-1.5">
                           {quizAnswers[m.interactiveQuiz.id].isCorrect ? (
                             <>
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>
-                                Chính xác tuyệt vời! Đạt +{m.interactiveQuiz.points} Điểm Năng
-                                Lượng! 🎉
-                              </span>
+                              <PiCheckCircleDuotone className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>Chính xác tuyệt vời! Đạt +{m.interactiveQuiz.points} Điểm Năng Lượng! 🎉</span>
                             </>
                           ) : (
                             <>
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                              <PiWarningCircleDuotone className="w-4 h-4 text-amber-600 shrink-0" />
                               <span>Chưa chính xác. Em xem giải thích chi tiết dưới đây nhé:</span>
                             </>
                           )}
@@ -888,31 +1025,31 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                   </div>
                 )}
 
-                {/* 3. Misconception Reason Box (Giải thích vì sao sai) */}
+                {/* Misconception Reason Box */}
                 {isBot && m.misconceptionReason && (
-                  <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1.5">
+                  <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1.5">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-200">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <PiWarningCircleDuotone className="w-4 h-4 text-amber-600 shrink-0" />
                       <span>Chẩn đoán sai lầm & Cách khắc phục:</span>
                     </div>
-                    <p className="text-xs text-amber-950 dark:text-amber-100 leading-relaxed">
+                    <p className="text-xs text-amber-950 dark:text-amber-100 leading-relaxed font-medium">
                       {m.misconceptionReason}
                     </p>
                   </div>
                 )}
 
-                {/* 4. Lesson & Textbook Citations (Trích dẫn bài học làm căn cứ) */}
+                {/* Citations Box */}
                 {isBot && m.citations && m.citations.length > 0 && (
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071120] border border-slate-200 dark:border-slate-800 space-y-2">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                      <BookmarkCheck className="w-3.5 h-3.5 text-[#1865F2]" />
-                      <span>Căn cứ bài học & Sách giáo khoa GDPT 2018:</span>
+                      <PiBookBookmarkDuotone className="w-4 h-4 text-[#1865F2]" />
+                      <span>Căn cứ sách giáo khoa GDPT 2018:</span>
                     </div>
                     <div className="space-y-1.5">
                       {m.citations.map((cite, cIdx) => (
                         <div
                           key={cIdx}
-                          className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700 text-[11px] space-y-0.5"
+                          className="p-2.5 rounded-xl bg-white dark:bg-[#0D1A30] border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1"
                         >
                           <div className="font-bold text-slate-900 dark:text-slate-100 line-clamp-1">
                             {cite.title}
@@ -929,17 +1066,59 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                   </div>
                 )}
 
-                {/* Timestamp */}
-                <span
-                  className={`block text-[10px] text-right ${isBot ? "text-slate-400 dark:text-slate-500" : "text-blue-100"}`}
-                >
-                  {m.timestamp}
-                </span>
+                {/* Message Footer Toolbar */}
+                <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400">
+                  {isBot ? (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleSpeakText(m.id, m.content)}
+                        className={`p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ${
+                          isSpeaking ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        }`}
+                        title={isSpeaking ? "Dừng đọc" : "Đọc gợi ý bằng giọng nói"}
+                      >
+                        {isSpeaking ? (
+                          <PiSpeakerSimpleXDuotone className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+                        ) : (
+                          <PiSpeakerHighDuotone className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => handleCopyText(m.id, m.content)}
+                        className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition cursor-pointer"
+                        title={isCopied ? "Đã sao chép!" : "Sao chép câu trả lời"}
+                      >
+                        {isCopied ? (
+                          <span className="text-emerald-600 font-bold text-[9px]">Đã chép!</span>
+                        ) : (
+                          <PiCopyDuotone className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => handleToggleLike(m.id)}
+                        className={`p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ${
+                          isLiked ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        }`}
+                        title="Hữu ích"
+                      >
+                        <PiThumbsUpDuotone className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  <span className={isBot ? "text-slate-400 dark:text-slate-500" : "text-blue-100"}>
+                    {m.timestamp}
+                  </span>
+                </div>
               </div>
 
               {!isBot && (
-                <div className="w-7 h-7 rounded-full bg-[#0B2147] dark:bg-slate-700 flex items-center justify-center text-white shrink-0 mb-0.5 shadow-xs">
-                  <UserIcon className="w-3.5 h-3.5" />
+                <div className="w-8 h-8 rounded-xl bg-[#0A1A36] dark:bg-slate-700 flex items-center justify-center text-white shrink-0 mb-0.5 shadow-sm">
+                  <PiUserCircleDuotone className="w-5 h-5" />
                 </div>
               )}
             </div>
@@ -948,63 +1127,154 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
         {isTyping && (
           <div className="flex gap-2.5 items-start">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 shadow-xs">
-              <RiRobot2Fill className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 shadow-sm border border-white/20">
+              <PiRobotDuotone className="w-5 h-5" />
             </div>
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-500 dark:text-slate-400 shadow-xs flex items-center gap-1.5">
+            <div className="bg-white dark:bg-[#0D1A30] border border-slate-200/90 dark:border-slate-800 p-3.5 rounded-2xl text-xs text-slate-500 dark:text-slate-400 shadow-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce" />
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.2s]" />
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.4s]" />
-              <span className="ml-1 text-[11px]">Gia sư AI đang xây dựng gợi ý sư phạm...</span>
+              <span className="ml-1 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                Thầy đang chuẩn bị gợi ý sư phạm cho em...
+              </span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Prompt Pills (Thay đổi linh hoạt theo chế độ đang chọn) */}
-      <div className="p-2.5 bg-white dark:bg-[#0F172A] border-t border-slate-100 dark:border-slate-800 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+      {/* 4. SMART PROMPT SUGGESTIONS PILLS */}
+      <div className="px-3.5 py-2 bg-white dark:bg-[#0B1528] border-t border-slate-100 dark:border-slate-800 flex gap-1.5 overflow-x-auto no-scrollbar shrink-0">
         {getPromptSuggestions().map((p, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(p)}
-            className="text-[11px] whitespace-nowrap bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-[#1865F2] dark:hover:text-blue-400 px-3 py-1 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0 border border-slate-200/60 dark:border-slate-700"
+            className="text-[11px] font-semibold whitespace-nowrap bg-slate-100 dark:bg-[#0D1A30] hover:bg-blue-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#1865F2] dark:hover:text-blue-400 px-3 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0 border border-slate-200/70 dark:border-slate-800"
           >
-            <Lightbulb className="w-3 h-3 text-amber-500" />
             <span>{p}</span>
           </button>
         ))}
       </div>
 
-      {/* Input Form with Privacy Guard */}
-      <div className="p-3 bg-white dark:bg-[#0F172A] border-t border-slate-200 dark:border-slate-800 shrink-0">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
-          className="flex items-center gap-2"
-        >
-          <input
-            type="text"
+      {/* 5. MULTI-MODAL PHOTO SELECTION MENU */}
+      {isPhotoMenuOpen && (
+        <div className="p-3 bg-slate-50 dark:bg-[#071120] border-t border-slate-200 dark:border-slate-800 space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-150 shrink-0">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+            <span className="flex items-center gap-1.5">
+              <PiCameraDuotone className="w-4 h-4 text-blue-600" />
+              <span>Chụp ảnh / Quét đề bài tập K–12</span>
+            </span>
+            <button
+              onClick={() => setIsPhotoMenuOpen(false)}
+              className="text-slate-400 hover:text-slate-600 font-bold"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <button
+              onClick={() =>
+                handleSimulatePhotoUpload("📸 Đã quét: Cho 2 phân số 3/4 và 5/6. Hãy tìm mẫu số chung nhỏ nhất và quy đồng.")
+              }
+              className="p-2.5 rounded-xl bg-white dark:bg-[#0D1A30] border border-slate-200 dark:border-slate-700 hover:border-blue-500 text-left transition flex items-center gap-2 cursor-pointer"
+            >
+              <PiImagesDuotone className="w-4 h-4 text-emerald-500 shrink-0" />
+              <div className="truncate">
+                <span className="font-bold block truncate">Bài tập tìm Mẫu số chung</span>
+                <span className="text-[10px] text-slate-400">3/4 và 5/6</span>
+              </div>
+            </button>
+            <button
+              onClick={() =>
+                handleSimulatePhotoUpload("📸 Đã quét: Rút gọn phân số 48/64 về dạng phân số tối giản.")
+              }
+              className="p-2.5 rounded-xl bg-white dark:bg-[#0D1A30] border border-slate-200 dark:border-slate-700 hover:border-blue-500 text-left transition flex items-center gap-2 cursor-pointer"
+            >
+              <PiImagesDuotone className="w-4 h-4 text-blue-500 shrink-0" />
+              <div className="truncate">
+                <span className="font-bold block truncate">Bài tập Rút gọn phân số</span>
+                <span className="text-[10px] text-slate-400">Phân số 48/64</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 6. INPUT BAR WITH ENTER KEY & SMART BUTTONS */}
+      <div className="p-3 bg-white dark:bg-[#0B1528] border-t border-slate-200/90 dark:border-slate-800 shrink-0">
+        <div className="flex items-end gap-2 bg-slate-100 dark:bg-[#071120] rounded-2xl p-2 border border-slate-200 dark:border-slate-800 focus-within:border-[#1865F2] focus-within:bg-white dark:focus-within:bg-[#0D1A30] transition">
+          {/* Homework Photo Scan Button */}
+          <button
+            type="button"
+            onClick={() => setIsPhotoMenuOpen(!isPhotoMenuOpen)}
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+            title="Quét ảnh đề bài tập"
+          >
+            <PiCameraDuotone className="w-5 h-5" />
+          </button>
+
+          {/* Voice Mic Button */}
+          <button
+            type="button"
+            onClick={handleToggleVoiceInput}
+            className={`p-2 rounded-xl transition cursor-pointer shrink-0 ${
+              isListening
+                ? "bg-rose-500 text-white animate-pulse"
+                : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/70 dark:hover:bg-slate-800"
+            }`}
+            title={isListening ? "Đang lắng nghe..." : "Hỏi bằng giọng nói"}
+          >
+            <PiMicrophoneDuotone className="w-5 h-5" />
+          </button>
+
+          {/* Flexible Textarea with Enter-to-Submit */}
+          <textarea
+            ref={inputRef}
+            rows={1}
             value={input}
             onChange={handleInputChange}
-            placeholder={`Hỏi Gia Sư AI (${TUTOR_MODES.find((m) => m.id === selectedMode)?.name} Lớp ${selectedGrade})...`}
-            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm rounded-xl px-3.5 py-2.5 border border-transparent focus:bg-white dark:focus:bg-slate-750 focus:border-[#1865F2] focus:outline-none transition"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            placeholder={`Hỏi thầy về bài toán, hiện tượng tự nhiên (Lớp ${selectedGrade})...`}
+            className="flex-1 bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm resize-none focus:outline-none min-h-[36px] max-h-[120px] py-1.5 leading-relaxed"
           />
-          <button
-            type="submit"
-            disabled={!input.trim() || cooldownSec > 0}
-            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1557D0] disabled:opacity-40 text-white flex items-center justify-center transition shadow-sm cursor-pointer shrink-0 font-mono text-xs font-bold"
-            title={cooldownSec > 0 ? `Vui lòng chờ ${cooldownSec}s` : "Gửi câu hỏi tới Gia sư AI"}
-          >
-            {cooldownSec > 0 ? <span>{cooldownSec}s</span> : <Send className="w-4 h-4" />}
-          </button>
-        </form>
 
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-1.5 flex items-center justify-center gap-1">
-          <FaShieldHalved className="w-2.5 h-2.5 text-emerald-500" />
-          <span>Kiểm duyệt an toàn K-12. Dữ liệu học sinh được bảo vệ và mã hóa riêng tư.</span>
+          {/* Clear text button */}
+          {input.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setInput("")}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+              title="Xóa nội dung"
+            >
+              <PiXBold className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {/* Send Button */}
+          <button
+            type="button"
+            disabled={!input.trim() || cooldownSec > 0}
+            onClick={() => handleSend()}
+            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1253cc] active:scale-95 disabled:opacity-40 text-white flex items-center justify-center transition shadow-md shadow-blue-500/20 cursor-pointer shrink-0 font-bold"
+            title={cooldownSec > 0 ? `Vui lòng chờ ${cooldownSec}s` : "Gửi câu hỏi (Nhấn Enter)"}
+          >
+            {cooldownSec > 0 ? (
+              <span className="font-mono text-xs">{cooldownSec}s</span>
+            ) : (
+              <PiPaperPlaneRightFill className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+
+        {/* Security & COPPA compliance badge */}
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2 flex items-center justify-center gap-1.5">
+          <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span>Kiểm duyệt an toàn K-12 · Dữ liệu học sinh được bảo vệ và mã hóa riêng tư.</span>
         </p>
       </div>
     </div>

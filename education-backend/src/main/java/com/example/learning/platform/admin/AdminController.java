@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,7 @@ import com.example.learning.platform.storage.StorageService;
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 @Tag(name = "Admin CMS", description = "Quản trị hệ thống, báo cáo tổng quan, RBAC và cấp S3 Presigned URL")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class AdminController {
 
     private final AdminReportService adminReportService;

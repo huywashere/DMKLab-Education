@@ -59,7 +59,7 @@ public class AdminReportService {
                 .jvmMemoryUsedMb(usedMemory)
                 .jvmMemoryMaxMb(maxMemory)
                 .postgresStatus("HEALTHY (HikariCP Active)")
-                .flywayStatus("APPLIED (V3__user_profile_fields)")
+                .flywayStatus("APPLIED (V5__query_optimization_indexes)")
                 .redisStatus(redisStatus)
                 .build();
     }

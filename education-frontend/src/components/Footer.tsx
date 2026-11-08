@@ -314,16 +314,12 @@ export const Footer: React.FC<FooterProps> = ({
 
             {/* Column 5: OFFICIAL BRAND LOGO & MISSION */}
             <div className="col-span-2 md:col-span-1 lg:col-span-1 space-y-4">
-              <div className="flex items-center gap-2.5">
-                {/* Official Khan Academy Sprout Hexagon Icon */}
-                <div className="w-8 h-8 rounded-lg bg-[#14BF96] flex items-center justify-center shrink-0 shadow-xs">
-                  <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2C9.5 4.5 8 8 8 11.5c0 2.2 1.8 4 4 4s4-1.8 4-4C16 8 14.5 4.5 12 2z" />
-                    <path d="M8.5 11c-1.8 0-3.5 1.5-3.5 3.5 0 1.8 1.5 3.5 3.5 3.5 1 0 2.2-.4 3-1-.6-2-1.8-4.5-3-6z" opacity="0.85" />
-                    <path d="M15.5 11c1.8 0 3.5 1.5 3.5 3.5 0 1.8-1.5 3.5-3.5 3.5-1 0-2.2-.4-3-1 .6-2 1.8-4.5 3-6z" opacity="0.85" />
-                  </svg>
-                </div>
-                <span className="text-xl font-bold tracking-tight text-white">Khan Academy</span>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+                  alt="DMKLab"
+                  className="h-8 w-auto object-contain brightness-110"
+                />
               </div>
 
               {/* Mission Statement */}

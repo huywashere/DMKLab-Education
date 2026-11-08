@@ -92,6 +92,49 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công!"));
     }
 
+    @PostMapping("/refresh")
+    @Operation(summary = "Làm mới Access Token ngầm (Silent Refresh Token)")
+    public ResponseEntity<ApiResponse<AuthDto.AuthResponse>> refreshToken(@Valid @RequestBody AuthDto.RefreshTokenRequest req) {
+        String token = req.getRefreshToken();
+        if (!tokenProvider.validateToken(token)) {
+            throw new RuntimeException("Refresh token không hợp lệ hoặc đã hết hạn!");
+        }
+
+        UUID userId = tokenProvider.getUserIdFromToken(token);
+        User user = userService.findById(userId);
+        String newAccessToken = tokenProvider.generateToken(user);
+
+        AuthDto.AuthResponse response = AuthDto.AuthResponse.builder()
+                .accessToken(newAccessToken)
+                .tokenType("Bearer")
+                .expiresIn(tokenProvider.getExpirationMs())
+                .user(userService.toDto(user))
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.success("Làm mới phiên đăng nhập thành công!", response));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Yêu cầu cấp mã OTP đặt lại mật khẩu qua email")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> forgotPassword(
+            @Valid @RequestBody AuthDto.ForgotPasswordRequest req) {
+        String otp = userService.generatePasswordResetOtp(req.getEmail());
+        java.util.Map<String, String> data = java.util.Map.of(
+                "email", req.getEmail(),
+                "otp", otp,
+                "message", "Mã xác thực OTP đã được gửi tới email của bạn (Hiệu lực 15 phút)."
+        );
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Xác nhận mã OTP và đặt mật khẩu mới")
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @Valid @RequestBody AuthDto.ResetPasswordRequest req) {
+        userService.resetPasswordWithOtp(req.getEmail(), req.getOtp(), req.getNewPassword());
+        return ResponseEntity.ok(ApiResponse.success("Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới."));
+    }
+
     @PostMapping("/logout")
     @Operation(summary = "Đăng xuất an toàn và đưa JWT vào danh sách đen (Blacklist)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<String>> logout(

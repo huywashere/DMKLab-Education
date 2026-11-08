@@ -1,38 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { User, UserRole, Grade } from "@/types";
 import {
   Search,
   ChevronDown,
   Sparkles,
-  Flame,
-  LayoutDashboard,
-  GraduationCap,
-  UserCheck,
-  ShieldCheck,
   BookOpen,
-  Compass,
-  Calculator,
   Atom,
   Globe,
   User as UserIcon,
   LogOut,
-  Key,
   LogIn,
-  UserPlus,
   Bell,
   PlayCircle,
   CheckCircle,
-  BookMarked,
   Bookmark,
   Sliders,
   Settings,
   Mail,
   MessageSquare,
   Check,
-  HelpCircle,
-  Filter,
   Home,
   Menu,
   X,
@@ -40,6 +28,9 @@ import {
   Sun,
   Moon,
   Building2,
+  Command,
+  ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 import {
   FaFireFlameCurved,
@@ -52,11 +43,8 @@ import {
 import {
   RiSparklingFill,
   RiTranslate2,
-  RiNotification3Line,
   RiDashboardFill,
   RiSearchLine,
-  RiAtomLine,
-  RiBookOpenLine,
   RiRobot2Fill,
   RiBookOpenFill,
 } from "react-icons/ri";
@@ -80,6 +68,7 @@ interface HeaderProps {
     | "profile"
     | "about"
     | "articles"
+    | "books"
     | "contact";
   onChangeView: (
     view:
@@ -92,6 +81,7 @@ interface HeaderProps {
       | "profile"
       | "about"
       | "articles"
+      | "books"
       | "contact"
   ) => void;
   selectedGrade: Grade;
@@ -129,9 +119,14 @@ export const Header: React.FC<HeaderProps> = ({
   const [activeDropdown, setActiveDropdown] = useState<"products" | "resources" | null>(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // Command Palette & Search State (Linear / Raycast developer pattern)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const { bookmarks, openModal: openBookmarksModal } = useBookmarks();
   const { openShortcuts } = useAccessibility();
   const [notifCategory, setNotifCategory] = useState<"all" | "unread" | "lesson" | "system">("all");
@@ -142,7 +137,36 @@ export const Header: React.FC<HeaderProps> = ({
     zalo: true,
   });
   const [channelSavedMsg, setChannelSavedMsg] = useState(false);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // Hotkey listener for Cmd+K / Ctrl+K (Linear / Raycast standard)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      } else if (e.key === "Escape") {
+        setCommandPaletteOpen(false);
+        setActiveDropdown(null);
+        setShowUserDropdown(false);
+        setShowNotifications(false);
+        setShowLangMenu(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Auto-focus input when Command Palette opens
+  useEffect(() => {
+    if (commandPaletteOpen) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    } else {
+      setSearchTerm("");
+    }
+  }, [commandPaletteOpen]);
 
   const [notifications, setNotifications] = useState([
     {
@@ -203,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const searchResults =
     searchTerm.trim() === ""
-      ? []
+      ? MOCK_LESSONS.slice(0, 4) // Show recommendations by default
       : MOCK_LESSONS.filter(
           (l) =>
             l.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -211,518 +235,382 @@ export const Header: React.FC<HeaderProps> = ({
         );
 
   return (
-    <header className="sticky top-2 sm:top-3.5 z-50 px-3 sm:px-6 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto rounded-full bg-white/95 dark:bg-[#0B172E]/95 border border-slate-200/90 dark:border-slate-800 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.06)] px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-        {/* Left: Brand Logo + Nav Links & Rich Dropdowns */}
-        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
-          {/* Mobile Drawer Trigger (Only on < lg screens) */}
-          <button
-            type="button"
-            onClick={() => setMobileDrawerOpen(true)}
-            className="lg:hidden p-1.5 rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-            title="Mở menu"
-            aria-label="Mở menu điều hướng"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+    <>
+      {/* ─────────────────────────────────────────────────────────────
+          FULL-BLEED STICKY HEADER — Developer-First Standard (Linear & Vercel)
+          Solid surface, hairline border, 56px height, high visual balance
+      ───────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#070D18] border-b border-slate-200/90 dark:border-slate-800/90 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+          
+          {/* LEFT: Brand Identity & Primary Nav Links */}
+          <div className="flex items-center gap-4 lg:gap-7 shrink-0">
+            {/* Mobile Drawer Trigger (Only on < lg screens) */}
+            <button
+              type="button"
+              onClick={() => setMobileDrawerOpen(true)}
+              className="lg:hidden p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Mở menu"
+              aria-label="Mở menu điều hướng"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
-          {/* Brilliant-style Minimalist Brand Identity */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveDropdown(null);
-              onChangeView("student");
-            }}
-            className="flex items-center gap-2.5 group cursor-pointer shrink-0"
-            title="DMKLab Education - Về Trang Chủ"
-          >
-            <div className="w-8 h-8 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center transition-transform group-hover:scale-105 shadow-xs">
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-
-            <div className="flex items-center">
-              <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                DMK<span className="text-[#05ac60]">Lab</span>
-              </span>
-            </div>
-          </button>
-
-          {/* Shadcnblocks Navigation Links with Rich Flyout Dropdowns */}
-          <nav className="hidden lg:flex items-center gap-1 shrink-0 relative">
-            {/* 1. Home */}
+            {/* Brand Logo & Version Pill */}
             <button
               type="button"
               onClick={() => {
                 setActiveDropdown(null);
                 onChangeView("student");
               }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                activeView === "student" && !activeDropdown
-                  ? "text-slate-900 dark:text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
-              }`}
+              className="flex items-center gap-2 group cursor-pointer shrink-0"
+              title="DMKLab Education - Về Trang Chủ"
             >
-              {lang === "en" ? "Home" : "Trang chủ"}
+              <img
+                src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
+                alt="DMKLab Education"
+                className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+              />
+              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80">
+                K–12
+              </span>
             </button>
 
-            {/* 2. Products / Khóa học (Dropdown) */}
-            <div className="relative">
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 shrink-0 relative">
+              {/* 1. Trang chủ */}
               <button
                 type="button"
-                onClick={() => setActiveDropdown(activeDropdown === "products" ? null : "products")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                  activeDropdown === "products"
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow-2xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                onClick={() => {
+                  setActiveDropdown(null);
+                  onChangeView("student");
+                }}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer ${
+                  activeView === "student" && !activeDropdown
+                    ? "bg-slate-100 dark:bg-slate-800/90 text-slate-900 dark:text-white font-semibold"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
                 }`}
               >
-                <span>{lang === "en" ? "Products" : "Khóa học"}</span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === "products" ? "rotate-180 text-slate-900 dark:text-white" : ""
-                  }`}
-                />
+                {lang === "en" ? "Home" : "Trang chủ"}
               </button>
 
-              {activeDropdown === "products" && (
-                <div
-                  className="absolute left-0 top-full mt-2 w-[27rem] sm:w-[29rem] bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 z-50 animate-in fade-in zoom-in-95 duration-150"
-                  onMouseLeave={() => setActiveDropdown(null)}
+              {/* 2. Khóa học (Dropdown) */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown(activeDropdown === "products" ? null : "products")}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer ${
+                    activeDropdown === "products"
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  }`}
                 >
-                  <div className="space-y-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[0]);
-                        onChangeView("student");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <TbMathFunction className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
-                          {lang === "en" ? "K–12 Mathematics" : "Toán học K–12"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "From foundational arithmetic to algebra, geometry & calculus for national exams"
-                            : "Từ số học cơ bản đến đại số, hình học & giải tích vi phân ôn thi THPT Quốc gia"}
-                        </p>
-                      </div>
-                    </button>
+                  <span>{lang === "en" ? "Courses" : "Khóa học"}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                      activeDropdown === "products" ? "rotate-180 text-slate-900 dark:text-white" : ""
+                    }`}
+                  />
+                </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[2] || MOCK_LESSONS[0]);
-                        onChangeView("student");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-[#14BF96] dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <Atom className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#14BF96] dark:group-hover:text-emerald-400 transition-colors">
-                          {lang === "en" ? "Science & STEM" : "Khoa học & STEM"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Physics, chemistry, cellular biology and interactive natural sciences"
-                            : "Vật lý lý thuyết, Hóa học hợp chất, Sinh học di truyền & KHTN thực hành"}
-                        </p>
-                      </div>
-                    </button>
+                {/* Popover: Khóa học */}
+                {activeDropdown === "products" && (
+                  <div
+                    className="absolute left-0 top-full mt-2 w-[28rem] bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
+                    <div className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onSelectLesson) onSelectLesson(MOCK_LESSONS[0]);
+                          onChangeView("student");
+                          setActiveDropdown(null);
+                        }}
+                        className="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <TbMathFunction className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
+                            {lang === "en" ? "K–12 Mathematics" : "Toán học K–12"}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                            {lang === "en"
+                              ? "Foundational arithmetic, algebra, geometry & national calculus exams"
+                              : "Đại số, hình học không gian & giải tích ôn thi THPT Quốc gia"}
+                          </p>
+                        </div>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[1] || MOCK_LESSONS[0]);
-                        onChangeView("student");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-[#7433FF] dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <RiRobot2Fill className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#7433FF] dark:group-hover:text-purple-400 transition-colors">
-                          {lang === "en" ? "Coding & Artificial Intelligence" : "Lập trình & Trí Tuệ Nhân Tạo"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Scratch for kids, core Python programming & computational thinking"
-                            : "Học Scratch, Python căn bản, thuật toán & tư duy máy tính cùng AI Tutor"}
-                        </p>
-                      </div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onSelectLesson) onSelectLesson(MOCK_LESSONS[2] || MOCK_LESSONS[0]);
+                          onChangeView("student");
+                          setActiveDropdown(null);
+                        }}
+                        className="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-[#14BF96] dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <Atom className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#14BF96] dark:group-hover:text-emerald-400 transition-colors">
+                            {lang === "en" ? "Natural Sciences & STEM" : "Khoa học & STEM"}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                            {lang === "en"
+                              ? "Physics, chemistry, cellular biology and interactive natural sciences"
+                              : "Vật lý lý thuyết, Hóa học hợp chất, Sinh học di truyền & STEM"}
+                          </p>
+                        </div>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onSelectLesson) onSelectLesson(MOCK_LESSONS[0]);
-                        onChangeView("student");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-950/60 text-[#EA580C] dark:text-orange-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <RiBookOpenFill className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#EA580C] dark:group-hover:text-orange-400 transition-colors">
-                          {lang === "en" ? "Languages & Humanities" : "Ngôn ngữ & Nhân văn"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Literature comprehension, K-12 CEFR English, Vietnamese history & culture"
-                            : "Ngữ Văn cảm thụ, Tiếng Anh K–12 chuẩn CEFR & Lịch sử, Địa lý Việt Nam"}
-                        </p>
-                      </div>
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onSelectLesson) onSelectLesson(MOCK_LESSONS[1] || MOCK_LESSONS[0]);
+                          onChangeView("student");
+                          setActiveDropdown(null);
+                        }}
+                        className="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-[#7433FF] dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                          <RiRobot2Fill className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#7433FF] dark:group-hover:text-purple-400 transition-colors">
+                            {lang === "en" ? "Coding & AI Academy" : "Lập trình & Trí Tuệ Nhân Tạo"}
+                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5">
+                            {lang === "en"
+                              ? "Python programming, computational logic & interactive AI Tutor"
+                              : "Học Python căn bản, thuật toán tư duy & giải đề cùng Socratic AI"}
+                          </p>
+                        </div>
+                      </button>
+                    </div>
 
-                  {/* Quick Select Grade at Bottom of Dropdown */}
-                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      {lang === "en" ? "Quick select grade:" : "Chọn nhanh khối lớp:"}
-                    </p>
-                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
-                        <button
-                          key={g}
-                          type="button"
-                          onClick={() => {
-                            onSelectGrade({
-                              id: `g-${g}`,
-                              name: `Lớp ${g}`,
-                              code: `GRADE_${g}`,
-                              level: g <= 5 ? "PRIMARY" : g <= 9 ? "SECONDARY" : "HIGH_SCHOOL",
-                              displayOrder: g,
-                            });
-                            setActiveDropdown(null);
-                          }}
-                          className={`py-1 text-center font-bold text-[11px] rounded-md transition cursor-pointer ${
-                            selectedGrade?.name === `Lớp ${g}`
-                              ? "bg-[#1865F2] text-white"
-                              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                          }`}
-                        >
-                          L{g}
-                        </button>
-                      ))}
+                    {/* Quick Select Grade Grid */}
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          {lang === "en" ? "Quick select grade:" : "Chọn nhanh khối lớp:"}
+                        </span>
+                        <span className="text-[10px] font-semibold text-[#1865F2] dark:text-blue-400">
+                          {selectedGrade?.name || "Lớp 10"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-6 sm:grid-cols-12 gap-1">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => {
+                              onSelectGrade({
+                                id: `g-${g}`,
+                                name: `Lớp ${g}`,
+                                code: `GRADE_${g}`,
+                                level: g <= 5 ? "PRIMARY" : g <= 9 ? "SECONDARY" : "HIGH_SCHOOL",
+                                displayOrder: g,
+                              });
+                              setActiveDropdown(null);
+                            }}
+                            className={`py-1 text-center font-bold text-[11px] rounded transition cursor-pointer ${
+                              selectedGrade?.name === `Lớp ${g}`
+                                ? "bg-[#1865F2] text-white"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            }`}
+                          >
+                            L{g}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* 3. Resources / Tài nguyên (Dropdown matching Shadcnblocks screenshot) */}
-            <div className="relative">
+              {/* 3. Lộ trình */}
               <button
                 type="button"
-                onClick={() => setActiveDropdown(activeDropdown === "resources" ? null : "resources")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                  activeDropdown === "resources"
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold shadow-2xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                onClick={() => {
+                  setActiveDropdown(null);
+                  onChangeView("dashboard");
+                }}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer ${
+                  activeView === "dashboard" && !activeDropdown
+                    ? "bg-slate-100 dark:bg-slate-800/90 text-slate-900 dark:text-white font-semibold"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
                 }`}
               >
-                <span>{lang === "en" ? "Resources" : "Tài nguyên"}</span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === "resources" ? "rotate-180 text-slate-900 dark:text-white" : ""
-                  }`}
-                />
+                {lang === "en" ? "Roadmap" : "Lộ trình"}
               </button>
 
-              {activeDropdown === "resources" && (
-                <div
-                  className="absolute left-0 top-full mt-2 w-[24rem] sm:w-[26rem] bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-800 p-3 sm:p-4 z-50 animate-in fade-in zoom-in-95 duration-150"
-                  onMouseLeave={() => setActiveDropdown(null)}
+              {/* 4. Bài viết */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveDropdown(null);
+                  onChangeView("articles");
+                }}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer ${
+                  activeView === "articles" && !activeDropdown
+                    ? "bg-slate-100 dark:bg-slate-800/90 text-slate-900 dark:text-white font-semibold"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                }`}
+              >
+                {lang === "en" ? "Articles" : "Bài viết"}
+              </button>
+
+              {/* 5. Tủ sách K-12 & Trình bày sách */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveDropdown(null);
+                  onChangeView("books");
+                }}
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                  activeView === "books" && !activeDropdown
+                    ? "bg-slate-100 dark:bg-slate-800/90 text-slate-900 dark:text-white font-semibold"
+                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                }`}
+              >
+                <span>{lang === "en" ? "Textbooks" : "Tủ sách K-12"}</span>
+                <span className="text-[10px] uppercase font-black px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300">
+                  Mới
+                </span>
+              </button>
+
+              {/* 5. Tài nguyên (Dropdown) */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown(activeDropdown === "resources" ? null : "resources")}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[13px] font-medium transition cursor-pointer ${
+                    activeDropdown === "resources"
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  }`}
                 >
-                  <div className="space-y-1">
-                    {/* Item 1: Blog */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onChangeView("articles");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <BookOpen className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
-                          {lang === "en" ? "Blog" : "Blog & Tin tức"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "The latest industry news, updates, and info"
-                            : "Tin tức giáo dục mới nhất, phương pháp tự học và cẩm nang phụ huynh"}
-                        </p>
-                      </div>
-                    </button>
+                  <span>{lang === "en" ? "Resources" : "Tài nguyên"}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                      activeDropdown === "resources" ? "rotate-180 text-slate-900 dark:text-white" : ""
+                    }`}
+                  />
+                </button>
 
-                    {/* Item 2: Company */}
+                {activeDropdown === "resources" && (
+                  <div
+                    className="absolute left-0 top-full mt-2 w-72 bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
                     <button
                       type="button"
                       onClick={() => {
                         onChangeView("about");
                         setActiveDropdown(null);
                       }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                      className="w-full text-left flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer group"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <Building2 className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
-                          {lang === "en" ? "Company" : "Về DMKLab"}
+                      <Building2 className="w-4 h-4 text-slate-500 group-hover:text-[#1865F2] dark:group-hover:text-blue-400" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">
+                          {lang === "en" ? "About DMKLab" : "Giới thiệu DMKLab"}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Our mission is to innovate and empower the world"
-                            : "Sứ mệnh phổ cập nền giáo dục chuẩn quốc tế miễn phí cho học sinh Việt Nam"}
-                        </p>
+                        <p className="text-[10px] text-slate-400">Sứ mệnh giáo dục miễn phí</p>
                       </div>
                     </button>
 
-                    {/* Item 3: Careers */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onChangeView("about");
-                        setActiveDropdown(null);
-                      }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <Sparkles className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
-                          {lang === "en" ? "Careers" : "Cơ hội & Phương pháp"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Browse job listing and discover our workspace"
-                            : "Tìm hiểu phương pháp Socratic AI và cơ hội đồng hành sư phạm"}
-                        </p>
-                      </div>
-                    </button>
-
-                    {/* Item 4: Support */}
                     <button
                       type="button"
                       onClick={() => {
                         onChangeView("contact");
                         setActiveDropdown(null);
                       }}
-                      className="w-full text-left flex items-start gap-3.5 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer group"
+                      className="w-full text-left flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer group"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                        <MessageSquare className="w-5 h-5 text-slate-700 dark:text-slate-300" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 transition-colors">
-                          {lang === "en" ? "Support" : "Hỗ trợ & Liên hệ"}
+                      <MessageSquare className="w-4 h-4 text-slate-500 group-hover:text-[#1865F2] dark:group-hover:text-blue-400" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-900 dark:text-white">
+                          {lang === "en" ? "Contact & Support" : "Liên hệ & Hỗ trợ"}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                          {lang === "en"
-                            ? "Get in touch with our support team or visit our community forums"
-                            : "Kết nối đội ngũ tư vấn lộ trình học tập hoặc tham gia cộng đồng"}
-                        </p>
+                        <p className="text-[10px] text-slate-400">Tư vấn lộ trình học tập 24/7</p>
                       </div>
                     </button>
+
+                    <a
+                      href="http://localhost:8080/swagger-ui.html"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full text-left flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer group border-t border-slate-100 dark:border-slate-800 mt-1"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-4 h-4 text-slate-500 group-hover:text-[#1865F2]" />
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">OpenAPI Docs</p>
+                          <p className="text-[10px] text-slate-400">Tài liệu API Spring Boot</p>
+                        </div>
+                      </div>
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                    </a>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* 4. Pricing / Bảng điều khiển */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveDropdown(null);
-                onChangeView("dashboard");
-              }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                activeView === "dashboard" && !activeDropdown
-                  ? "text-slate-900 dark:text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
-              }`}
-            >
-              {lang === "en" ? "Pricing" : "Lộ trình"}
-            </button>
-
-            {/* 5. Blog / Bài viết */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveDropdown(null);
-                onChangeView("articles");
-              }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
-                activeView === "articles" && !activeDropdown
-                  ? "text-slate-900 dark:text-white font-semibold"
-                  : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60"
-              }`}
-            >
-              {lang === "en" ? "Blog" : "Bài viết"}
-            </button>
-          </nav>
-        </div>
-
-        {/* Center: Search Bar (Solid Box, No Frosted Glass) */}
-        <div className="hidden md:flex flex-1 max-w-xs lg:max-w-sm mx-2 relative">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setShowSearchResults(true);
-            }}
-            onFocus={() => setShowSearchResults(true)}
-            placeholder={t("nav_search_placeholder", "Tìm kiếm bài học...")}
-            className="w-full bg-slate-100 dark:bg-[#1E293B] text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-400 text-xs rounded-lg pl-8.5 pr-8 py-1.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1865F2] focus:bg-white dark:focus:bg-[#0F172A] transition"
-          />
-          <RiSearchLine className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" />
-          {searchTerm && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setShowSearchResults(false);
-              }}
-              className="absolute right-2.5 top-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer font-bold"
-            >
-              ✕
-            </button>
-          )}
-
-          {/* Live Search Results Dropdown */}
-          {showSearchResults && searchTerm.trim() !== "" && (
-            <div
-              className="absolute left-0 top-10 w-80 md:w-96 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 text-xs space-y-2 animate-in fade-in zoom-in-95 duration-150"
-              onMouseLeave={() => setShowSearchResults(false)}
-            >
-              <div className="flex items-center justify-between px-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                <span>Kết quả tìm kiếm ({searchResults.length})</span>
-                <span>Nhấn để học ngay</span>
+                )}
               </div>
+            </nav>
+          </div>
 
-              {searchResults.length === 0 ? (
-                <div className="p-4 text-center text-slate-400">
-                  Không tìm thấy bài học nào phù hợp với "{searchTerm}"
-                </div>
-              ) : (
-                <div className="max-h-64 overflow-y-auto space-y-1">
-                  {searchResults.map((lesson) => (
-                    <button
-                      key={lesson.id}
-                      onClick={() => {
-                        if (onSelectLesson) onSelectLesson(lesson);
-                        setShowSearchResults(false);
-                        setSearchTerm("");
-                      }}
-                      className="w-full text-left p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-start gap-2.5 group cursor-pointer"
-                    >
-                      <div className="w-7 h-7 rounded-md bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#1865F2] group-hover:text-white transition">
-                        <PlayCircle className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#1865F2] dark:group-hover:text-blue-400 truncate transition">
-                          {lesson.title}
-                        </p>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                          {lesson.description || "Bài giảng chuẩn K-12"}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right: Grouped Tools with subtle dividers */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 ml-auto">
-          {/* AI Tutor Button - Solid DMKLab Blue CTA (No Glass Blur) */}
-          <button
-            onClick={onOpenAiChat}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1865F2] hover:bg-[#0B4ED7] active:scale-95 text-white text-xs font-bold border border-[#1865F2] shadow-xs transition shrink-0 cursor-pointer"
-            title="Mở Gia sư AI Socratic"
-          >
-            <RiSparklingFill className="w-3.5 h-3.5 text-white" />
-            <span className="hidden sm:inline">AI Tutor</span>
-          </button>
-
-          {/* Hairline Divider */}
-          <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0" />
-
-          {/* Utilities: Bookmarks, Accessibility, Notifications, Language, Theme (Solid Surfaces) */}
-          <div className="flex items-center gap-1.5">
-            {/* Bookmarks & Saved Notes Trigger */}
+          {/* CENTER: Linear / Raycast Style Command Palette Trigger */}
+          <div className="flex-1 max-w-xs sm:max-w-sm hidden md:flex items-center justify-center">
             <button
-              onClick={openBookmarksModal}
-              className="relative p-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-              title={`Bài học & Ghi chú đã lưu (${bookmarks.length})`}
-              aria-label="Bài học đã lưu"
+              type="button"
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full bg-slate-100 hover:bg-slate-200/80 dark:bg-[#111927] dark:hover:bg-[#182336] text-slate-500 dark:text-slate-400 rounded-lg px-3 py-1.5 text-xs flex items-center justify-between border border-slate-200/90 dark:border-slate-800 transition cursor-pointer shadow-2xs group"
+              title="Tìm kiếm bài học (Nhấn phím ⌘K hoặc Ctrl+K)"
             >
-              <Bookmark className="w-4 h-4" />
-              {bookmarks.length > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-amber-500 text-white text-[9px] font-black flex items-center justify-center shadow-xs">
-                  {bookmarks.length}
-                </span>
-              )}
+              <div className="flex items-center gap-2 truncate">
+                <RiSearchLine className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 shrink-0" />
+                <span className="truncate">{t("nav_search_placeholder", "Tìm bài học, chủ đề...")}</span>
+              </div>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-[#070D18] text-slate-500 dark:text-slate-400 rounded border border-slate-200 dark:border-slate-700 shadow-2xs shrink-0">
+                ⌘K
+              </kbd>
             </button>
+          </div>
 
-            {/* Accessibility & Keyboard Shortcuts Trigger */}
-            <button
-              onClick={openShortcuts}
-              className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-[#1865F2] dark:hover:text-blue-400 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-              title="Hỗ trợ tiếp cận & Phím tắt (?)"
-              aria-label="Hỗ trợ tiếp cận"
-            >
-              <Sliders className="w-4 h-4" />
-            </button>
+          {/* RIGHT: Refined Actions & Consolidated User Controls */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
 
             {/* Notification Center */}
             <div className="relative shrink-0">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-                title="Thông báo tập trung"
+                className="relative p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Thông báo"
                 aria-label="Thông báo"
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotifCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#0B1120]" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#070D18]" />
                 )}
               </button>
 
+              {/* Notification Popover */}
               {showNotifications && (
                 <div
-                  className="absolute right-0 mt-2 w-84 sm:w-92 bg-white dark:bg-[#131E35] rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-3.5 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute right-0 mt-2 w-80 sm:w-88 bg-white dark:bg-[#0B172E] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-3.5 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150"
                   onMouseLeave={() => setShowNotifications(false)}
                 >
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className="font-extrabold text-slate-900 dark:text-slate-100 text-xs">
-                        Thông Báo Tập Trung
+                        Thông Báo
                       </span>
                       {unreadNotifCount > 0 && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
                           {unreadNotifCount} mới
                         </span>
                       )}
@@ -739,11 +627,11 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  {/* Notification Category Filters */}
-                  <div className="flex items-center gap-1 pb-1 overflow-x-auto no-scrollbar">
+                  {/* Filters */}
+                  <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
                     {[
-                      { key: "all", label: `Tất cả (${notifications.length})` },
-                      { key: "unread", label: `Chưa đọc (${unreadNotifCount})` },
+                      { key: "all", label: `Tất cả` },
+                      { key: "unread", label: `Chưa đọc` },
                       { key: "lesson", label: "Bài học" },
                       { key: "system", label: "Hệ thống" },
                     ].map((cat) => (
@@ -752,7 +640,7 @@ export const Header: React.FC<HeaderProps> = ({
                         onClick={() => setNotifCategory(cat.key as any)}
                         className={`px-2 py-0.5 rounded-md text-[10px] font-bold whitespace-nowrap transition cursor-pointer ${
                           notifCategory === cat.key
-                            ? "bg-[#1865F2] text-white shadow-2xs"
+                            ? "bg-[#1865F2] text-white"
                             : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                         }`}
                       >
@@ -761,11 +649,11 @@ export const Header: React.FC<HeaderProps> = ({
                     ))}
                   </div>
 
-                  {/* Notifications List */}
-                  <div className="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar">
+                  {/* Notification List */}
+                  <div className="space-y-1.5 max-h-60 overflow-y-auto">
                     {filteredNotifications.length === 0 ? (
-                      <div className="text-center py-6 text-slate-400 dark:text-slate-500 text-[11px]">
-                        Không có thông báo nào trong danh mục này.
+                      <div className="text-center py-6 text-slate-400 text-[11px]">
+                        Không có thông báo nào.
                       </div>
                     ) : (
                       filteredNotifications.map((n) => (
@@ -776,21 +664,19 @@ export const Header: React.FC<HeaderProps> = ({
                               prev.map((x) => (x.id === n.id ? { ...x, unread: false } : x))
                             )
                           }
-                          className={`p-2.5 rounded-xl border transition cursor-pointer ${
+                          className={`p-2 rounded-xl border transition cursor-pointer ${
                             n.unread
-                              ? "bg-blue-50/50 dark:bg-blue-950/30 border-blue-200/80 dark:border-blue-900/50"
-                              : "bg-slate-50/70 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 hover:bg-slate-100/70"
+                              ? "bg-blue-50/60 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900"
+                              : "bg-slate-50/70 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 hover:bg-slate-100"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1">
-                            <p
-                              className={`font-bold text-[11px] truncate ${n.unread ? "text-blue-900 dark:text-blue-200" : "text-slate-800 dark:text-slate-200"}`}
-                            >
+                            <p className="font-bold text-[11px] text-slate-900 dark:text-slate-100 truncate">
                               {n.title}
                             </p>
                             <span className="text-[9px] text-slate-400 shrink-0">{n.time}</span>
                           </div>
-                          <p className="text-slate-600 dark:text-slate-400 text-[10px] mt-1 leading-relaxed">
+                          <p className="text-slate-500 dark:text-slate-400 text-[10px] mt-0.5 line-clamp-2">
                             {n.desc}
                           </p>
                         </div>
@@ -798,179 +684,73 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  {/* Channel Preferences Trigger */}
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                     <button
                       onClick={() => {
                         setShowNotifications(false);
                         setShowChannelsModal(true);
                       }}
-                      className="w-full py-1.5 px-2 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer text-[11px] border border-slate-200 dark:border-slate-700"
+                      className="w-full py-1 text-center text-[10px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
                     >
-                      <Settings className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Cài đặt kênh thông báo (Website / Email / Zalo)</span>
+                      Cài đặt kênh thông báo (Web / Email / Zalo) →
                     </button>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Language Switcher */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => setShowLangMenu(!showLangMenu)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-                title={t("lang_select_title", "Chọn ngôn ngữ")}
-              >
-                <RiTranslate2 className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
-                <span>{lang === "vi" ? "VN" : "EN"}</span>
-                <ChevronDown
-                  className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${showLangMenu ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {showLangMenu && (
-                <div
-                  className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#131E35] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
-                  onMouseLeave={() => setShowLangMenu(false)}
-                >
-                  <button
-                    onClick={() => {
-                      setLang("vi");
-                      setShowLangMenu(false);
-                    }}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-medium transition cursor-pointer ${
-                      lang === "vi"
-                        ? "bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold"
-                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
-                    }`}
-                  >
-                    <span>🇻🇳 Tiếng Việt</span>
-                    {lang === "vi" && (
-                      <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setLang("en");
-                      setShowLangMenu(false);
-                    }}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-medium transition cursor-pointer ${
-                      lang === "en"
-                        ? "bg-blue-50 dark:bg-blue-950/50 text-[#1865F2] dark:text-blue-400 font-bold"
-                        : "hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
-                    }`}
-                  >
-                    <span>🇬🇧 English</span>
-                    {lang === "en" && (
-                      <CheckCircle className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Theme Toggle (Dark / Light Mode) */}
+            {/* Quick Theme Toggle */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-amber-400 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-              title={isDark ? t("theme_light", "Giao diện Sáng") : t("theme_dark", "Giao diện Tối")}
-              aria-label={t("theme_toggle", "Chuyển giao diện sáng/tối")}
+              className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title={isDark ? "Giao diện Sáng" : "Giao diện Tối"}
+              aria-label="Chuyển giao diện sáng/tối"
             >
               {isDark ? (
-                <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20" />
+                <Sun className="w-4 h-4 text-amber-400" />
               ) : (
                 <Moon className="w-4 h-4 text-slate-600" />
               )}
             </button>
-          </div>
 
-          {/* If user is logged in */}
-          {currentUser ? (
-            <>
-              {/* Hairline Divider */}
-              <div className="hidden xl:block h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0" />
+            {/* Hairline Divider */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0" />
 
-              {/* UNIFIED GAMIFICATION BADGE (Solid Slate Surface) */}
-              <div
-                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs"
-                title={`Chuỗi ${currentUser.streakDays || 1} ngày học • ${(currentUser.energyPoints || 1000).toLocaleString()} điểm năng lượng`}
-              >
-                <div className="flex items-center gap-1 text-slate-800 dark:text-slate-100">
-                  <FaFireFlameCurved className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  <span>{currentUser.streakDays || 1}</span>
-                </div>
-                <span className="text-slate-300 dark:text-slate-600 text-[10px]">•</span>
-                <div className="flex items-center gap-1 text-slate-800 dark:text-slate-100">
-                  <FaStar className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  <span>{(currentUser.energyPoints || 1000).toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Hairline Divider */}
-              <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 shrink-0" />
-
-              {/* Dashboard Navigation Button - Solid Secondary Surface Button */}
-              <button
-                onClick={() => {
-                  if (currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN") {
-                    window.location.href = "/admin";
-                  } else {
-                    onChangeView(activeView === "dashboard" ? "student" : "dashboard");
-                  }
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg transition border cursor-pointer whitespace-nowrap bg-slate-100 hover:bg-slate-200 dark:bg-[#1E293B] dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 shadow-2xs active:scale-95"
-                title={
-                  currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
-                    ? "Mở Cổng Quản Trị Riêng Biệt (/admin)"
-                    : currentUser.role === "STUDENT"
-                      ? "Bảng Điều Khiển"
-                      : "Không Gian Giáo Viên"
-                }
-              >
-                <RiDashboardFill className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
-                <span className="hidden xl:inline">
-                  {currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
-                    ? "Cổng Quản Trị ↗"
-                    : currentUser.role === "STUDENT"
-                      ? "Bảng Điều Khiển"
-                      : "Bảng Giáo Viên"}
-                </span>
-              </button>
-
-              {/* User Profile Avatar & Dropdown */}
+            {/* User Profile / Auth State */}
+            {currentUser ? (
               <div className="relative shrink-0">
                 <button
                   onClick={() => setShowUserDropdown(!showUserDropdown)}
-                  className="flex items-center p-0.5 rounded-full ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1865F2] dark:hover:ring-blue-400 transition cursor-pointer"
+                  className="flex items-center gap-1.5 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                   title={currentUser.fullName}
                 >
                   <img
                     src={currentUser.avatarUrl}
                     alt={currentUser.fullName}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
+                    className="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
                   />
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${showUserDropdown ? "rotate-180" : ""}`} />
                 </button>
 
+                {/* Consolidated Developer-First User Menu */}
                 {showUserDropdown && (
                   <div
-                    className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#131E35] text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150"
+                    className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#0B172E] text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 text-xs animate-in fade-in zoom-in-95 duration-150"
                     onMouseLeave={() => setShowUserDropdown(false)}
                   >
+                    {/* User Header */}
                     <div className="p-3 border-b border-slate-100 dark:border-slate-800">
-                      <p className="font-bold text-slate-900 dark:text-slate-100">
+                      <p className="font-bold text-slate-900 dark:text-white truncate">
                         {currentUser.fullName}
                       </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        @{currentUser.username}
-                      </p>
-                      <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                        Vai trò: {currentUser.role}
+                      <p className="text-[11px] text-slate-400 truncate">@{currentUser.username}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-800 text-[#1865F2] dark:text-blue-400">
+                        {currentUser.role}
                       </span>
                     </div>
 
+                    {/* Quick Tools & Shortcuts */}
                     <div className="py-1 space-y-0.5">
                       <button
                         onClick={() => {
@@ -981,14 +761,13 @@ export const Header: React.FC<HeaderProps> = ({
                           }
                           setShowUserDropdown(false);
                         }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200 cursor-pointer transition"
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center justify-between font-medium text-slate-700 dark:text-slate-200 cursor-pointer transition"
                       >
-                        <RiDashboardFill className="w-4 h-4 text-[#1865F2] dark:text-blue-400" />
-                        <span>
-                          {currentUser.role === "ADMIN" || currentUser.role === "SUPER_ADMIN"
-                            ? "Cổng Quản Trị Hệ Thống (/admin) ↗"
-                            : "Bảng Điều Khiển Cá Nhân"}
+                        <span className="flex items-center gap-2">
+                          <RiDashboardFill className="w-4 h-4 text-[#1865F2]" />
+                          <span>{currentUser.role === "ADMIN" ? "Cổng Quản Trị" : "Bảng Điều Khiển"}</span>
                         </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
                       </button>
 
                       <button
@@ -996,67 +775,111 @@ export const Header: React.FC<HeaderProps> = ({
                           onOpenProfile();
                           setShowUserDropdown(false);
                         }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-200 cursor-pointer transition"
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 cursor-pointer transition"
                       >
-                        <UserIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Xem Hồ Sơ & Huy Hiệu</span>
+                        <UserIcon className="w-4 h-4 text-emerald-500" />
+                        <span>Hồ sơ & Huy hiệu</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          openBookmarksModal();
+                          setShowUserDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center justify-between font-medium text-slate-700 dark:text-slate-200 cursor-pointer transition"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Bookmark className="w-4 h-4 text-amber-500" />
+                          <span>Bài học đã lưu</span>
+                        </span>
+                        {bookmarks.length > 0 && (
+                          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                            {bookmarks.length}
+                          </span>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          openShortcuts();
+                          setShowUserDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200 cursor-pointer transition"
+                      >
+                        <Sliders className="w-4 h-4 text-slate-500" />
+                        <span>Phím tắt & Trợ năng (?)</span>
                       </button>
 
                       <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
 
-                      <p className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        Chuyển vai trò:
+                      {/* Language Switch */}
+                      <button
+                        onClick={() => {
+                          setLang(lang === "vi" ? "en" : "vi");
+                          setShowUserDropdown(false);
+                        }}
+                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center justify-between font-medium text-slate-700 dark:text-slate-200 cursor-pointer transition"
+                      >
+                        <span className="flex items-center gap-2">
+                          <RiTranslate2 className="w-4 h-4 text-blue-500" />
+                          <span>Ngôn ngữ</span>
+                        </span>
+                        <span className="font-bold text-[10px] text-slate-500 uppercase">
+                          {lang === "vi" ? "Tiếng Việt" : "English"}
+                        </span>
+                      </button>
+
+                      <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+
+                      {/* Role Switcher */}
+                      <p className="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                        Chuyển vai trò test:
                       </p>
-                      <button
-                        onClick={() => {
-                          onSwitchUser("STUDENT");
-                          setShowUserDropdown(false);
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
-                      >
-                        <span className="flex items-center gap-2">
-                          <FaGraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <div className="grid grid-cols-3 gap-1 px-2 pb-1">
+                        <button
+                          onClick={() => {
+                            onSwitchUser("STUDENT");
+                            setShowUserDropdown(false);
+                          }}
+                          className={`py-1 text-center font-bold text-[10px] rounded transition cursor-pointer ${
+                            currentUser.role === "STUDENT"
+                              ? "bg-[#1865F2] text-white"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
+                          }`}
+                        >
                           Học sinh
-                        </span>
-                        {currentUser.role === "STUDENT" && (
-                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          onSwitchUser("TEACHER");
-                          setShowUserDropdown(false);
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
-                      >
-                        <span className="flex items-center gap-2">
-                          <FaChalkboardUser className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onSwitchUser("TEACHER");
+                            setShowUserDropdown(false);
+                          }}
+                          className={`py-1 text-center font-bold text-[10px] rounded transition cursor-pointer ${
+                            currentUser.role === "TEACHER"
+                              ? "bg-[#1865F2] text-white"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
+                          }`}
+                        >
                           Giáo viên
-                        </span>
-                        {currentUser.role === "TEACHER" && (
-                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          onSwitchUser("SUPER_ADMIN");
-                          setShowUserDropdown(false);
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium transition cursor-pointer"
-                      >
-                        <span className="flex items-center gap-2">
-                          <FaUserShield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                          Quản Trị Viên
-                        </span>
-                        {currentUser.role === "SUPER_ADMIN" && (
-                          <span className="text-[#1865F2] dark:text-blue-400 font-bold">✓</span>
-                        )}
-                      </button>
+                        </button>
+                        <button
+                          onClick={() => {
+                            onSwitchUser("SUPER_ADMIN");
+                            setShowUserDropdown(false);
+                          }}
+                          className={`py-1 text-center font-bold text-[10px] rounded transition cursor-pointer ${
+                            currentUser.role === "SUPER_ADMIN"
+                              ? "bg-[#1865F2] text-white"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
+                          }`}
+                        >
+                          Admin
+                        </button>
+                      </div>
 
                       <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
 
+                      {/* Logout */}
                       <button
                         onClick={() => {
                           onLogout();
@@ -1071,190 +894,256 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            /* Logged out state */
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={onOpenLogin}
-                className="px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-full shadow-2xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
-              >
-                <span>{lang === "en" ? "Sign in" : "Đăng nhập"}</span>
-              </button>
-              <button
-                onClick={onOpenRegister}
-                className="px-4 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-bold bg-[#05ac60] hover:bg-[#049653] text-white rounded-full shadow-xs transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
-              >
-                <span>{lang === "en" ? "Get started" : "Bắt đầu"}</span>
-              </button>
-            </div>
-          )}
+            ) : (
+              /* Logged Out Actions */
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onOpenLogin}
+                  className="px-3.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+                >
+                  {lang === "en" ? "Sign in" : "Đăng nhập"}
+                </button>
+                <button
+                  onClick={onOpenRegister}
+                  className="px-3.5 py-1.5 text-xs font-bold bg-[#05ac60] hover:bg-[#049653] text-white rounded-lg shadow-xs transition cursor-pointer active:scale-95"
+                >
+                  {lang === "en" ? "Get started" : "Bắt đầu"}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* Centralized Notification Channel Preferences Modal */}
+      {/* ─────────────────────────────────────────────────────────────
+          COMMAND PALETTE DIALOG (Linear / Raycast Hotkey Modal)
+          Triggered with ⌘K or click on search bar
+      ───────────────────────────────────────────────────────────── */}
+      {commandPaletteOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center pt-16 sm:pt-24 p-4 animate-in fade-in duration-100">
+          <div
+            className="w-full max-w-xl bg-white dark:bg-[#0B172E] text-slate-900 dark:text-white rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Search Input Bar */}
+            <div className="flex items-center px-4 border-b border-slate-200 dark:border-slate-800">
+              <RiSearchLine className="w-5 h-5 text-slate-400 shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm bài học, chủ đề, môn học hoặc phím tắt..."
+                className="w-full px-3 py-3.5 bg-transparent text-sm focus:outline-none placeholder-slate-400"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white px-1 cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 border border-slate-200 dark:border-slate-700 ml-2">
+                ESC
+              </kbd>
+            </div>
+
+            {/* Quick Filter Categories */}
+            <div className="p-3 max-h-80 overflow-y-auto space-y-2">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">
+                {searchTerm ? `Kết quả tìm kiếm (${searchResults.length})` : "Gợi ý phổ biến"}
+              </div>
+
+              <div className="space-y-1">
+                {searchResults.map((lesson) => (
+                  <button
+                    key={lesson.id}
+                    onClick={() => {
+                      if (onSelectLesson) onSelectLesson(lesson);
+                      setCommandPaletteOpen(false);
+                      setSearchTerm("");
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition flex items-center justify-between group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-[#1865F2] group-hover:text-white transition">
+                        <PlayCircle className="w-4 h-4" />
+                      </div>
+                      <div className="truncate">
+                        <p className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#1865F2] dark:group-hover:text-blue-400 truncate">
+                          {lesson.title}
+                        </p>
+                        <p className="text-[10px] text-slate-400 truncate">{lesson.description || "Bài học chuẩn K-12"}</p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition shrink-0" />
+                  </button>
+                ))}
+              </div>
+
+              {/* Quick Actions in Command Palette */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1">
+                  Thao tác nhanh
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                  <button
+                    onClick={() => {
+                      setCommandPaletteOpen(false);
+                      onOpenAiChat();
+                    }}
+                    className="p-2 text-left rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer"
+                  >
+                    <RiSparklingFill className="w-3.5 h-3.5 text-[#1865F2]" />
+                    <span>Mở Socratic AI Tutor</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCommandPaletteOpen(false);
+                      onChangeView("dashboard");
+                    }}
+                    className="p-2 text-left rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer"
+                  >
+                    <RiDashboardFill className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Xem Bảng Điều Khiển</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer Keybinds */}
+            <div className="px-4 py-2.5 bg-slate-50 dark:bg-[#070D18] border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+              <div className="flex items-center gap-3">
+                <span>Dùng <kbd className="font-mono bg-white dark:bg-slate-800 px-1 py-0.2 rounded border">↑↓</kbd> để di chuyển</span>
+                <span><kbd className="font-mono bg-white dark:bg-slate-800 px-1 py-0.2 rounded border">↵</kbd> để chọn</span>
+              </div>
+              <span>DMKLab Search</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          NOTIFICATION CHANNEL SETTINGS MODAL
+      ───────────────────────────────────────────────────────────── */}
       {showChannelsModal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#131E35] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-5 animate-in fade-in zoom-in-95 text-slate-800 dark:text-slate-100">
+          <div className="bg-white dark:bg-[#0B172E] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 animate-in fade-in zoom-in-95 text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] flex items-center justify-center">
                   <Bell className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
-                    Cài Đặt Kênh Nhận Thông Báo
-                  </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Quản lý nhận thông báo trên website, email hoặc kênh phù hợp
-                  </p>
+                  <h3 className="font-bold text-sm text-slate-900 dark:text-white">Cài Đặt Kênh Thông Báo</h3>
+                  <p className="text-[11px] text-slate-400">Chọn các kênh bạn muốn nhận tin tức</p>
                 </div>
               </div>
               <button
-                onClick={() => {
-                  setShowChannelsModal(false);
-                  setChannelSavedMsg(false);
-                }}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold p-1 cursor-pointer"
+                onClick={() => setShowChannelsModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {channelSavedMsg && (
-              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-600" />
-                <span>Đã lưu tùy chọn kênh thông báo thành công!</span>
+              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                <span>Đã lưu tùy chọn kênh thông báo!</span>
               </div>
             )}
 
-            <div className="space-y-3 text-xs">
-              {/* Channel 1: Website */}
-              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <p className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-[#1865F2]" />
-                    <span>Thông báo trong Website</span>
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Hiển thị chuông thông báo, bài học mới, và nhắc nhở duy trì chuỗi học tập
-                    (Streak).
-                  </p>
+            <div className="space-y-2 text-xs">
+              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-slate-900 dark:text-white">Website & Ứng dụng</p>
+                  <p className="text-[10px] text-slate-400">Chuông thông báo & streak hàng ngày</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.website}
-                  onChange={(e) =>
-                    setChannelSettings((prev) => ({ ...prev, website: e.target.checked }))
-                  }
-                  className="w-4 h-4 accent-[#1865F2] rounded cursor-pointer shrink-0"
+                  onChange={(e) => setChannelSettings((prev) => ({ ...prev, website: e.target.checked }))}
+                  className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
               </div>
 
-              {/* Channel 2: Email */}
-              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <p className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-purple-600" />
-                    <span>Thông báo qua Email</span>
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Gửi thư tổng kết tiến độ hàng tuần, báo cáo phụ huynh và cảnh báo bảo mật tài
-                    khoản.
-                  </p>
+              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-slate-900 dark:text-white">Email hàng tuần</p>
+                  <p className="text-[10px] text-slate-400">Báo cáo tổng kết tiến độ học tập</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.email}
-                  onChange={(e) =>
-                    setChannelSettings((prev) => ({ ...prev, email: e.target.checked }))
-                  }
-                  className="w-4 h-4 accent-purple-600 rounded cursor-pointer shrink-0"
+                  onChange={(e) => setChannelSettings((prev) => ({ ...prev, email: e.target.checked }))}
+                  className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
               </div>
 
-              {/* Channel 3: Zalo / Di động */}
-              <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <p className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Kênh Zalo OA & Ứng dụng Di động</span>
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Tin nhắn nhắc học mỗi tối 19:30, chúc mừng mở khóa huy hiệu mới qua Zalo
-                    Official Account.
-                  </p>
+              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-slate-900 dark:text-white">Zalo OA Thông Báo</p>
+                  <p className="text-[10px] text-slate-400">Nhắc nhở học tập mỗi tối 19:30</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={channelSettings.zalo}
-                  onChange={(e) =>
-                    setChannelSettings((prev) => ({ ...prev, zalo: e.target.checked }))
-                  }
-                  className="w-4 h-4 accent-emerald-600 rounded cursor-pointer shrink-0"
+                  onChange={(e) => setChannelSettings((prev) => ({ ...prev, zalo: e.target.checked }))}
+                  className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <button
-                onClick={() => {
-                  setShowChannelsModal(false);
-                  setChannelSavedMsg(false);
-                }}
-                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#1E293B] text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs transition cursor-pointer"
+                onClick={() => setShowChannelsModal(false)}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold cursor-pointer"
               >
                 Đóng
               </button>
               <button
                 onClick={() => {
                   try {
-                    localStorage.setItem(
-                      "dmklab_notification_channels",
-                      JSON.stringify(channelSettings)
-                    );
+                    localStorage.setItem("dmklab_notification_channels", JSON.stringify(channelSettings));
                   } catch {}
                   setChannelSavedMsg(true);
                   setTimeout(() => {
                     setShowChannelsModal(false);
                     setChannelSavedMsg(false);
-                  }, 1200);
+                  }, 1000);
                 }}
-                className="px-5 py-2 rounded-xl bg-[#1865F2] hover:bg-[#0B4ED7] text-white font-bold text-xs border border-[#1865F2] shadow-xs transition cursor-pointer flex items-center gap-1.5 active:scale-95"
+                className="px-4 py-1.5 rounded-lg bg-[#1865F2] text-white text-xs font-bold shadow-xs cursor-pointer"
               >
-                <Check className="w-3.5 h-3.5" />
-                <span>Lưu Cấu Hình</span>
+                Lưu cấu hình
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Mobile Drawer (Slide-out menu for tablet/mobile) */}
+      {/* ─────────────────────────────────────────────────────────────
+          MOBILE SLIDE-OUT DRAWER
+      ───────────────────────────────────────────────────────────── */}
       {mobileDrawerOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="fixed inset-0 bg-black/70 transition-opacity"
-            onClick={() => setMobileDrawerOpen(false)}
-          />
-          <div className="relative w-72 max-w-[80vw] bg-white dark:bg-[#0B1528] text-slate-800 dark:text-slate-100 p-5 shadow-2xl flex flex-col justify-between h-full z-10 animate-in slide-in-from-left duration-200">
-            <div className="space-y-5">
+          <div className="fixed inset-0 bg-black/60" onClick={() => setMobileDrawerOpen(false)} />
+          <div className="relative w-72 max-w-[80vw] bg-white dark:bg-[#070D18] text-slate-800 dark:text-slate-100 p-5 shadow-2xl flex flex-col justify-between h-full z-10 animate-in slide-in-from-left duration-200">
+            <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2">
                   <img
                     src="/img-web/duc_mai_khoi_lab-removebg-removebg-preview.png"
-                    alt="DMKLab"
+                    alt="DMKLab Education"
                     className="h-7 w-auto object-contain"
                   />
-                  <span className="text-xs font-black text-[#1865F2] dark:text-blue-400 uppercase tracking-wider">
-                    DMKLab K-12
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                    K–12
                   </span>
                 </div>
-                <button
-                  onClick={() => setMobileDrawerOpen(false)}
-                  className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
+                <button onClick={() => setMobileDrawerOpen(false)} className="p-1 cursor-pointer">
+                  <X className="w-5 h-5 text-slate-400" />
                 </button>
               </div>
 
@@ -1265,7 +1154,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onChangeView("student");
                     setMobileDrawerOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-2.5 transition cursor-pointer ${
+                  className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 cursor-pointer ${
                     activeView === "student"
                       ? "bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] font-bold"
                       : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
@@ -1277,17 +1166,32 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
+                    onChangeView("dashboard");
+                    setMobileDrawerOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 cursor-pointer ${
+                    activeView === "dashboard"
+                      ? "bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] font-bold"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+                  }`}
+                >
+                  <RiDashboardFill className="w-4 h-4 text-emerald-500" />
+                  <span>Lộ Trình Học Tập</span>
+                </button>
+
+                <button
+                  onClick={() => {
                     openBookmarksModal();
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
                   <span className="flex items-center gap-2.5">
                     <Bookmark className="w-4 h-4 text-amber-500" />
-                    <span>Bài Học Đã Lưu & Ghi Chú</span>
+                    <span>Bài Học Đã Lưu</span>
                   </span>
                   {bookmarks.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                    <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800">
                       {bookmarks.length}
                     </span>
                   )}
@@ -1295,35 +1199,35 @@ export const Header: React.FC<HeaderProps> = ({
 
                 <button
                   onClick={() => {
-                    openShortcuts();
+                    onChangeView("articles");
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2.5 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
-                  <Sliders className="w-4 h-4 text-[#1865F2]" />
-                  <span>Hỗ Trợ Tiếp Cận & Phím Tắt (?)</span>
+                  Bài Viết & Tài Liệu
                 </button>
 
-                <div className="border-t border-slate-100 dark:border-slate-800 my-2" />
+                <button
+                  onClick={() => {
+                    onChangeView("books");
+                    setMobileDrawerOpen(false);
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer flex items-center justify-between"
+                >
+                  <span>Tủ Sách K-12 & Trình Bày Sách</span>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-600 dark:text-blue-300">
+                    Mới
+                  </span>
+                </button>
 
                 <button
                   onClick={() => {
                     onChangeView("about");
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
-                  Giới Thiệu Nền Tảng
-                </button>
-
-                <button
-                  onClick={() => {
-                    onChangeView("articles");
-                    setMobileDrawerOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
-                >
-                  Bài Viết & Tài Liệu
+                  Giới Thiệu DMKLab
                 </button>
 
                 <button
@@ -1331,43 +1235,31 @@ export const Header: React.FC<HeaderProps> = ({
                     onChangeView("contact");
                     setMobileDrawerOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
-                  Liên Hệ & Góp Ý
-                </button>
-
-                <div className="border-t border-slate-100 dark:border-slate-800 my-2" />
-
-                <button
-                  onClick={() => {
-                    window.location.href = "/admin";
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center justify-between text-slate-800 dark:text-slate-200 transition font-bold cursor-pointer"
-                >
-                  <span>Cổng Quản Trị Hệ Thống (/admin)</span>
-                  <span>↗</span>
+                  Liên Hệ & Hỗ Trợ
                 </button>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
-              DMKLab Education K–12 Platform
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400">
+              DMKLab Education K–12 Standard
             </div>
           </div>
         </div>
       )}
 
-      {/* Mobile Fixed Bottom Navigation Bar (Đa thiết bị: Điện thoại & Máy tính bảng nhỏ) */}
+      {/* ─────────────────────────────────────────────────────────────
+          MOBILE BOTTOM NAVIGATION (Persistent thumb bar)
+      ───────────────────────────────────────────────────────────── */}
       <nav
         aria-label="Điều hướng di động"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#0B1120] border-t border-slate-200 dark:border-slate-800 py-1.5 px-3 flex items-center justify-around shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#070D18] border-t border-slate-200 dark:border-slate-800 py-1.5 px-3 flex items-center justify-around shadow-lg"
       >
         <button
           onClick={() => onChangeView("student")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition cursor-pointer ${
-            activeView === "student"
-              ? "text-[#1865F2] font-bold"
-              : "text-slate-500 dark:text-slate-400"
+            activeView === "student" ? "text-[#1865F2] font-bold" : "text-slate-500 dark:text-slate-400"
           }`}
         >
           <Home className="w-4 h-4" />
@@ -1375,24 +1267,11 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          onClick={() => setMobileDrawerOpen(true)}
+          onClick={() => setCommandPaletteOpen(true)}
           className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 transition cursor-pointer"
         >
-          <BookOpen className="w-4 h-4" />
-          <span>Danh mục</span>
-        </button>
-
-        <button
-          onClick={openBookmarksModal}
-          className="relative flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 transition cursor-pointer"
-        >
-          <Bookmark className="w-4 h-4" />
-          {bookmarks.length > 0 && (
-            <span className="absolute -top-1 right-2 min-w-3.5 h-3.5 px-0.5 rounded-full bg-amber-500 text-white text-[8px] font-black flex items-center justify-center">
-              {bookmarks.length}
-            </span>
-          )}
-          <span>Đã lưu</span>
+          <RiSearchLine className="w-4 h-4" />
+          <span>Tìm kiếm</span>
         </button>
 
         <button
@@ -1406,14 +1285,16 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          onClick={() => setShowNotifications(!showNotifications)}
+          onClick={openBookmarksModal}
           className="relative flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 transition cursor-pointer"
         >
-          <Bell className="w-4 h-4" />
-          {unreadNotifCount > 0 && (
-            <span className="absolute -top-1 right-2 w-2 h-2 bg-rose-500 rounded-full" />
+          <Bookmark className="w-4 h-4" />
+          {bookmarks.length > 0 && (
+            <span className="absolute -top-1 right-2 min-w-3 h-3 px-0.5 rounded-full bg-amber-500 text-white text-[8px] font-bold flex items-center justify-center">
+              {bookmarks.length}
+            </span>
           )}
-          <span>Thông báo</span>
+          <span>Đã lưu</span>
         </button>
 
         <button
@@ -1430,6 +1311,6 @@ export const Header: React.FC<HeaderProps> = ({
           <span>{currentUser ? "Cá nhân" : "Đăng nhập"}</span>
         </button>
       </nav>
-    </header>
+    </>
   );
 };

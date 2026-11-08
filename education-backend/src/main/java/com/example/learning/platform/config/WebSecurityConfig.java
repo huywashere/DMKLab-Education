@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,8 +30,12 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    @Value("${app.cors.allowed-origins:http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,https://*.dmklab.edu.vn,https://dmklab.edu.vn}")
+    private String allowedOrigins;
 
     private final RateLimitingFilter rateLimitingFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -50,21 +56,21 @@ public class WebSecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register").permitAll()
+                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/v1/grades/**", "/api/v1/subjects/**", "/api/v1/courses/**", "/api/v1/lessons/**").permitAll()
                 .requestMatchers("/api/v1/quizzes/**").permitAll()
                 .requestMatchers("/api/v1/progress/**").permitAll()
                 .requestMatchers("/api/v1/ai/**").permitAll()
-                .requestMatchers("/api/v1/admin/**").permitAll()
+                .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .requestMatchers("/api/v1/internal/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/v1/auth/me", "/api/v1/auth/profile", "/api/v1/auth/change-password").authenticated()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(rateLimitingFilter, JwtAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitingFilter, org.springframework.security.web.authentication.logout.LogoutFilter.class)
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
                 .contentTypeOptions(content -> {})
@@ -72,6 +78,15 @@ public class WebSecurityConfig {
                     .includeSubDomains(true)
                     .maxAgeInSeconds(63072000)
                     .preload(true)
+                )
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; frame-ancestors 'self'; object-src 'none'")
+                )
+                .referrerPolicy(referrer -> referrer
+                    .policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                )
+                .permissionsPolicy(permissions -> permissions
+                    .policy("camera=(self), microphone=(self), geolocation=(), browsing-topics=()")
                 )
             );
 
@@ -81,7 +96,11 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        List<String> origins = java.util.Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+        config.setAllowedOriginPatterns(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

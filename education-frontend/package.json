@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@prisma/client": "6.4.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^2.0.126",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",

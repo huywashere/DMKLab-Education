@@ -126,22 +126,42 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         return RateLimitPolicy.DEFAULT_GLOBAL;
     }
 
+    private static final java.util.regex.Pattern IP_PATTERN =
+            java.util.regex.Pattern.compile("^[0-9a-fA-F.:]{3,45}$");
+
     /**
-     * Trích xuất địa chỉ IP thực tế của client kể cả khi đứng sau Proxy / CDN (Cloudflare, Nginx)
+     * Trích xuất địa chỉ IP thực tế của client kể cả khi đứng sau Proxy / CDN (Cloudflare, Nginx).
+     * Ưu tiên header tin cậy từ Edge Gateway (CF-Connecting-IP, X-Real-IP) trước khi đọc X-Forwarded-For
+     * và lọc định dạng regex để ngăn chặn Header Injection / Spoofing.
      */
     private String extractClientIp(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (StringUtils.hasText(xForwardedFor)) {
-            return xForwardedFor.split(",")[0].trim();
-        }
+        // 1. Cloudflare Edge Proxy Header (Được ký và tiêm từ Cloudflare Gateway, client không thể giả mạo)
         String cfConnectingIp = request.getHeader("CF-Connecting-IP");
-        if (StringUtils.hasText(cfConnectingIp)) {
+        if (StringUtils.hasText(cfConnectingIp) && IP_PATTERN.matcher(cfConnectingIp.trim()).matches()) {
             return cfConnectingIp.trim();
         }
+
+        // 2. Nginx / Ingress Reverse Proxy IP
         String xRealIp = request.getHeader("X-Real-IP");
-        if (StringUtils.hasText(xRealIp)) {
+        if (StringUtils.hasText(xRealIp) && IP_PATTERN.matcher(xRealIp.trim()).matches()) {
             return xRealIp.trim();
         }
-        return request.getRemoteAddr() != null ? request.getRemoteAddr() : "127.0.0.1";
+
+        // 3. X-Forwarded-For (lấy client IP đầu tiên trong chuỗi hop và sanitize)
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (StringUtils.hasText(xForwardedFor)) {
+            String firstIp = xForwardedFor.split(",")[0].trim();
+            if (IP_PATTERN.matcher(firstIp).matches()) {
+                return firstIp;
+            }
+        }
+
+        // 4. Fallback TCP Remote Address
+        String remoteAddr = request.getRemoteAddr();
+        if (StringUtils.hasText(remoteAddr) && IP_PATTERN.matcher(remoteAddr.trim()).matches()) {
+            return remoteAddr.trim();
+        }
+
+        return "127.0.0.1";
     }
 }

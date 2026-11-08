@@ -1,18 +1,19 @@
 ---
 name: modern-ui-design-system
 description: >-
-  Cẩm nang thiết kế UI/UX hiện đại cho EdTech kết hợp shadcn/ui, Magic UI, Aceternity UI và phong cách Godly.
+  Cẩm nang thiết kế UI/UX hiện đại cho EdTech kết hợp shadcn/ui, Magic UI, Aceternity UI, Brilliant.org và Godly.
   Kích hoạt khi xây dựng landing page, trang môn học K-12, thẻ bài giảng, hoặc bảng điều khiển,
   đảm bảo 100% bề mặt màu đặc (solid enterprise UI), không glass blur mờ đục, chuẩn WCAG 2.1 và hiệu năng 60fps.
 ---
 
-# Modern UI Design System for EdTech (shadcn/ui + Magic UI + Godly)
+# Modern UI Design System for EdTech (shadcn/ui + Magic UI + Godly + Brilliant)
 
 Cẩm nang này định hình bộ quy chuẩn thiết kế giao diện cho hệ thống giáo dục trực tuyến DMKLab Education, kế thừa tinh hoa từ các thư viện và showcase Open UI hàng đầu thế giới:
 
 1. **shadcn/ui**: Đóng vai trò **nền tảng kỹ thuật** (Foundational Primitives, semantic tokens, accessible structure, cva/cn utilities).
 2. **Magic UI & Aceternity UI**: Đóng vai trò **vi tương tác & điểm chạm cảm xúc** (Micro-interactions, marquee ticker, bento grid, number ticker, shimmer button, spotlight lighting, 3D tilt).
 3. **Godly & Land-book**: Đóng vai trò **định hướng thẩm mỹ tổng thể** (Art Direction, typographic hierarchy, nhịp thở không gian 64px–96px, màu sắc doanh nghiệp cao cấp).
+4. **Brilliant.org & Generative UI**: Đóng vai trò **tương tác học tập chủ động** (Active Learning Manipulatives, trực quan hóa bài toán tương tác, instant feedback loops <200ms).
 
 ---
 
@@ -22,7 +23,7 @@ Cẩm nang này định hình bộ quy chuẩn thiết kế giao diện cho hệ
 - **Lý do**: Lớp kính mờ (`backdrop-blur-md`, `bg-white/10`) làm chữ bị nhòe khó đọc trong môi trường học tập, gây sụt giảm FPS đáng kể trên máy tính bảng/điện thoại học sinh, và trông thiếu chuyên nghiệp.
 - **Giải pháp**: 100% các thành phần (Header, Card, Modal, Footer, Popover, Dropdown) phải dùng **màu nền đặc (solid background)**:
   - Dark Mode: `#000000` (Khan black), `#081C3D` (Khan midnight navy), `#0B172E` (Slate dark navy).
-  - Light Mode: `#FFFFFF`, `#F8FAFC` (Slate 50), `#FEF8E7` (Khan warm cream).
+  - Light Mode: `#FFFFFF`, `#F8FAFC` (Slate 50), `#F9F7F5` (Khan warm cream).
 
 ### Quy tắc 2: Tương phản cao & Chuẩn tiếp cận (WCAG 2.1 AA+)
 - Văn bản phải đạt tỷ lệ tương phản tối thiểu 4.5:1 so với nền.
@@ -82,7 +83,7 @@ import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
 ```
 
 ### 4. ShimmerButton (`@/components/ui/shimmer-button`)
-- Nút kêu gọi hành động (CTA) nổi bật với dải sáng xoay quanh viền, nền xanh đặc `#1865F2` chuẩn Khan Academy.
+- Nút kêu gọi hành động (CTA) nổi bật với dải sáng xoay quanh viền, nền xanh đặc `#1865F2` hoặc `#14BF96`.
 ```tsx
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 
@@ -96,7 +97,7 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 ```tsx
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 
-<SpotlightCard spotlightColor="rgba(20, 191, 150, 0.15)">
+<SpotlightCard spotlightColor="rgba(24, 101, 242, 0.12)">
   <h4>Môn Toán Hình Học Không Gian</h4>
 </SpotlightCard>
 ```
@@ -143,3 +144,21 @@ import { GridPattern } from "@/components/ui/grid-pattern";
    - Section Title: `text-2xl sm:text-4xl font-extrabold tracking-tight`.
    - Body Text: `text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300`.
    - Tag / Badge: `text-[11px] font-bold uppercase tracking-wider`.
+
+---
+
+## 4. Mô Hình Thiết Kế Interactive Knowledge Widgets (Brilliant.org & Generative UI)
+
+Mỗi khi tạo các khối bài giảng hoặc mô phỏng kiến thức:
+
+1. **Cấu Trúc Chuẩn của Một Widget Tương Tác**:
+   - **Header**: Tiêu đề khái niệm + Tag môn học + Nút Reset trạng thái.
+   - **Interactive Canvas / Stage**: Vùng thao tác trực quan (SVG / Canvas / Flex grid) hỗ trợ click, hover, hoặc kéo slider.
+   - **Control Bar**: Các nút lựa chọn chế độ (vd: Lát cắt hình học, Bộ nhiễm sắc thể, Bước sóng) + Slider điều chỉnh thông số.
+   - **Insight Box**: Khung giải thích động cập nhật theo thời gian thực dựa trên thao tác của học sinh.
+
+2. **Quy Trình Tạo Generative UI Prototype Trong Chat**:
+   - Khi người dùng yêu cầu ý tưởng giao diện mới hoặc thiết kế bài học mới:
+     - Tạo nhanh file HTML standalone sử dụng semantic tokens (`bg-[var(--card)]`, `text-[var(--foreground)]`) và Tailwind CSS.
+     - Nhúng bằng `<agent-embed>` để người dùng tương tác trực tiếp ngay trong chat.
+     - Sau khi người dùng hài lòng, chuyển đổi sạch sẽ thành React Component chuẩn (`src/components/` hoặc `src/features/`).

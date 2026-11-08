@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import dynamic from "next/dynamic";
 import { Homepage } from "@/features/student/homepage";
+import { ProfilePage } from "@/features/profile/ProfilePage";
 
 // Fast lightweight loading skeleton for code-split components
 const ViewSkeleton = () => (
@@ -42,10 +43,7 @@ const RegisterPage = dynamic(
   () => import("@/features/auth/RegisterPage").then((m) => m.RegisterPage),
   { loading: () => <ViewSkeleton /> }
 );
-const ProfilePage = dynamic(
-  () => import("@/features/profile/ProfilePage").then((m) => m.ProfilePage),
-  { loading: () => <ViewSkeleton /> }
-);
+
 const AboutPage = dynamic(() => import("@/features/about/AboutPage").then((m) => m.AboutPage), {
   loading: () => <ViewSkeleton />,
 });
@@ -55,6 +53,10 @@ const ArticlesPage = dynamic(
 );
 const ContactPage = dynamic(
   () => import("@/features/contact/ContactPage").then((m) => m.ContactPage),
+  { loading: () => <ViewSkeleton /> }
+);
+const BookReaderPage = dynamic(
+  () => import("@/features/books/BookReaderPage").then((m) => m.BookReaderPage),
   { loading: () => <ViewSkeleton /> }
 );
 
@@ -71,6 +73,7 @@ export default function HomePage() {
     | "profile"
     | "about"
     | "articles"
+    | "books"
     | "contact"
   >("home");
   const [selectedLesson, setSelectedLesson] = useState<Lesson>(MOCK_LESSONS[1]);
@@ -171,43 +174,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Khan Academy Official Top Announcement & Mission Bar */}
-      <div className="bg-[#0B2149] text-white text-xs py-2 border-b border-[#183664] transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 overflow-hidden">
-            <span className="w-2 h-2 rounded-full bg-[#14BF96] shrink-0 animate-pulse" />
-            <span className="font-medium text-slate-100 truncate">
-              Sứ mệnh của chúng tôi: Cung cấp nền giáo dục chuẩn quốc tế, hoàn toàn miễn phí cho mọi
-              học sinh K–12 Việt Nam.
-            </span>
-          </div>
-          <div className="hidden md:flex items-center gap-3 text-[11px] text-slate-300 shrink-0">
-            <button
-              onClick={() => setActiveView("about")}
-              className="text-[#14BF96] hover:underline font-bold transition cursor-pointer"
-            >
-              Tìm hiểu sứ mệnh ↗
-            </button>
-            <span className="text-slate-600">|</span>
-            <span className="inline-flex items-center gap-1.5 text-slate-300 font-medium">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? "bg-emerald-400" : "bg-amber-400"}`}
-              />
-              {isBackendConnected ? "Hệ thống trực tuyến" : "Sẵn sàng"}
-            </span>
-            <a
-              href="http://localhost:8080/swagger-ui.html"
-              target="_blank"
-              rel="noreferrer"
-              className="text-slate-400 hover:text-white transition underline"
-              title="OpenAPI Documentation"
-            >
-              OpenAPI
-            </a>
-          </div>
-        </div>
-      </div>
-
       <Header
         currentUser={currentUser}
         onSwitchUser={handleSwitchUser}
@@ -301,6 +267,15 @@ export default function HomePage() {
           />
         )}
 
+        {activeView === "books" && (
+          <BookReaderPage
+            onBackToHome={() => {
+              setActiveView("home");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        )}
+
         {activeView === "contact" && (
           <ContactPage
             onBackToHome={() => {
@@ -317,6 +292,7 @@ export default function HomePage() {
             onSuccess={handleLoginSuccess}
             onGoToRegister={() => setActiveView("register")}
             onBackToHome={() => setActiveView("home")}
+            onOpenAiChat={() => setIsAiChatOpen(true)}
           />
         )}
 
@@ -325,6 +301,7 @@ export default function HomePage() {
             onSuccess={handleRegisterSuccess}
             onGoToLogin={() => setActiveView("login")}
             onBackToHome={() => setActiveView("home")}
+            onOpenAiChat={() => setIsAiChatOpen(true)}
           />
         )}
 
@@ -334,6 +311,7 @@ export default function HomePage() {
             onUpdateUser={(updated) => setCurrentUser(updated)}
             onLogout={handleLogout}
             onBackToHome={() => setActiveView("home")}
+            onOpenAiChat={() => setIsAiChatOpen(true)}
           />
         )}
 

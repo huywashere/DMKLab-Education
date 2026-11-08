@@ -21,6 +21,12 @@ spring:
       idle-timeout: 30000
       connection-timeout: 20000
       max-lifetime: 1800000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        reWriteBatchedInserts: true
 
   jpa:
     hibernate:
@@ -29,7 +35,11 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        default_batch_fetch_size: 20 # Tránh N+1
+        default_batch_fetch_size: 32 # Tránh N+1
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 25
 
   flyway:
     enabled: true
@@ -78,6 +88,8 @@ management:
 
 # Cấu hình AI, JWT & Media
 app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,https://*.dmklab.edu.vn,https://dmklab.edu.vn}
   jwt:
     secret: ${JWT_SECRET:KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform}
     expiration-ms: 86400000 # 24h

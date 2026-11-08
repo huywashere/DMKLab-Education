@@ -29,3 +29,9 @@ Thumbs.db
 *.so
 *.dylib
 temp_transcode/
+
+# Environment variables
+.env
+.env*.local
+*.env
+!.env.example
