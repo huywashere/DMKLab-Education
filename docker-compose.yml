@@ -74,6 +74,9 @@ services:
       S3_ENDPOINT: http://minio:9000
       JWT_SECRET: KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform
       OPENAI_API_KEY: ${OPENAI_API_KEY:-mock-key}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-DMKLab Education <onboarding@resend.dev>}
     ports:
       - "8080:8080"
     depends_on:
