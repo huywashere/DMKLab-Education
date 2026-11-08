@@ -4,6 +4,7 @@ import com.example.learning.identity.dto.AuthDto;
 import com.example.learning.identity.entity.User;
 import com.example.learning.identity.service.UserService;
 import com.example.learning.platform.api.ApiResponse;
+import java.util.UUID;
 import com.example.learning.platform.security.JwtTokenProvider;
 import com.example.learning.platform.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;

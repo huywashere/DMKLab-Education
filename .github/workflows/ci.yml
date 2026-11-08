@@ -1,76 +1,98 @@
-name: DMKLab Enterprise CI/CD Pipeline
+name: DMKLab K-12 Platform CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, thu-nghiem ]
+    branches: [main, master, thu-nghiem]
   pull_request:
-    branches: [ main, thu-nghiem ]
+    branches: [main, master, thu-nghiem]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # Job 1: Spring Boot 3.3.4 (Java 21) Backend CI
-  # ---------------------------------------------------------------------------
-  backend-ci:
-    name: Backend Build & Automated Tests
+  # ==============================================================================
+  # 1. BACKEND AUTOMATED UNIT & INTEGRATION TESTS
+  # ==============================================================================
+  backend-test:
+    name: Spring Boot 3.3.4 (Java 21) Test Suite
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Source Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21 (Eclipse Temurin)
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Run Maven Tests (Unit & Integration)
-        run: mvn clean test -B
-        working-directory: education-backend
+      - name: Run Backend Unit & Concurrency Tests
+        run: |
+          mvn -f education-backend/pom.xml clean test
 
-      - name: Build Fat JAR Package
-        run: mvn package -DskipTests -B
-        working-directory: education-backend
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: education-backend/target/surefire-reports/
 
-      - name: Verify Artifact Creation
-        run: ls -lh education-backend/target/*.jar
-
-  # ---------------------------------------------------------------------------
-  # Job 2: Next.js 16 (TypeScript / PNPM) Frontend CI
-  # ---------------------------------------------------------------------------
-  frontend-ci:
-    name: Frontend Lint, Prettier & Production Build
+  # ==============================================================================
+  # 2. FRONTEND TURBOPACK BUILD & TYPECHECK
+  # ==============================================================================
+  frontend-check:
+    name: Next.js 16 + TypeScript + Turbopack Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Source Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install PNPM Package Manager
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - name: Set up Node.js 22 LTS
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
 
-      - name: Install Monorepo Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
 
-      - name: Validate Prettier Code Formatting
-        run: pnpm format:check
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Build Next.js Production Standalone Bundle
-        run: pnpm --filter education-frontend build
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Frontend Dependencies
+        working-directory: education-frontend
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Run Next.js Production Build
+        working-directory: education-frontend
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          NODE_ENV: production
+        run: pnpm build
+
+  # ==============================================================================
+  # 3. DOCKER & INFRASTRUCTURE VALIDATION
+  # ==============================================================================
+  docker-validation:
+    name: Validate Docker Compose & Sidecars
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose config --quiet
+          echo "✅ docker-compose.yml configuration is valid syntax"

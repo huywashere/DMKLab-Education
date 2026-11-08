@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  # 1. Spring Boot 3.3.4 Actuator Metrics (Micrometer / Prometheus)
+  - job_name: 'spring-boot-monolith'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['backend:8080']
+        labels:
+          service: 'education-backend'
+          environment: 'production'
+
+  # 2. Golang AI Streaming Proxy Metrics
+  - job_name: 'ai-streaming-proxy'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['ai_proxy:8086']
+        labels:
+          service: 'ai-streaming-proxy'
+          environment: 'production'
+
+  # 3. Golang Live Gateway & Heartbeat Hub
+  - job_name: 'live-gateway'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['live_gateway:8087']
+        labels:
+          service: 'live-gateway'
+          environment: 'production'
+
+  # 4. Prometheus Self-Monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus-engine'
