@@ -13,8 +13,11 @@ public interface LessonRepository extends JpaRepository<Lesson, UUID> {
 
     List<Lesson> findBySubjectIdAndPublishedTrueOrderByDisplayOrderAsc(UUID subjectId);
 
-    @Query("SELECT l FROM Lesson l WHERE l.published = true ORDER BY l.createdAt DESC")
-    List<Lesson> findRecentPublished();
+    default List<Lesson> findRecentPublished() {
+        return findTop12ByPublishedTrueOrderByCreatedAtDesc();
+    }
+
+    List<Lesson> findTop12ByPublishedTrueOrderByCreatedAtDesc();
 
     long countByPublishedTrue();
 }

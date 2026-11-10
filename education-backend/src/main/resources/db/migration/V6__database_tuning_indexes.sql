@@ -14,3 +14,9 @@ CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username));
 -- 4. Accelerate Parent-Student Cascade Relationship Lookups
 CREATE INDEX IF NOT EXISTS idx_user_relations_parent_student ON user_relations(parent_id, student_id);
 
+-- 5. Accelerate Incomplete/Active Learning Progress Lookups (Partial Index)
+CREATE INDEX IF NOT EXISTS idx_progress_active_incomplete ON learning_progress(user_id, last_accessed_at DESC) WHERE is_completed = FALSE;
+
+-- 6. Accelerate Audit Logs Time-Range Lookups using BRIN Index (Block Range Index for append-only audit trail)
+CREATE INDEX IF NOT EXISTS idx_audit_logs_brin_time ON audit_logs USING BRIN(created_at);
+

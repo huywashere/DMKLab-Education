@@ -32,12 +32,13 @@ public class AdminReportService {
         long usedMemory = totalMemory - freeMemory;
         long maxMemory = runtime.maxMemory() / (1024 * 1024);
 
-        long totalUsers = userRepository.count();
-        long totalStudents = userRepository.countByRole(UserRole.STUDENT);
-        long totalTeachers = userRepository.countByRole(UserRole.TEACHER);
+        UserRepository.UserKpiStats userKpis = userRepository.getUserKpiStats();
+        long totalUsers = userKpis != null ? userKpis.getTotalUsers() : userRepository.count();
+        long totalStudents = userKpis != null ? userKpis.getTotalStudents() : userRepository.countByRole(UserRole.STUDENT);
+        long totalTeachers = userKpis != null ? userKpis.getTotalTeachers() : userRepository.countByRole(UserRole.TEACHER);
+        long totalEnergyPoints = userKpis != null ? userKpis.getTotalEnergyPoints() : userRepository.sumEnergyPoints();
         long totalLessons = lessonRepository.countByPublishedTrue();
         long totalQuizzesCompleted = learningProgressRepository.countByIsCompletedTrue();
-        long totalEnergyPoints = userRepository.sumEnergyPoints();
 
         RateLimiterService.RateLimitStats rlStats = rateLimiterService.getStats();
         String redisStatus = rlStats.isRedisConnected()
@@ -59,7 +60,7 @@ public class AdminReportService {
                 .jvmMemoryUsedMb(usedMemory)
                 .jvmMemoryMaxMb(maxMemory)
                 .postgresStatus("HEALTHY (HikariCP Active)")
-                .flywayStatus("APPLIED (V5__query_optimization_indexes)")
+                .flywayStatus("APPLIED (V6__database_tuning_indexes)")
                 .redisStatus(redisStatus)
                 .build();
     }
