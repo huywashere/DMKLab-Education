@@ -13,6 +13,8 @@ public enum RateLimitPolicy {
     ASSESSMENT_SUBMIT("Nộp bài thi & Quiz", 10, 60, "Chống spam đáp án và farm điểm năng lượng ảo"),
     PROGRESS_HEARTBEAT("Đồng bộ tiến độ video", 30, 60, "Chống flood request giả mạo thời lượng học"),
     PUBLIC_CONTACT("Gửi liên hệ & góp ý", 3, 600, "Chống spam tin nhắn rác & bot hòm thư"),
+    MEDIA_UPLOAD("Tải lên tệp & cấp Presigned URL", 10, 60, "Chống spam tạo rác Object Storage và nghẽn CPU FFmpeg"),
+    SEARCH_QUERY("Tìm kiếm bài giảng & Vector Search", 30, 60, "Chống crawler cào dữ liệu và nghẽn Index Database"),
     ADMIN_OPERATIONS("Tác vụ quản trị nặng", 60, 60, "Chống nghẽn tài nguyên database aggregation"),
     DEFAULT_GLOBAL("Toàn hệ thống K-12", 120, 60, "Bảo vệ chung chống crawler/scraper quá tải");
 

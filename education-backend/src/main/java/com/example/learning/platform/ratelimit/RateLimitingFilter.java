@@ -125,6 +125,12 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         if (uri.startsWith("/api/v1/public/contact") && "POST".equalsIgnoreCase(method)) {
             return RateLimitPolicy.PUBLIC_CONTACT;
         }
+        if (uri.contains("/media/upload-url") && "POST".equalsIgnoreCase(method)) {
+            return RateLimitPolicy.MEDIA_UPLOAD;
+        }
+        if (uri.contains("/search")) {
+            return RateLimitPolicy.SEARCH_QUERY;
+        }
         if (uri.startsWith("/api/v1/admin/")) {
             return RateLimitPolicy.ADMIN_OPERATIONS;
         }
