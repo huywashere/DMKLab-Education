@@ -87,7 +87,15 @@ services:
       R2_PUBLIC_URL: ${R2_PUBLIC_URL:-https://media.dmklab.edu.vn}
       S3_ENDPOINT: http://minio:9000
       JWT_SECRET: KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-mock-key}
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
       EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM: ${RESEND_FROM:-DMKLab Education <onboarding@resend.dev>}
@@ -149,9 +157,13 @@ services:
     restart: unless-stopped
     environment:
       PORT: 8086
-      OPENAI_API_KEY: ${GEMINI_API_KEY:-${OPENAI_API_KEY:-mock-key}}
-      OPENAI_MODEL: ${GEMINI_MODEL:-${OPENAI_MODEL:-gemini-2.5-flash}}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
       REDIS_ADDR: redis:6379
       REDIS_PASSWORD: ""
       CACHE_TTL_MINUTES: 1440

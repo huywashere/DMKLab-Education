@@ -39,6 +39,15 @@ public class AiService {
     @Value("${app.ai.gemini.model:${GEMINI_MODEL:gemini-2.5-flash}}")
     private String geminiModel;
 
+    @Value("${app.ai.groq.api-key:${GROQ_API_KEY:}}")
+    private String groqApiKey;
+
+    @Value("${app.ai.groq.model:${GROQ_MODEL:llama-3.3-70b-versatile}}")
+    private String groqModel;
+
+    @Value("${app.ai.groq.base-url:${GROQ_BASE_URL:https://api.groq.com/openai/v1}}")
+    private String groqBaseUrl;
+
     @Value("${app.ai.openai.api-key:${OPENAI_API_KEY:}}")
     private String openAiApiKey;
 
@@ -250,17 +259,25 @@ public class AiService {
         // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
         addStandardCitations(out, gradeLevel, context);
 
-        // 1. Thử gọi mô hình AI ưu tiên (Gemini hoặc OpenAI với cơ chế song hành)
+        // 1. Thử gọi mô hình AI ưu tiên (Groq Cloud -> Gemini -> OpenAI -> Fallback Socratic nội bộ)
         String liveReply = null;
-        if ("openai".equalsIgnoreCase(aiProvider)) {
+        if ("groq".equalsIgnoreCase(aiProvider) || (groqApiKey != null && groqApiKey.startsWith("gsk_"))) {
+            liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+        }
+
+        if (liveReply == null && ("openai".equalsIgnoreCase(aiProvider))) {
             liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
             if (liveReply == null) {
                 // Fallback sang Gemini
                 liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
             }
-        } else {
-            // Mặc định ưu tiên Gemini (vì đang hoạt động 200 OK)
+        } else if (liveReply == null) {
+            // Mặc định ưu tiên Gemini (vì đang hoạt động 200 OK với quota lớn)
             liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            if (liveReply == null) {
+                // Fallback sang Groq nếu chưa gọi
+                liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            }
             if (liveReply == null) {
                 // Fallback sang OpenAI
                 liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
@@ -451,7 +468,75 @@ public class AiService {
     }
 
     /**
-     * Chế độ 1: Giải thích theo trình độ lớp (Lớp 1-5 Tiểu học, Lớp 6-9 THCS, Lớp 10-12 THPT)
+     * Gọi Groq Cloud API (LPU Inference siêu tốc - OpenAI Compatible)
+     * Hỗ trợ các Open Models hàng đầu: llama-3.3-70b-versatile, deepseek-r1-distill-llama-70b, qwen-2.5-32b
+     */
+    private String callGroqLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+        if (groqApiKey == null || groqApiKey.isBlank() || "mock-key".equalsIgnoreCase(groqApiKey)) {
+            return null;
+        }
+
+        try {
+            String systemPrompt = String.format(
+                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
+                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
+                + "Quy tắc sư phạm Socratic K-12:\n"
+                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
+                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
+                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
+                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
+                gradeLevel, subject, context, mode, gradeLevel
+            );
+
+            String userPrompt = message;
+            if (studentAnswer != null && !studentAnswer.isBlank()) {
+                userPrompt += " (Câu trả lời học sinh đã chọn: " + studentAnswer + ")";
+            }
+
+            String baseUrl = (groqBaseUrl != null && !groqBaseUrl.isBlank()) ? groqBaseUrl.replaceAll("/+$", "") : "https://api.groq.com/openai/v1";
+            String endpoint = baseUrl + "/chat/completions";
+            String targetModel = (groqModel != null && !groqModel.isBlank()) ? groqModel : "llama-3.3-70b-versatile";
+
+            java.util.Map<String, Object> sysMsg = java.util.Map.of("role", "system", "content", systemPrompt);
+            java.util.Map<String, Object> userMsg = java.util.Map.of("role", "user", "content", userPrompt);
+
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("model", targetModel);
+            body.put("messages", java.util.List.of(sysMsg, userMsg));
+            body.put("temperature", 0.6);
+            body.put("max_tokens", 800);
+
+            String jsonPayload = objectMapper.writeValueAsString(body);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + groqApiKey)
+                    .timeout(java.time.Duration.ofSeconds(10))
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload, java.nio.charset.StandardCharsets.UTF_8))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+                com.fasterxml.jackson.databind.JsonNode choices = root.path("choices");
+                if (choices.isArray() && !choices.isEmpty()) {
+                    String reply = choices.get(0).path("message").path("content").asText();
+                    if (reply != null && !reply.isBlank()) {
+                        log.info("[GROQ_LIVE_OK] Phản hồi thành công từ Groq Cloud API ({})", targetModel);
+                        return reply.trim();
+                    }
+                }
+            } else {
+                log.warn("[GROQ_LIVE_WARN] Groq API trả về mã lỗi HTTP {}: {}", response.statusCode(), response.body());
+            }
+        } catch (Exception ex) {
+            log.warn("[GROQ_LIVE_FALLBACK] Lỗi gọi Groq API: {}", ex.getMessage());
+        }
+
+        return null;
+    }
      */
     private void handleGradeAdaptedMode(TutorOutput out, int gradeLevel, String q, String context) {
         if (gradeLevel <= 5) {

@@ -18,19 +18,29 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	apiKey := getEnv("GEMINI_API_KEY", "")
-	if apiKey == "" {
-		apiKey = getEnv("OPENAI_API_KEY", "mock-key")
-	}
+	groqKey := getEnv("GROQ_API_KEY", "")
+	geminiKey := getEnv("GEMINI_API_KEY", "")
+	openAiKey := getEnv("OPENAI_API_KEY", "")
 
-	model := getEnv("GEMINI_MODEL", "")
-	if model == "" {
-		model = getEnv("OPENAI_MODEL", "gemini-2.5-flash")
-	}
-
+	apiKey := ""
+	model := ""
 	defaultBaseURL := "https://generativelanguage.googleapis.com/v1beta/openai"
-	if apiKey == "mock-key" || strings.HasPrefix(apiKey, "sk-") {
+
+	if groqKey != "" && strings.HasPrefix(groqKey, "gsk_") {
+		apiKey = groqKey
+		model = getEnv("GROQ_MODEL", "llama-3.3-70b-versatile")
+		defaultBaseURL = "https://api.groq.com/openai/v1"
+	} else if geminiKey != "" {
+		apiKey = geminiKey
+		model = getEnv("GEMINI_MODEL", "gemini-2.5-flash")
+		defaultBaseURL = "https://generativelanguage.googleapis.com/v1beta/openai"
+	} else if openAiKey != "" {
+		apiKey = openAiKey
+		model = getEnv("OPENAI_MODEL", "gpt-4o-mini")
 		defaultBaseURL = "https://api.openai.com/v1"
+	} else {
+		apiKey = "mock-key"
+		model = "gemini-2.5-flash"
 	}
 
 	return &Config{
