@@ -50,3 +50,4 @@ echo "[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] Cleaning up local backups older than ${
 find "${BACKUP_DIR}" -type f -name "*.sql.gz" -mtime "+${RETENTION_DAYS}" -exec rm -f {} \;
 
 echo "[$(date -u +'%Y-%m-%dT%H:%M:%SZ')] All backup maintenance tasks completed."
+
