@@ -33,6 +33,7 @@ import {
   PiCaretDownBold,
   PiClockCountdownDuotone,
   PiImagesDuotone,
+  PiFileTextDuotone,
 } from "react-icons/pi";
 import confetti from "canvas-confetti";
 import { api, SocraticChatResponse, InteractiveQuizData, CitationData } from "@/lib/api";
@@ -159,6 +160,11 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const maxTokens = 10000;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Huấn luyện chuyên sâu (In-Context Knowledge Grounding)
+  const [customKnowledge, setCustomKnowledge] = useState<string>("");
+  const [knowledgeFileName, setKnowledgeFileName] = useState<string | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -281,6 +287,34 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     inputRef.current?.focus();
   };
 
+  // Nạp tài liệu bài học để huấn luyện AI chuyên sâu theo dữ liệu thực tế
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      if (text) {
+        setCustomKnowledge(text);
+        setKnowledgeFileName(file.name);
+        setIsPhotoMenuOpen(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `sys-${Date.now()}`,
+            role: "assistant",
+            content: `📚 **Đã nạp thành công tài liệu chuyên sâu:** \`${file.name}\` (${(file.size / 1024).toFixed(1)} KB).\n\nTừ bây giờ, tôi đã được huấn luyện chuyên sâu bám sát 100% dữ liệu, công thức và phương pháp trong tài liệu này! Em hãy đặt câu hỏi nhé.`,
+            timestamp: "Vừa xong",
+            isSocraticHint: true,
+            mode: selectedMode,
+            gradeLevel: selectedGrade,
+          },
+        ]);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Giả lập nhận diện giọng nói
   const handleToggleVoiceInput = () => {
     if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
@@ -386,6 +420,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         contextLessonTitle: activeLessonTitle,
         contextSubject: "Toán học K-12",
         studentAnswer: currentMode === "ERROR_DIAGNOSIS" ? text : undefined,
+        customKnowledge: customKnowledge || undefined,
       });
 
       if (res && res.reply) {
@@ -1196,12 +1231,57 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                 <span className="text-[10px] text-slate-400">Phân số 48/64</span>
               </div>
             </button>
+
+            {/* Upload Custom Training Data Document */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700/50 hover:border-amber-500 text-left transition flex items-center gap-2 cursor-pointer col-span-1 sm:col-span-2"
+            >
+              <PiFileTextDuotone className="w-5 h-5 text-amber-500 shrink-0" />
+              <div className="truncate">
+                <span className="font-bold text-amber-900 dark:text-amber-200 block truncate">
+                  Tải lên tệp tài liệu / Giáo án (.txt, .md, .json)
+                </span>
+                <span className="text-[10px] text-amber-700/80 dark:text-amber-300/70">
+                  Huấn luyện AI chuyên sâu theo dữ liệu & chủ đề của bạn (In-Context Grounding)
+                </span>
+              </div>
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* 5.5 ACTIVE CUSTOM KNOWLEDGE GROUNDING BADGE */}
+      {knowledgeFileName && (
+        <div className="px-3.5 py-1.5 bg-amber-500/10 border-t border-amber-500/30 flex items-center justify-between text-xs text-amber-300 shrink-0">
+          <span className="flex items-center gap-1.5 truncate">
+            <PiFileTextDuotone className="w-4 h-4 text-amber-400 shrink-0" />
+            <span className="truncate">
+              Đang áp dụng dữ liệu huấn luyện: <strong>{knowledgeFileName}</strong>
+            </span>
+          </span>
+          <button
+            onClick={() => {
+              setCustomKnowledge("");
+              setKnowledgeFileName(null);
+            }}
+            className="text-amber-400 hover:text-amber-200 text-xs ml-2 cursor-pointer font-bold px-1.5 py-0.5 rounded hover:bg-amber-500/20"
+            title="Gỡ bỏ tài liệu này"
+          >
+            ✕ Gỡ bỏ
+          </button>
         </div>
       )}
 
       {/* 6. INPUT BAR WITH ENTER KEY & SMART BUTTONS */}
       <div className="p-3 bg-white dark:bg-[#0B1528] border-t border-slate-200/90 dark:border-slate-800 shrink-0">
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept=".txt,.md,.json,.csv"
+          className="hidden"
+          onChange={handleFileUpload}
+        />
         <div className="flex items-end gap-2 bg-slate-100 dark:bg-[#071120] rounded-2xl p-2 border border-slate-200 dark:border-slate-800 focus-within:border-[#1865F2] focus-within:bg-white dark:focus-within:bg-[#0D1A30] transition">
           {/* Homework Photo Scan Button */}
           <button

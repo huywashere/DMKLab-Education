@@ -18,8 +18,10 @@ public class AiChatDto {
     public static class ChatRequest {
         private String message;
         private UUID sessionId;
+        private UUID lessonId;
         private String contextLessonTitle;
         private String contextSubject;
+        private String customKnowledge; // Dữ liệu tài liệu bài học tải lên để huấn luyện ngữ cảnh (In-Context Grounding)
         private String mode; // SOCRATIC, GRADE_ADAPTED, PRACTICE, ERROR_DIAGNOSIS, CITE_LESSON
         private Integer gradeLevel; // 1 to 12
         private String studentAnswer;

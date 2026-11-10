@@ -769,6 +769,7 @@ export const api = {
       studentAnswer?: string;
       contextLessonTitle?: string;
       contextSubject?: string;
+      customKnowledge?: string;
     }
   ): Promise<SocraticChatResponse> {
     const payload = {
@@ -780,6 +781,7 @@ export const api = {
       studentAnswer: options?.studentAnswer,
       contextLessonTitle: options?.contextLessonTitle,
       contextSubject: options?.contextSubject,
+      customKnowledge: options?.customKnowledge,
     };
     const res = await fetch(`${API_BASE}/ai/learning/chat`, {
       method: "POST",

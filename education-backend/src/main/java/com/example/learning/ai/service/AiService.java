@@ -25,6 +25,7 @@ public class AiService {
 
     private final ChatSessionRepository sessionRepository;
     private final ChatMessageRepository messageRepository;
+    private final com.example.learning.content.repository.LessonRepository lessonRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
     private final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newBuilder()
             .connectTimeout(java.time.Duration.ofSeconds(10))
@@ -97,13 +98,41 @@ public class AiService {
                 .build();
         messageRepository.save(userMsg);
 
-        // 5. Generate Advanced AI Tutor Response
+        // 5. Trích xuất dữ liệu chuyên sâu từ bài học (Lesson Content) nếu có lessonId
+        String effectiveKnowledge = req.getCustomKnowledge();
+        String lessonTitle = req.getContextLessonTitle();
+        String subject = req.getContextSubject();
+
+        if (req.getLessonId() != null) {
+            try {
+                var lessonOpt = lessonRepository.findById(req.getLessonId());
+                if (lessonOpt.isPresent()) {
+                    var lesson = lessonOpt.get();
+                    if (lessonTitle == null || lessonTitle.isBlank()) {
+                        lessonTitle = lesson.getTitle();
+                    }
+                    if (lesson.getSubject() != null && (subject == null || subject.isBlank())) {
+                        subject = lesson.getSubject().getName();
+                    }
+                    if (lesson.getDescription() != null && !lesson.getDescription().isBlank()) {
+                        String lessonDesc = "Tài liệu bài học '" + lesson.getTitle() + "': " + lesson.getDescription();
+                        effectiveKnowledge = (effectiveKnowledge != null && !effectiveKnowledge.isBlank())
+                                ? effectiveKnowledge + "\n\n" + lessonDesc
+                                : lessonDesc;
+                    }
+                }
+            } catch (Exception ex) {
+                log.warn("[AI_KNOWLEDGE_RESOLVE_WARN] Không thể nạp dữ liệu bài học {}: {}", req.getLessonId(), ex.getMessage());
+            }
+        }
+
+        // 6. Generate Advanced AI Tutor Response (với In-Context Grounding từ tài liệu đã upload)
         String mode = req.getMode() != null ? req.getMode().toUpperCase() : "SOCRATIC";
         int gradeLevel = req.getGradeLevel() != null ? req.getGradeLevel() : 5;
 
-        TutorOutput output = generateTutorResponse(mode, gradeLevel, rawMessage, req.getContextLessonTitle(), req.getContextSubject(), req.getStudentAnswer());
+        TutorOutput output = generateTutorResponse(mode, gradeLevel, rawMessage, lessonTitle, subject, req.getStudentAnswer(), effectiveKnowledge);
 
-        // 6. Save Assistant response
+        // 7. Save Assistant response
         ChatMessage assistantMsg = ChatMessage.builder()
                 .sessionId(session.getId())
                 .senderRole("ASSISTANT")
@@ -250,7 +279,7 @@ public class AiService {
      * 4. Giải thích vì sao câu trả lời sai (Misconception Diagnosis)
      * 5. Trích dẫn bài học hoặc tài liệu SGK làm căn cứ
      */
-    private TutorOutput generateTutorResponse(String mode, int gradeLevel, String message, String lessonTitle, String subject, String studentAnswer) {
+    private TutorOutput generateTutorResponse(String mode, int gradeLevel, String message, String lessonTitle, String subject, String studentAnswer, String customKnowledge) {
         TutorOutput out = new TutorOutput();
         String qLower = message.toLowerCase();
         String context = lessonTitle != null ? lessonTitle : "Toán học K-12";
@@ -262,25 +291,25 @@ public class AiService {
         // 1. Thử gọi mô hình AI ưu tiên (Groq Cloud -> Gemini -> OpenAI -> Fallback Socratic nội bộ)
         String liveReply = null;
         if ("groq".equalsIgnoreCase(aiProvider) || (groqApiKey != null && groqApiKey.startsWith("gsk_"))) {
-            liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
         }
 
         if (liveReply == null && ("openai".equalsIgnoreCase(aiProvider))) {
-            liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             if (liveReply == null) {
                 // Fallback sang Gemini
-                liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+                liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
         } else if (liveReply == null) {
             // Mặc định ưu tiên Gemini (vì đang hoạt động 200 OK với quota lớn)
-            liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             if (liveReply == null) {
                 // Fallback sang Groq nếu chưa gọi
-                liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+                liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
             if (liveReply == null) {
                 // Fallback sang OpenAI
-                liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+                liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
         }
 
@@ -320,24 +349,43 @@ public class AiService {
     }
 
     /**
+     * Tạo System Prompt chuẩn hóa cho Socratic Tutor kèm dữ liệu học tập đã upload (In-Context Grounding)
+     */
+    private String buildSocraticSystemPrompt(int gradeLevel, String subject, String context, String mode, String customKnowledge) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(
+            "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
+            + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
+            + "Quy tắc sư phạm Socratic K-12:\n"
+            + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
+            + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
+            + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
+            + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
+            gradeLevel, subject, context, mode, gradeLevel
+        ));
+
+        if (customKnowledge != null && !customKnowledge.isBlank()) {
+            sb.append("\n\n[DỮ LIỆU & TÀI LIỆU CHUYÊN SÂU ĐÃ NẠP TỪ BÀI HỌC / TÀI LIỆU UPLOAD]:\n")
+              .append(customKnowledge.trim())
+              .append("\n\nYÊU CẦU HUẤN LUYỆN CHUYÊN BIỆT (IN-CONTEXT GROUNDING):\n")
+              .append("1. Bạn PHẢI bám sát 100% dữ liệu tài liệu trên để gợi ý, dẫn dắt và đặt câu hỏi cho học sinh.\n")
+              .append("2. Sử dụng đúng phương pháp giải, công thức và thuật ngữ đã nêu trong tài liệu.\n")
+              .append("3. Tuyệt đối KHÔNG bịa đặt kiến thức ngoài tài liệu bài giảng đã nạp.");
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Gọi Google Gemini 2.5 Flash API để tạo câu trả lời sư phạm Socratic K-12
      */
-    private String callGeminiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+    private String callGeminiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (geminiApiKey == null || geminiApiKey.isBlank() || "mock-key".equalsIgnoreCase(geminiApiKey)) {
             return null;
         }
 
         try {
-            String systemPrompt = String.format(
-                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
-                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
-                + "Quy tắc sư phạm Socratic K-12:\n"
-                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
-                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
-                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
-                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
-                gradeLevel, subject, context, mode, gradeLevel
-            );
+            String systemPrompt = buildSocraticSystemPrompt(gradeLevel, subject, context, mode, customKnowledge);
 
             String userPrompt = message;
             if (studentAnswer != null && !studentAnswer.isBlank()) {
@@ -400,22 +448,13 @@ public class AiService {
     /**
      * Gọi OpenAI ChatGPT API (gpt-4o-mini) với cơ chế an toàn và tương thích
      */
-    private String callOpenAiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+    private String callOpenAiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (openAiApiKey == null || openAiApiKey.isBlank() || "mock-key".equalsIgnoreCase(openAiApiKey)) {
             return null;
         }
 
         try {
-            String systemPrompt = String.format(
-                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
-                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
-                + "Quy tắc sư phạm Socratic K-12:\n"
-                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
-                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
-                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
-                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
-                gradeLevel, subject, context, mode, gradeLevel
-            );
+            String systemPrompt = buildSocraticSystemPrompt(gradeLevel, subject, context, mode, customKnowledge);
 
             String userPrompt = message;
             if (studentAnswer != null && !studentAnswer.isBlank()) {
@@ -471,22 +510,13 @@ public class AiService {
      * Gọi Groq Cloud API (LPU Inference siêu tốc - OpenAI Compatible)
      * Hỗ trợ các Open Models hàng đầu: llama-3.3-70b-versatile, deepseek-r1-distill-llama-70b, qwen-2.5-32b
      */
-    private String callGroqLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+    private String callGroqLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (groqApiKey == null || groqApiKey.isBlank() || "mock-key".equalsIgnoreCase(groqApiKey)) {
             return null;
         }
 
         try {
-            String systemPrompt = String.format(
-                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
-                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
-                + "Quy tắc sư phạm Socratic K-12:\n"
-                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
-                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
-                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
-                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
-                gradeLevel, subject, context, mode, gradeLevel
-            );
+            String systemPrompt = buildSocraticSystemPrompt(gradeLevel, subject, context, mode, customKnowledge);
 
             String userPrompt = message;
             if (studentAnswer != null && !studentAnswer.isBlank()) {
