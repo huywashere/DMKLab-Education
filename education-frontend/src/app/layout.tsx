@@ -144,10 +144,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`h-full antialiased ${beVietnamPro.variable}`}
     >
       <head>
+        <link rel="manifest" href="/manifest.json" />
         {/* Anti-flicker instant theme initialization */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('dmklab_theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();`,
+          }}
+        />
+        {/* Service Worker Registration for Offline K-12 Textbooks & PWA */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof window!=='undefined'&&'serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').then(function(r){console.log('[SW] DMKLab PWA ready:',r.scope);}).catch(function(e){console.warn('[SW] Registration failed:',e);});});}`,
           }}
         />
         {/* JSON-LD Structured Data Schema for Google & Search Engines */}

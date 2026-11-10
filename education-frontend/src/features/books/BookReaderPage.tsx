@@ -502,6 +502,10 @@ export const BookReaderPage: React.FC<BookReaderPageProps> = ({
                 <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
                   {currentBook.grade}
                 </span>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title="Trang sách đã được lưu vào bộ nhớ cache ngoại tuyến PWA">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Offline Ready
+                </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                 {currentBook.publisher}

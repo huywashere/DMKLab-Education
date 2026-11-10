@@ -1,0 +1,21 @@
+{
+  "name": "DMKLab Education - Nền Tảng Giáo Dục Trực Tuyến K–12",
+  "short_name": "DMKLab K-12",
+  "description": "Nền tảng học trực tuyến K-12 chuẩn Bộ GD&ĐT kết hợp Gia Sư Socratic AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1528",
+  "theme_color": "#1865F2",
+  "icons": [
+    {
+      "src": "/dmklab-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/dmklab-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

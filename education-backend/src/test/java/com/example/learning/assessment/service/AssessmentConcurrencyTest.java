@@ -98,7 +98,6 @@ class AssessmentConcurrencyTest {
     @DisplayName("Nộp bài đúng 100% phải đạt chuẩn MASTERED và cộng 100 điểm năng lượng")
     void shouldEvaluatePerfectQuizAndAwardPoints() {
         when(quizRepository.findByLessonIdOrderByDisplayOrderAsc(lessonId)).thenReturn(mockQuestions);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(progressRepository.findByUserIdAndLessonId(userId, lessonId)).thenReturn(Optional.empty());
 
         QuizSubmissionDto.QuizSubmissionRequest request = new QuizSubmissionDto.QuizSubmissionRequest(List.of(
@@ -116,7 +115,7 @@ class AssessmentConcurrencyTest {
         assertTrue(response.isPassed());
         assertEquals(100, response.getEnergyPointsAwarded());
 
-        verify(userRepository, times(1)).save(argThat(u -> u.getEnergyPoints() == 1100));
+        verify(userRepository, times(1)).addEnergyPoints(eq(userId), eq(100));
         verify(progressRepository, times(1)).save(argThat(p -> p.isCompleted() && "MASTERED".equals(p.getMasteryLevel())));
     }
 
@@ -140,7 +139,7 @@ class AssessmentConcurrencyTest {
         assertFalse(response.isPassed());
         assertEquals(0, response.getEnergyPointsAwarded());
 
-        verify(userRepository, never()).save(any());
+        verify(userRepository, never()).addEnergyPoints(any(), anyInt());
         verify(progressRepository, never()).save(any());
     }
 
@@ -148,7 +147,6 @@ class AssessmentConcurrencyTest {
     @DisplayName("Kiểm thử đa luồng đồng thời (Concurrency Test) - Đảm bảo tính toán độc lập và an toàn")
     void shouldHandleConcurrentQuizSubmissionsResiliently() throws InterruptedException {
         when(quizRepository.findByLessonIdOrderByDisplayOrderAsc(lessonId)).thenReturn(mockQuestions);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(progressRepository.findByUserIdAndLessonId(userId, lessonId)).thenReturn(Optional.empty());
 
         int threadCount = 10;

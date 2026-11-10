@@ -34,6 +34,26 @@ public class AiController {
                 aiService.processLearningChat(userId, req)));
     }
 
+    @GetMapping(value = "/learning/chat/stream", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "Streaming Socratic AI Response qua Server-Sent Events (SSE)")
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter streamLearningChat(
+            @RequestParam String message,
+            @RequestParam(required = false) String lessonTitle,
+            @RequestParam(required = false) String subject,
+            @RequestParam(required = false, defaultValue = "5") int gradeLevel,
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        UUID userId = principal != null ? principal.getId() : UUID.fromString("33333333-3333-3333-3333-333333333333");
+        AiChatDto.ChatRequest req = AiChatDto.ChatRequest.builder()
+                .message(message)
+                .contextLessonTitle(lessonTitle)
+                .contextSubject(subject)
+                .gradeLevel(gradeLevel)
+                .build();
+
+        return aiService.streamLearningChat(userId, req);
+    }
+
     @PostMapping("/admin/chat")
     @Operation(summary = "Chatbot hướng dẫn nghiệp vụ dành cho Quản trị viên & Giáo viên", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<AiChatDto.ChatResponse>> adminChat(

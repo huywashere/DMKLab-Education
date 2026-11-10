@@ -101,6 +101,12 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         if (uri.startsWith("/api/v1/auth/login") && "POST".equalsIgnoreCase(method)) {
             return RateLimitPolicy.AUTH_LOGIN;
         }
+        if (uri.startsWith("/api/v1/auth/forgot-password") && "POST".equalsIgnoreCase(method)) {
+            return RateLimitPolicy.AUTH_LOGIN;
+        }
+        if (uri.startsWith("/api/v1/notifications/email/") && "POST".equalsIgnoreCase(method)) {
+            return RateLimitPolicy.AUTH_LOGIN;
+        }
         if (uri.startsWith("/api/v1/auth/register") && "POST".equalsIgnoreCase(method)) {
             return RateLimitPolicy.AUTH_REGISTER;
         }

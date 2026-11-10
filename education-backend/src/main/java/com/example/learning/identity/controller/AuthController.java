@@ -32,9 +32,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthDto.AuthResponse>> register(@Valid @RequestBody AuthDto.RegisterRequest req) {
         User user = userService.register(req);
         String token = tokenProvider.generateToken(user);
+        String refreshToken = tokenProvider.generateRefreshToken(user);
 
         AuthDto.AuthResponse response = AuthDto.AuthResponse.builder()
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(tokenProvider.getExpirationMs())
                 .user(userService.toDto(user))
@@ -48,9 +50,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthDto.AuthResponse>> login(@Valid @RequestBody AuthDto.LoginRequest req) {
         User user = userService.authenticate(req.getUsernameOrEmail(), req.getPassword());
         String token = tokenProvider.generateToken(user);
+        String refreshToken = tokenProvider.generateRefreshToken(user);
 
         AuthDto.AuthResponse response = AuthDto.AuthResponse.builder()
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(tokenProvider.getExpirationMs())
                 .user(userService.toDto(user))
@@ -90,11 +94,13 @@ public class AuthController {
 
         User user = userService.registerOrLoginOAuth(req);
         String token = tokenProvider.generateToken(user);
+        String refreshToken = tokenProvider.generateRefreshToken(user);
 
         String domain = email.contains("@") ? email.substring(email.indexOf("@") + 1) : "";
 
         AuthDto.OAuthAuthResponse response = AuthDto.OAuthAuthResponse.builder()
                 .accessToken(token)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(tokenProvider.getExpirationMs())
                 .user(userService.toDto(user))
@@ -145,7 +151,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "Làm mới Access Token ngầm (Silent Refresh Token)")
+    @Operation(summary = "Làm mới Access Token ngầm (Silent Refresh Token với Token Rotation)")
     public ResponseEntity<ApiResponse<AuthDto.AuthResponse>> refreshToken(@Valid @RequestBody AuthDto.RefreshTokenRequest req) {
         String token = req.getRefreshToken();
         if (!tokenProvider.validateToken(token)) {
@@ -155,9 +161,11 @@ public class AuthController {
         UUID userId = tokenProvider.getUserIdFromToken(token);
         User user = userService.findById(userId);
         String newAccessToken = tokenProvider.generateToken(user);
+        String newRefreshToken = tokenProvider.generateRefreshToken(user);
 
         AuthDto.AuthResponse response = AuthDto.AuthResponse.builder()
                 .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(tokenProvider.getExpirationMs())
                 .user(userService.toDto(user))

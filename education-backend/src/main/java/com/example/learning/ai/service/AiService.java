@@ -99,6 +99,40 @@ public class AiService {
                 .build();
     }
 
+    public org.springframework.web.servlet.mvc.method.annotation.SseEmitter streamLearningChat(
+            UUID userId, AiChatDto.ChatRequest req) {
+        org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter = 
+                new org.springframework.web.servlet.mvc.method.annotation.SseEmitter(60000L);
+
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                AiChatDto.ChatResponse resp = processLearningChat(userId, req);
+                String fullText = resp.getReply() != null ? resp.getReply() : "";
+                String[] words = fullText.split(" ");
+                for (int i = 0; i < words.length; i++) {
+                    String piece = words[i] + (i < words.length - 1 ? " " : "");
+                    emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event()
+                            .name("token")
+                            .data(piece));
+                    Thread.sleep(25); // 25ms typing delay for smooth Socratic delivery
+                }
+                emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event()
+                        .name("done")
+                        .data(resp));
+                emitter.complete();
+            } catch (Exception ex) {
+                try {
+                    emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter.event()
+                            .name("error")
+                            .data(ex.getMessage()));
+                } catch (Exception ignored) {}
+                emitter.completeWithError(ex);
+            }
+        });
+
+        return emitter;
+    }
+
     @Transactional
     public AiChatDto.ChatResponse processAdminChat(UUID userId, AiChatDto.ChatRequest req) {
         ChatSession session = sessionRepository.findFirstByUserIdAndSessionTypeOrderByCreatedAtDesc(userId, "ADMIN")

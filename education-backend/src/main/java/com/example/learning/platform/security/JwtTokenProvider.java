@@ -32,6 +32,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(user.getId().toString())
+                .claim("type", "ACCESS")
                 .claim("username", user.getUsername())
                 .claim("email", user.getEmail())
                 .claim("fullName", user.getFullName())
@@ -40,6 +41,30 @@ public class JwtTokenProvider {
                 .expiration(expiryDate)
                 .signWith(key)
                 .compact();
+    }
+
+    public String generateRefreshToken(User user) {
+        Date now = new Date();
+        // 7 days expiration for refresh token (604,800,000 ms)
+        Date expiryDate = new Date(now.getTime() + 604800000L);
+
+        return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim("type", "REFRESH")
+                .claim("username", user.getUsername())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(key)
+                .compact();
+    }
+
+    public boolean isRefreshToken(String token) {
+        try {
+            Claims claims = getClaimsFromToken(token);
+            return "REFRESH".equals(claims.get("type", String.class));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean validateToken(String token) {

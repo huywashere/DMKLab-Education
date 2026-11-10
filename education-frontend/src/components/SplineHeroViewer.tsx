@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Sparkles, Bot, Box, RotateCcw, Compass, MousePointer } from "lucide-react";
+import { Sparkles, Bot, Box, RotateCcw, Compass, MousePointer, Zap, ZapOff, CheckCircle } from "lucide-react";
 
 // Dynamically import Spline to avoid SSR issues with WebGL canvas
 const Spline = dynamic(() => import("@splinetool/react-spline"), {
@@ -31,6 +31,26 @@ interface SplineHeroViewerProps {
 export const SplineHeroViewer: React.FC<SplineHeroViewerProps> = ({ isVi = true }) => {
   const [activePreset, setActivePreset] = useState<"robot" | "quantum">("robot");
   const [splineKey, setSplineKey] = useState<number>(0);
+  const [isLiteMode, setIsLiteMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dmklab_lite_mode");
+      if (saved === "true") {
+        setIsLiteMode(true);
+      }
+    } catch (_) {}
+  }, []);
+
+  const toggleLiteMode = () => {
+    setIsLiteMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("dmklab_lite_mode", String(next));
+      } catch (_) {}
+      return next;
+    });
+  };
 
   // Official high-performance verified Spline Community 3D Scenes
   const SCENES = {
@@ -62,7 +82,7 @@ export const SplineHeroViewer: React.FC<SplineHeroViewerProps> = ({ isVi = true 
   return (
     <div className="w-full max-w-[450px] sm:max-w-[500px] bg-white dark:bg-[#0B172E] rounded-[36px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-200 dark:border-slate-800 p-5 sm:p-7 flex flex-col relative select-none overflow-hidden">
       
-      {/* 1. Header Toolbar: Preset Switcher */}
+      {/* 1. Header Toolbar: Preset Switcher & Lite Mode Toggle */}
       <div className="w-full flex items-center justify-between pb-3.5 mb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
         <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-full">
           <button
@@ -92,21 +112,64 @@ export const SplineHeroViewer: React.FC<SplineHeroViewerProps> = ({ isVi = true 
           </button>
         </div>
 
-        {/* Live Status Badge */}
-        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${currentScene.badgeColor}`}>
-          WebGL 60FPS
-        </span>
+        {/* Lite Mode Button & Live Status Badge */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={toggleLiteMode}
+            title={isLiteMode ? "Chuyển sang 3D WebGL (Đầy đủ hiệu ứng)" : "Chuyển sang chế độ Tiết kiệm pin & CPU (Thích hợp cho máy yếu/học sinh)"}
+            className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-tight border flex items-center gap-1 transition-all cursor-pointer ${
+              isLiteMode
+                ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700 font-extrabold"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            {isLiteMode ? <Zap className="w-3 h-3 text-amber-500 fill-amber-500" /> : <ZapOff className="w-3 h-3 text-slate-400" />}
+            <span>{isLiteMode ? "Lite Mode" : "Tiết kiệm"}</span>
+          </button>
+
+          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${currentScene.badgeColor}`}>
+            {isLiteMode ? "0% GPU" : "60 FPS"}
+          </span>
+        </div>
       </div>
 
-      {/* 2. Interactive Spline 3D Stage */}
+      {/* 2. Interactive Stage: Either WebGL Spline OR Zero-GPU Lite Mode Vector Card */}
       <div className="relative w-full aspect-square max-w-[340px] sm:max-w-[360px] mx-auto rounded-3xl overflow-hidden bg-slate-50/50 dark:bg-[#071328] border border-slate-200/80 dark:border-slate-800 flex items-center justify-center">
-        <Spline key={splineKey} scene={currentScene.url} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-        {/* Subtle Bottom Floating Hint */}
-        <div className="absolute bottom-3 inset-x-0 mx-auto w-fit px-3 py-1 rounded-full bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-semibold flex items-center gap-1.5 shadow-md pointer-events-none">
-          <MousePointer className="w-3 h-3 text-[#14BF96]" />
-          <span>{isVi ? "Rê chuột hoặc kéo để xoay 360°" : "Hover or drag to rotate 360°"}</span>
-        </div>
+        {isLiteMode ? (
+          <div className="w-full h-full p-6 flex flex-col items-center justify-center text-center space-y-4 bg-radial from-blue-50/80 to-transparent dark:from-blue-950/20">
+            <div className="w-24 h-24 rounded-3xl bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 flex items-center justify-center shadow-lg relative">
+              {activePreset === "robot" ? (
+                <Bot className="w-12 h-12 text-[#1865F2] dark:text-blue-400 animate-bounce" />
+              ) : (
+                <Box className="w-12 h-12 text-[#1865F2] dark:text-blue-400" />
+              )}
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px]">
+                ✓
+              </span>
+            </div>
+            <div>
+              <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                {currentScene.title}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Chế độ Tiết kiệm Điện & CPU kích hoạt
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-3 py-1 rounded-full">
+              <CheckCircle className="w-3 h-3" />
+              <span>Phù hợp máy tính K-12 & ĐTDĐ</span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <Spline key={splineKey} scene={currentScene.url} className="w-full h-full cursor-grab active:cursor-grabbing" />
+            <div className="absolute bottom-3 inset-x-0 mx-auto w-fit px-3 py-1 rounded-full bg-slate-900/70 backdrop-blur-xs text-white text-[10px] font-semibold flex items-center gap-1.5 shadow-md pointer-events-none">
+              <MousePointer className="w-3 h-3 text-[#14BF96]" />
+              <span>{isVi ? "Rê chuột hoặc kéo để xoay 360°" : "Hover or drag to rotate 360°"}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 3. Spline Info Footer */}

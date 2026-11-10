@@ -53,10 +53,7 @@ public class ProgressService {
         LearningProgress saved = progressRepository.save(progress);
 
         if (newlyCompleted) {
-            userRepository.findById(userId).ifPresent(u -> {
-                u.setEnergyPoints(u.getEnergyPoints() + 50);
-                userRepository.save(u);
-            });
+            userRepository.addEnergyPoints(userId, 50);
         }
 
         return ProgressDto.ProgressResponse.builder()

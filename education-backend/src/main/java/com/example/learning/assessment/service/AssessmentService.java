@@ -68,12 +68,9 @@ public class AssessmentService {
         if (isPassed) {
             energyAwarded = 100;
 
-            // Update user energy points
+            // Update user energy points atomically to prevent lost updates in concurrency
             if (userId != null) {
-                userRepository.findById(userId).ifPresent(user -> {
-                    user.setEnergyPoints(user.getEnergyPoints() + 100);
-                    userRepository.save(user);
-                });
+                userRepository.addEnergyPoints(userId, 100);
 
                 // Update learning progress
                 LearningProgress progress = progressRepository.findByUserIdAndLessonId(userId, lessonId)

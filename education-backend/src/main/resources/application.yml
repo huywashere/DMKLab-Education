@@ -21,6 +21,7 @@ spring:
       idle-timeout: 30000
       connection-timeout: 20000
       max-lifetime: 1800000
+      leak-detection-threshold: 20000
       data-source-properties:
         cachePrepStmts: true
         prepStmtCacheSize: 250
