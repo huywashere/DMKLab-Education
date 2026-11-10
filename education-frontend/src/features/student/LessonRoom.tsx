@@ -27,6 +27,8 @@ import {
   ExternalLink,
   Presentation,
   Network,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { PlyrVideoPlayer, PlyrPlayerHandle } from "@/components/PlyrVideoPlayer";
 import { useBookmarks } from "@/lib/bookmarks/BookmarksContext";
@@ -214,6 +216,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const [currentTime, setCurrentTime] = useState(activeLesson.positionSeconds || 0);
   const [duration, setDuration] = useState(activeLesson.durationSeconds || 600);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [isTheaterMode, setIsTheaterMode] = useState<boolean>(false);
 
   // Bookmarks & Personal Notes
   const { isBookmarked, toggleBookmark, addNote, getNotesForLesson, deleteNote } = useBookmarks();
@@ -393,6 +396,28 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
           )}
 
           <button
+            onClick={() => setIsTheaterMode((prev) => !prev)}
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full transition-all text-xs font-black cursor-pointer border ${
+              isTheaterMode
+                ? "bg-amber-400 text-slate-950 border-amber-500 shadow-xs"
+                : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+            }`}
+            title={isTheaterMode ? "Trở về bố cục chuẩn" : "Mở rộng Chế độ Rạp chiếu"}
+          >
+            {isTheaterMode ? (
+              <>
+                <Minimize2 className="w-3.5 h-3.5" />
+                <span>Bố cục chuẩn</span>
+              </>
+            ) : (
+              <>
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span>Rạp chiếu</span>
+              </>
+            )}
+          </button>
+
+          <button
             onClick={() => toggleBookmark({ id: activeLesson.id, title: activeLesson.title })}
             className={`px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 text-xs font-black cursor-pointer border ${
               isBookmarked(activeLesson.id)
@@ -427,40 +452,47 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
       {/* ─────────────────────────────────────────────────────────────
           2. MAIN CONTENT GRID (VIDEO + SIDE CURRICULUM)
       ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (8 cols): Video Player + Interactive Workspace */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Plyr Video Player */}
-          <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md bg-black">
-            <PlyrVideoPlayer
-              ref={playerRef}
-              src={
-                activeLesson.videoUrl ||
-                "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start transition-all duration-300">
+        {/* Left Column: Video Player + Interactive Workspace (8 cols or 12 cols in Theater Mode) */}
+        <div
+          className={`${
+            isTheaterMode ? "lg:col-span-12" : "lg:col-span-8"
+          } space-y-6 transition-all duration-300`}
+        >
+          {/* Plyr Video Player with Modern Ambient Glow and Top Overlay HUD */}
+          <PlyrVideoPlayer
+            ref={playerRef}
+            src={
+              activeLesson.videoUrl ||
+              "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            }
+            title={activeLesson.title}
+            initialTime={activeLesson.positionSeconds || 0}
+            chapters={CHAPTERS}
+            defaultSubtitles={subtitlesDefault}
+            isTheaterMode={isTheaterMode}
+            onToggleTheater={() => setIsTheaterMode((prev) => !prev)}
+            onAskAi={(time, chapter) => {
+              onOpenAiChat();
+            }}
+            onTimeUpdate={(curTime, dur) => {
+              setCurrentTime(curTime);
+              if (dur > 0 && dur !== duration) {
+                setDuration(dur);
               }
-              title={activeLesson.title}
-              initialTime={activeLesson.positionSeconds || 0}
-              chapters={CHAPTERS}
-              defaultSubtitles={subtitlesDefault}
-              onTimeUpdate={(curTime, dur) => {
-                setCurrentTime(curTime);
-                if (dur > 0 && dur !== duration) {
-                  setDuration(dur);
-                }
-              }}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => {
-                setIsPlaying(false);
-                api.updateLessonProgress(
-                  activeLesson.id,
-                  Math.floor(duration),
-                  Math.floor(duration),
-                  true
-                );
-              }}
-            />
-          </div>
+            }}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => {
+              setIsPlaying(false);
+              api.updateLessonProgress(
+                activeLesson.id,
+                Math.floor(duration),
+                Math.floor(duration),
+                true
+              );
+            }}
+          />
 
           {/* Solid Chapter Timeline Markers Bar */}
           <div className="bg-[#081C3D] dark:bg-[#071328] text-white p-3 sm:p-3.5 rounded-2xl flex items-center gap-2 overflow-x-auto text-xs no-scrollbar shadow-xs border border-slate-700/60 dark:border-slate-800">
@@ -880,8 +912,14 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
           </div>
         </div>
 
-        {/* Right Column (4 cols): Curriculum Progress & Socratic AI Card */}
-        <div className="lg:col-span-4 space-y-5">
+        {/* Right Column: Curriculum Progress & Socratic AI Card */}
+        <div
+          className={`${
+            isTheaterMode
+              ? "lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6 space-y-0"
+              : "lg:col-span-4 space-y-5"
+          } transition-all duration-300`}
+        >
           {/* Chapter Outline Card */}
           <div className="bg-white dark:bg-[#0B172E] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
             <h3 className="font-black text-sm text-slate-900 dark:text-white flex items-center justify-between tracking-tight">

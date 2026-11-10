@@ -255,71 +255,156 @@ body {
    ========================================================================== */
 :root {
   --plyr-color-main: #1865f2; /* DMKLab Brand Blue */
-  --plyr-video-control-color: #f8fafc;
+  --plyr-video-control-color: #f1f5f9;
   --plyr-video-control-color-hover: #ffffff;
   --plyr-video-control-background-hover: #1865f2;
   --plyr-video-controls-background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0) 0%,
-    rgba(10, 15, 29, 0.88) 100%
+    rgba(4, 10, 24, 0.94) 100%
   );
-  --plyr-control-radius: 8px;
+  --plyr-control-radius: 10px;
   --plyr-control-spacing: 10px;
-  --plyr-range-thumb-height: 14px;
+  --plyr-range-thumb-height: 15px;
   --plyr-range-thumb-background: #ffffff;
-  --plyr-range-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --plyr-range-track-height: 5px;
+  --plyr-range-thumb-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --plyr-range-track-height: 6px;
   --plyr-video-progress-buffered-background: rgba(255, 255, 255, 0.25);
-  --plyr-menu-background: rgba(15, 23, 42, 0.95);
+  --plyr-menu-background: rgba(11, 20, 42, 0.96);
   --plyr-menu-color: #f8fafc;
-  --plyr-menu-border-radius: 12px;
-  --plyr-menu-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
-  --plyr-tooltip-background: rgba(15, 23, 42, 0.92);
-  --plyr-tooltip-border-radius: 6px;
+  --plyr-menu-border-radius: 14px;
+  --plyr-menu-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.5);
+  --plyr-tooltip-background: rgba(10, 18, 38, 0.95);
+  --plyr-tooltip-border-radius: 8px;
   --plyr-tooltip-color: #ffffff;
-  --plyr-tooltip-padding: 5px 8px;
+  --plyr-tooltip-padding: 6px 10px;
   --plyr-font-family: inherit;
   --plyr-font-weight-regular: 500;
   --plyr-font-weight-bold: 700;
 }
 
 .dmklab-plyr-container .plyr--video {
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   overflow: hidden;
   font-family: inherit;
 }
 
+/* Radar pulse wave on overlaid center play button */
 .dmklab-plyr-container .plyr__control--overlaid {
-  background: rgba(24, 101, 242, 0.9) !important;
+  background: linear-gradient(135deg, #1865f2 0%, #104bbb 100%) !important;
   border-radius: 9999px !important;
-  width: 64px !important;
-  height: 64px !important;
-  box-shadow: 0 0 25px rgba(24, 101, 242, 0.6) !important;
-  transition:
-    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.2s ease !important;
+  width: 68px !important;
+  height: 68px !important;
+  box-shadow: 0 8px 30px rgba(24, 101, 242, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.25s ease !important;
+  position: relative !important;
+}
+
+.dmklab-plyr-container .plyr__control--overlaid::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  border: 2px solid rgba(24, 101, 242, 0.65);
+  animation: dmklab-plyr-radar 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes dmklab-plyr-radar {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
 }
 
 .dmklab-plyr-container .plyr__control--overlaid:hover {
-  background: #1865f2 !important;
-  transform: scale(1.1) !important;
+  background: linear-gradient(135deg, #2b74f5 0%, #1865f2 100%) !important;
+  transform: scale(1.12) !important;
+  box-shadow: 0 12px 35px rgba(24, 101, 242, 0.7) !important;
 }
 
+/* Sleeker control bar with glassmorphic padding */
+.dmklab-plyr-container .plyr__controls {
+  padding: 12px 18px !important;
+  backdrop-filter: blur(10px);
+}
+
+.dmklab-plyr-container .plyr__controls .plyr__control {
+  border-radius: 10px !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+
+.dmklab-plyr-container .plyr__controls .plyr__control:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+/* Progress bar thumb */
+.dmklab-plyr-container .plyr__progress input[type="range"]::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(24, 101, 242, 0.3), 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease;
+}
+
+.dmklab-plyr-container .plyr__progress input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+/* Chapter marker gold dots on progress line */
+.dmklab-plyr-container .plyr__progress__marker {
+  background: #f59e0b !important;
+  width: 5px !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8) !important;
+  z-index: 4 !important;
+}
+
+/* Crisp Captions Styling */
 .dmklab-plyr-container .plyr__captions span {
-  background: rgba(15, 23, 42, 0.88) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 8px !important;
-  padding: 6px 14px !important;
-  font-size: 13.5px !important;
+  background: rgba(11, 19, 38, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 10px !important;
+  padding: 7px 16px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+  letter-spacing: 0.01em !important;
 }
 
+/* Settings and menu dropdown */
 .dmklab-plyr-container .plyr__menu__container {
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px !important;
+}
+
+.dmklab-plyr-container .plyr__menu__container .plyr__control[role="menuitem"] {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  margin: 2px 4px !important;
+}
+
+.dmklab-plyr-container .plyr__menu__container .plyr__control[role="menuitem"]:hover {
+  background-color: rgba(24, 101, 242, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Tooltip */
+.dmklab-plyr-container .plyr__tooltip {
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
 }
 
 /* ==========================================================================
