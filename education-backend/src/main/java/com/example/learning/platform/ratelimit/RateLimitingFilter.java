@@ -24,6 +24,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final RateLimiterService rateLimiterService;
     private final AuditService auditService;
+    private final com.example.learning.platform.security.JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -50,7 +51,22 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         String clientIp = extractClientIp(request);
         RateLimitPolicy policy = resolvePolicy(uri, method);
 
-        RateLimitResult result = rateLimiterService.checkRateLimit(policy, clientIp);
+        // Định danh đối tượng Rate Limit:
+        // - Với người dùng đã đăng nhập: Phân biệt theo "user:{userId}" để tránh nghẽn khi cả phòng máy trường học dùng chung 1 địa chỉ IP NAT
+        // - Với endpoint công khai / chưa đăng nhập (Auth login, register, contact): Phân biệt theo "ip:{clientIp}"
+        String clientIdentifier = "ip:" + clientIp;
+        String authHeader = request.getHeader("Authorization");
+        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    java.util.UUID userId = jwtTokenProvider.getUserIdFromToken(token);
+                    clientIdentifier = "user:" + userId;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        RateLimitResult result = rateLimiterService.checkRateLimit(policy, clientIdentifier);
 
         // Gắn các HTTP Header tiêu chuẩn RFC 6585 & IETF RateLimit
         response.setHeader("X-RateLimit-Limit", String.valueOf(result.getMaxRequests()));
