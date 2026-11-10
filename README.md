@@ -299,3 +299,4 @@ Frontend se khoi chay tai dia chi: `http://localhost:3000`.
 ## 9. Giay Phep va Ban Quyen
 
 Du an duoc phat trien boi doi ngu ky su DMKLab Education Platform. Ban quyen thuoc ve DMKLab Education System 2026.
+
