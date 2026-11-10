@@ -123,7 +123,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     {
       id: "msg-01",
       role: "assistant",
-      content: `Chào ${currentUser.fullName || "em"}! Thầy là Gia sư AI đồng hành cùng em theo phương pháp Socratic.\n\nThay vì giải hộ đáp án, thầy sẽ gợi ý từng bước, lấy ví dụ thực tế và tạo bài tập luyện tập để em tự tin nắm chắc bài. Em đang cần thầy hỗ trợ ở câu hỏi hay bài tập nào?`,
+      content: `Chào ${currentUser.fullName || "em"}! Thầy là Gia sư AI đồng hành cùng em theo phương pháp Socratic (vận hành bởi Google Gemini 2.5 Flash).\n\nThay vì giải hộ đáp án, thầy sẽ gợi ý từng bước, lấy ví dụ thực tế và tạo bài tập luyện tập để em tự tin nắm chắc bài. Em đang cần thầy hỗ trợ ở câu hỏi hay bài tập nào?`,
       timestamp: "Vừa xong",
       isSocraticHint: true,
       mode: "SOCRATIC",
@@ -645,8 +645,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               <h3 className="font-black text-sm text-white tracking-tight truncate">
                 Gia Sư AI Socratic
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
-                v2.5
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40 shrink-0 flex items-center gap-1">
+                <span>Gemini 2.5 Flash</span>
               </span>
             </div>
             <p className="text-[11px] text-slate-300 flex items-center gap-1.5 truncate mt-0.5">

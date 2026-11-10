@@ -25,6 +25,16 @@ public class AiService {
 
     private final ChatSessionRepository sessionRepository;
     private final ChatMessageRepository messageRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+    private final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(10))
+            .build();
+
+    @Value("${app.ai.gemini.api-key:${GEMINI_API_KEY:}}")
+    private String geminiApiKey;
+
+    @Value("${app.ai.gemini.model:${GEMINI_MODEL:gemini-2.5-flash}}")
+    private String geminiModel;
 
     @Value("${app.ai.openai.student-daily-quota:30}")
     private int dailyQuota;
@@ -223,10 +233,22 @@ public class AiService {
         TutorOutput out = new TutorOutput();
         String qLower = message.toLowerCase();
         String context = lessonTitle != null ? lessonTitle : "Toán học K-12";
+        String subj = subject != null ? subject : "Toán học";
 
         // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
         addStandardCitations(out, gradeLevel, context);
 
+        // 1. Thử gọi mô hình Google Gemini 2.5 Flash thực tế
+        String geminiLiveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+        if (geminiLiveReply != null && !geminiLiveReply.isBlank()) {
+            out.reply = geminiLiveReply;
+            out.stepByStepHints.add("Gợi ý 1: Đọc kỹ câu hỏi và xác định rõ yêu cầu bài toán.");
+            out.stepByStepHints.add("Gợi ý 2: Áp dụng định nghĩa và tính chất cơ bản đã học trong bài '" + context + "'.");
+            out.stepByStepHints.add("Gợi ý 3: Tự nhẩm thử hoặc vẽ hình trực quan để kiểm tra kết quả.");
+            return out;
+        }
+
+        // 2. Fallback nội bộ theo quy tắc nếu chưa có mạng hoặc lỗi API
         switch (mode) {
             case "GRADE_ADAPTED":
                 handleGradeAdaptedMode(out, gradeLevel, qLower, context);
@@ -251,6 +273,84 @@ public class AiService {
         }
 
         return out;
+    }
+
+    /**
+     * Gọi Google Gemini 2.5 Flash API để tạo câu trả lời sư phạm Socratic K-12
+     */
+    private String callGeminiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+        if (geminiApiKey == null || geminiApiKey.isBlank() || "mock-key".equalsIgnoreCase(geminiApiKey)) {
+            return null;
+        }
+
+        try {
+            String systemPrompt = String.format(
+                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
+                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
+                + "Quy tắc sư phạm Socratic K-12:\n"
+                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
+                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
+                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
+                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
+                gradeLevel, subject, context, mode, gradeLevel
+            );
+
+            String userPrompt = message;
+            if (studentAnswer != null && !studentAnswer.isBlank()) {
+                userPrompt += " (Câu trả lời học sinh đã chọn: " + studentAnswer + ")";
+            }
+
+            String targetModel = (geminiModel != null && !geminiModel.isBlank()) ? geminiModel : "gemini-2.5-flash";
+            String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + targetModel + ":generateContent?key=" + geminiApiKey;
+
+            java.util.Map<String, Object> sysPart = java.util.Map.of("text", systemPrompt);
+            java.util.Map<String, Object> sysInstruction = java.util.Map.of("parts", java.util.List.of(sysPart));
+
+            java.util.Map<String, Object> userPart = java.util.Map.of("text", userPrompt);
+            java.util.Map<String, Object> userContent = java.util.Map.of("role", "user", "parts", java.util.List.of(userPart));
+
+            java.util.Map<String, Object> genConfig = java.util.Map.of(
+                "temperature", 0.6,
+                "maxOutputTokens", 800
+            );
+
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("system_instruction", sysInstruction);
+            body.put("contents", java.util.List.of(userContent));
+            body.put("generationConfig", genConfig);
+
+            String jsonPayload = objectMapper.writeValueAsString(body);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .timeout(java.time.Duration.ofSeconds(12))
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload, java.nio.charset.StandardCharsets.UTF_8))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+                com.fasterxml.jackson.databind.JsonNode candidates = root.path("candidates");
+                if (candidates.isArray() && !candidates.isEmpty()) {
+                    com.fasterxml.jackson.databind.JsonNode parts = candidates.get(0).path("content").path("parts");
+                    if (parts.isArray() && !parts.isEmpty()) {
+                        String reply = parts.get(0).path("text").asText();
+                        if (reply != null && !reply.isBlank()) {
+                            log.info("[GEMINI_LIVE_OK] Phản hồi thành công từ Google Gemini ({})", targetModel);
+                            return reply.trim();
+                        }
+                    }
+                }
+            } else {
+                log.warn("[GEMINI_LIVE_WARN] Google Gemini API trả về mã lỗi HTTP {}: {}", response.statusCode(), response.body());
+            }
+        } catch (Exception ex) {
+            log.warn("[GEMINI_LIVE_FALLBACK] Lỗi gọi Gemini API (Kích hoạt luật Socratic nội bộ): {}", ex.getMessage());
+        }
+
+        return null;
     }
 
     /**

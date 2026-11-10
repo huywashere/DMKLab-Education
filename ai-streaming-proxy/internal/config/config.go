@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -17,11 +18,26 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
+	apiKey := getEnv("GEMINI_API_KEY", "")
+	if apiKey == "" {
+		apiKey = getEnv("OPENAI_API_KEY", "mock-key")
+	}
+
+	model := getEnv("GEMINI_MODEL", "")
+	if model == "" {
+		model = getEnv("OPENAI_MODEL", "gemini-2.5-flash")
+	}
+
+	defaultBaseURL := "https://generativelanguage.googleapis.com/v1beta/openai"
+	if apiKey == "mock-key" || strings.HasPrefix(apiKey, "sk-") {
+		defaultBaseURL = "https://api.openai.com/v1"
+	}
+
 	return &Config{
 		Port:            getEnv("PORT", "8086"),
-		OpenAIKey:       getEnv("OPENAI_API_KEY", "mock-key"),
-		OpenAIModel:     getEnv("OPENAI_MODEL", "gpt-4o-mini"),
-		OpenAIBaseURL:   getEnv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+		OpenAIKey:       apiKey,
+		OpenAIModel:     model,
+		OpenAIBaseURL:   getEnv("OPENAI_BASE_URL", defaultBaseURL),
 		RedisAddr:       getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:   getEnv("REDIS_PASSWORD", ""),
 		CacheTTLMinutes: getEnvAsInt("CACHE_TTL_MINUTES", 1440),

@@ -99,9 +99,13 @@ app:
     secret: ${JWT_SECRET:KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform}
     expiration-ms: 86400000 # 24h
   ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-2.5-flash}
     openai:
-      api-key: ${OPENAI_API_KEY:mock-key}
-      model: ${OPENAI_MODEL:gpt-4o-mini}
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gemini-2.5-flash}
+      base-url: ${OPENAI_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
       max-tokens-per-request: 1000
       student-daily-quota: 30
   storage:
