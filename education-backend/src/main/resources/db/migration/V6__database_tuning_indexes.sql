@@ -13,3 +13,4 @@ CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users(LOWER(username));
 
 -- 4. Accelerate Parent-Student Cascade Relationship Lookups
 CREATE INDEX IF NOT EXISTS idx_user_relations_parent_student ON user_relations(parent_id, student_id);
+
