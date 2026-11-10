@@ -30,11 +30,23 @@ public class AiService {
             .connectTimeout(java.time.Duration.ofSeconds(10))
             .build();
 
+    @Value("${app.ai.provider:${AI_PROVIDER:gemini}}")
+    private String aiProvider;
+
     @Value("${app.ai.gemini.api-key:${GEMINI_API_KEY:}}")
     private String geminiApiKey;
 
     @Value("${app.ai.gemini.model:${GEMINI_MODEL:gemini-2.5-flash}}")
     private String geminiModel;
+
+    @Value("${app.ai.openai.api-key:${OPENAI_API_KEY:}}")
+    private String openAiApiKey;
+
+    @Value("${app.ai.openai.model:${OPENAI_MODEL:gpt-4o-mini}}")
+    private String openAiModel;
+
+    @Value("${app.ai.openai.base-url:${OPENAI_BASE_URL:https://api.openai.com/v1}}")
+    private String openAiBaseUrl;
 
     @Value("${app.ai.openai.student-daily-quota:30}")
     private int dailyQuota;
@@ -238,10 +250,25 @@ public class AiService {
         // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
         addStandardCitations(out, gradeLevel, context);
 
-        // 1. Thử gọi mô hình Google Gemini 2.5 Flash thực tế
-        String geminiLiveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
-        if (geminiLiveReply != null && !geminiLiveReply.isBlank()) {
-            out.reply = geminiLiveReply;
+        // 1. Thử gọi mô hình AI ưu tiên (Gemini hoặc OpenAI với cơ chế song hành)
+        String liveReply = null;
+        if ("openai".equalsIgnoreCase(aiProvider)) {
+            liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            if (liveReply == null) {
+                // Fallback sang Gemini
+                liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            }
+        } else {
+            // Mặc định ưu tiên Gemini (vì đang hoạt động 200 OK)
+            liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            if (liveReply == null) {
+                // Fallback sang OpenAI
+                liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer);
+            }
+        }
+
+        if (liveReply != null && !liveReply.isBlank()) {
+            out.reply = liveReply;
             out.stepByStepHints.add("Gợi ý 1: Đọc kỹ câu hỏi và xác định rõ yêu cầu bài toán.");
             out.stepByStepHints.add("Gợi ý 2: Áp dụng định nghĩa và tính chất cơ bản đã học trong bài '" + context + "'.");
             out.stepByStepHints.add("Gợi ý 3: Tự nhẩm thử hoặc vẽ hình trực quan để kiểm tra kết quả.");
@@ -348,6 +375,76 @@ public class AiService {
             }
         } catch (Exception ex) {
             log.warn("[GEMINI_LIVE_FALLBACK] Lỗi gọi Gemini API (Kích hoạt luật Socratic nội bộ): {}", ex.getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Gọi OpenAI ChatGPT API (gpt-4o-mini) với cơ chế an toàn và tương thích
+     */
+    private String callOpenAiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer) {
+        if (openAiApiKey == null || openAiApiKey.isBlank() || "mock-key".equalsIgnoreCase(openAiApiKey)) {
+            return null;
+        }
+
+        try {
+            String systemPrompt = String.format(
+                "Bạn là Gia sư AI Socratic thông thái của DMKLab Education (K-12 Việt Nam).\n"
+                + "Học sinh đang học Lớp %d, môn %s, bài học '%s', chế độ '%s'.\n"
+                + "Quy tắc sư phạm Socratic K-12:\n"
+                + "1. Tuyệt đối KHÔNG đưa luôn đáp án số học hay bài giải mẫu ăn sẵn.\n"
+                + "2. Dẫn dắt bằng cách hỏi ngược lại từng bước logic, liên hệ thực tế gần gũi với lứa tuổi Lớp %d.\n"
+                + "3. Nếu học sinh sai hoặc hỏi đáp án, an ủi khích lệ và chỉ ra điểm mấu chốt để em tự làm.\n"
+                + "4. Giọng văn ấm áp, thân thiện, khích lệ và chuẩn mực tiếng Việt sư phạm.",
+                gradeLevel, subject, context, mode, gradeLevel
+            );
+
+            String userPrompt = message;
+            if (studentAnswer != null && !studentAnswer.isBlank()) {
+                userPrompt += " (Câu trả lời học sinh đã chọn: " + studentAnswer + ")";
+            }
+
+            String baseUrl = (openAiBaseUrl != null && !openAiBaseUrl.isBlank()) ? openAiBaseUrl.replaceAll("/+$", "") : "https://api.openai.com/v1";
+            String endpoint = baseUrl + "/chat/completions";
+            String targetModel = (openAiModel != null && !openAiModel.isBlank()) ? openAiModel : "gpt-4o-mini";
+
+            java.util.Map<String, Object> sysMsg = java.util.Map.of("role", "system", "content", systemPrompt);
+            java.util.Map<String, Object> userMsg = java.util.Map.of("role", "user", "content", userPrompt);
+
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("model", targetModel);
+            body.put("messages", java.util.List.of(sysMsg, userMsg));
+            body.put("temperature", 0.6);
+            body.put("max_tokens", 800);
+
+            String jsonPayload = objectMapper.writeValueAsString(body);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + openAiApiKey)
+                    .timeout(java.time.Duration.ofSeconds(12))
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload, java.nio.charset.StandardCharsets.UTF_8))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+                com.fasterxml.jackson.databind.JsonNode choices = root.path("choices");
+                if (choices.isArray() && !choices.isEmpty()) {
+                    String reply = choices.get(0).path("message").path("content").asText();
+                    if (reply != null && !reply.isBlank()) {
+                        log.info("[OPENAI_LIVE_OK] Phản hồi thành công từ OpenAI ChatGPT ({})", targetModel);
+                        return reply.trim();
+                    }
+                }
+            } else {
+                log.warn("[OPENAI_LIVE_WARN] OpenAI API trả về mã lỗi HTTP {}: {}", response.statusCode(), response.body());
+            }
+        } catch (Exception ex) {
+            log.warn("[OPENAI_LIVE_FALLBACK] Lỗi gọi OpenAI API: {}", ex.getMessage());
         }
 
         return null;
