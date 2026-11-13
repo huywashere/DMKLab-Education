@@ -13,6 +13,9 @@ export default function DedicatedBooksPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(MOCK_USERS.student);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(MOCK_GRADES[4]);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const [activeBookTitle, setActiveBookTitle] = useState("Sách Giáo Khoa Toán Học 10 - Tập 1");
+  const [activeChapterTitle, setActiveChapterTitle] = useState("Chương I: Mệnh Đề và Tập Hợp");
+  const [activeSubject, setActiveSubject] = useState("Toán học");
 
   useEffect(() => {
     api
@@ -60,6 +63,11 @@ export default function DedicatedBooksPage() {
           onBackToHome={() => {
             window.location.href = "/";
           }}
+          onActiveContextChange={(bTitle, cTitle, subj, gNum) => {
+            setActiveBookTitle(bTitle);
+            setActiveChapterTitle(cTitle);
+            setActiveSubject(subj);
+          }}
         />
       </main>
 
@@ -68,6 +76,9 @@ export default function DedicatedBooksPage() {
         isOpen={isAiChatOpen}
         onClose={() => setIsAiChatOpen(false)}
         onOpen={() => setIsAiChatOpen(true)}
+        activeBookTitle={activeBookTitle}
+        activeChapterTitle={activeChapterTitle}
+        activeSubject={activeSubject}
       />
 
       <Footer

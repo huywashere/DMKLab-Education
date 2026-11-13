@@ -26,6 +26,7 @@ public class AiService {
     private final ChatSessionRepository sessionRepository;
     private final ChatMessageRepository messageRepository;
     private final com.example.learning.content.repository.LessonRepository lessonRepository;
+    private final SystemKnowledgeCrawlerService knowledgeCrawler;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
     private final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newBuilder()
             .connectTimeout(java.time.Duration.ofSeconds(10))
@@ -133,7 +134,22 @@ public class AiService {
         String mode = req.getMode() != null ? req.getMode().toUpperCase() : "SOCRATIC";
         int gradeLevel = req.getGradeLevel() != null ? req.getGradeLevel() : 5;
 
-        TutorOutput output = generateTutorResponse(session.getId(), mode, gradeLevel, rawMessage, lessonTitle, subject, req.getStudentAnswer(), effectiveKnowledge);
+        // Crawl tri thức hệ thống & kiểm tra rào cản bảo vệ chủ đề (System Crawler & Topic Guardrail)
+        SystemKnowledgeCrawlerService.KnowledgeCrawlResult crawlResult = knowledgeCrawler.crawlAndGroundKnowledge(
+                rawMessage, gradeLevel, subject, lessonTitle, effectiveKnowledge
+        );
+
+        TutorOutput output = generateTutorResponse(
+                session.getId(),
+                mode,
+                gradeLevel,
+                rawMessage,
+                lessonTitle,
+                subject,
+                req.getStudentAnswer(),
+                crawlResult.getGroundedPromptKnowledge(),
+                crawlResult
+        );
 
         // 7. Save Assistant response
         ChatMessage assistantMsg = ChatMessage.builder()
@@ -296,7 +312,16 @@ public class AiService {
      * 4. Giải thích vì sao câu trả lời sai (Misconception Diagnosis)
      * 5. Trích dẫn bài học hoặc tài liệu SGK làm căn cứ
      */
-    private TutorOutput generateTutorResponse(UUID sessionId, String mode, int gradeLevel, String message, String lessonTitle, String subject, String studentAnswer, String customKnowledge) {
+    private TutorOutput generateTutorResponse(
+            UUID sessionId,
+            String mode,
+            int gradeLevel,
+            String message,
+            String lessonTitle,
+            String subject,
+            String studentAnswer,
+            String customKnowledge,
+            SystemKnowledgeCrawlerService.KnowledgeCrawlResult crawlResult) {
         TutorOutput out = new TutorOutput();
         String qLower = message.toLowerCase();
         String context = lessonTitle != null ? lessonTitle : "Toán học K-12";
@@ -308,8 +333,22 @@ public class AiService {
         out.quickReplies.add("📝 Cho em một bài tập tương tự để luyện");
         out.quickReplies.add("✨ Em đã hiểu rồi, cảm ơn thầy!");
 
-        // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
-        addStandardCitations(out, gradeLevel, context);
+        // Gắn trích dẫn SGK: Ưu tiên tài liệu SGK chuẩn đã được crawl từ hệ thống
+        if (crawlResult != null && crawlResult.getCitations() != null && !crawlResult.getCitations().isEmpty()) {
+            out.citations.addAll(crawlResult.getCitations());
+        } else {
+            addStandardCitations(out, gradeLevel, context);
+        }
+
+        // Xử lý rào cản bảo vệ chủ đề nếu câu hỏi bị xác định là lạc đề / phi học thuật
+        if (crawlResult != null && !crawlResult.isOnTopic()) {
+            out.misconceptionReason = "OFF_TOPIC_REDIRECT";
+            out.quickReplies.clear();
+            out.quickReplies.add("📖 Trở lại bài học: " + context);
+            out.quickReplies.add("💡 Cho em xem công thức SGK trọng tâm");
+            out.quickReplies.add("📝 Thử một câu hỏi luyện tập");
+            out.quickReplies.add("✨ Em đã sẵn sàng tiếp tục!");
+        }
 
         // Truy xuất lịch sử hội thoại gần nhất (tối đa 6 tin nhắn trước đó) để duy trì trí nhớ liên tục (Multi-turn Memory)
         List<ChatMessage> recentHistory = new ArrayList<>();
@@ -390,6 +429,14 @@ public class AiService {
         }
 
         // 2. Fallback nội bộ theo quy tắc nếu chưa có mạng hoặc lỗi API
+        if (crawlResult != null && !crawlResult.isOnTopic() && crawlResult.getOffTopicRedirectAdvice() != null) {
+            out.reply = crawlResult.getOffTopicRedirectAdvice();
+            out.stepByStepHints.add("Bước 1: Tập trung vào mục tiêu bài học: " + context);
+            out.stepByStepHints.add("Bước 2: Xem lại các định nghĩa và công thức cơ bản trong SGK.");
+            out.stepByStepHints.add("Bước 3: Đặt câu hỏi cho thầy về phần em chưa hiểu trong bài nhé.");
+            return out;
+        }
+
         switch (mode) {
             case "GRADE_ADAPTED":
                 handleGradeAdaptedMode(out, gradeLevel, qLower, context);
@@ -455,14 +502,18 @@ public class AiService {
           .append("2. NGUYÊN TẮC 'MỘT BƯỚC MỖI LẦN' (ONE STEP AT A TIME): Chỉ đặt đúng 01 câu hỏi gợi mở tiếp theo ở cuối câu trả lời để học sinh tự suy nghĩ và phản hồi, không đặt dồn dập nhiều câu hỏi.\n")
           .append("3. CHẨN ĐOÁN ĐIỂM NGỘ NHẬN (MISCONCEPTION DIAGNOSIS): Nếu học sinh tính sai hoặc chọn sai đáp án, đừng chỉ nói 'Sai rồi'. Hãy chỉ ra chính xác điểm em đang nhầm lẫn (ví dụ: nhầm giữa dấu âm trong ngoặc và ngoài ngoặc, nhầm giữa cộng và nhân lũy thừa).\n")
           .append("4. ĐỊNH DẠNG TOÁN HỌC CHUẨN LATEX (KATEX): Toàn bộ công thức toán, biến số và phân số PHẢI được bọc trong cặp dấu $...$ (ví dụ: $x^2 - 4 = 0$, $\\frac{1}{2}$, $\\sqrt{3}$) để giao diện web hiển thị công thức sắc nét.\n")
-          .append("5. KHÍCH LỆ TÍCH CỰC: Luôn ghi nhận nỗ lực suy nghĩ của học sinh trước khi chỉ ra chỗ cần điều chỉnh.");
+          .append("5. KHÍCH LỆ TÍCH CỰC: Luôn ghi nhận nỗ lực suy nghĩ của học sinh trước khi chỉ ra chỗ cần điều chỉnh.\n")
+          .append("6. QUY TẮC BẢO VỆ CHỦ ĐỀ & TRẢ LỜI ĐÚNG TRỌNG TÂM (TOPIC GUARDRAIL & ZERO-HALLUCINATION):\n")
+          .append("   - Bạn là Gia sư chuyên trách môn '").append(subject).append("' và bài học '").append(context).append("'.\n")
+          .append("   - Bám sát 100% tài liệu SGK/giáo trình hệ thống trích xuất bên dưới. Sử dụng đúng định nghĩa, định lý và công thức LaTeX chuẩn. Tuyệt đối không bịa đặt kiến thức ngoài chương trình GDPT 2018.\n")
+          .append("   - NẾU HỌC SINH HỎI LẠC ĐỀ (game, giải trí, việc riêng, câu hỏi phi học thuật...): Tuyệt đối KHÔNG bàn luận lan man theo câu hỏi lạc đề. Hãy nhẹ nhàng nhắc nhở em quay lại trọng tâm bài học và đặt 01 câu hỏi gợi mở của bài học để khơi gợi tư duy.");
 
         if (customKnowledge != null && !customKnowledge.isBlank()) {
-            sb.append("\n\n[TÀI LIỆU & DỮ LIỆU CHUYÊN SÂU ĐÃ NẠP TỪ BÀI HỌC / TÀI LIỆU UPLOAD]:\n")
+            sb.append("\n\n[TÀI LIỆU SGK & DỮ LIỆU CỐT LÕI CRAWL TỰ ĐỘNG TỪ HỆ THỐNG]:\n")
               .append(customKnowledge.trim())
               .append("\n\nYÊU CẦU HUẤN LUYỆN CHUYÊN BIỆT (IN-CONTEXT GROUNDING):\n")
-              .append("1. Bạn PHẢI bám sát 100% dữ liệu giáo trình trên để gợi ý, dẫn dắt và đặt câu hỏi cho học sinh.\n")
-              .append("2. Sử dụng đúng phương pháp giải, công thức và thuật ngữ đã nêu trong tài liệu.\n")
+              .append("1. Bạn PHẢI bám sát 100% dữ liệu giáo trình và công thức trích xuất ở trên để dẫn dắt học sinh.\n")
+              .append("2. Trích dẫn đúng định nghĩa, định lý và công thức LaTeX chuẩn xác từ tài liệu.\n")
               .append("3. Tuyệt đối KHÔNG bịa đặt kiến thức ngoài tài liệu bài giảng đã nạp.");
         }
 
@@ -693,7 +744,7 @@ public class AiService {
 
         return null;
     }
-     */
+
     private void handleGradeAdaptedMode(TutorOutput out, int gradeLevel, String q, String context) {
         if (gradeLevel <= 5) {
             // Tiểu học: Ngôn ngữ trực quan, hình tượng quả cam, bánh pizza, que tính

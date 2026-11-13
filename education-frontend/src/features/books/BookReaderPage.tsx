@@ -48,6 +48,12 @@ import confetti from "canvas-confetti";
 interface BookReaderPageProps {
   onBackToHome?: () => void;
   initialBookId?: string;
+  onActiveContextChange?: (
+    bookTitle: string,
+    chapterTitle: string,
+    subject: string,
+    gradeNumber: number
+  ) => void;
 }
 
 type ReaderMode = "reader" | "presentation" | "mindmap";
@@ -57,6 +63,7 @@ type ReaderFont = "sans" | "serif" | "mono";
 export const BookReaderPage: React.FC<BookReaderPageProps> = ({
   onBackToHome,
   initialBookId = "toan-10-canh-dieu",
+  onActiveContextChange,
 }) => {
   // Books Collection State
   const [booksList, setBooksList] = useState<Textbook[]>(K12_SAMPLE_BOOKS);
@@ -127,6 +134,18 @@ export const BookReaderPage: React.FC<BookReaderPageProps> = ({
       }
     };
   }, []);
+
+  // Report active context to parent for AI grounding
+  useEffect(() => {
+    if (currentBook && currentChapter) {
+      onActiveContextChange?.(
+        currentBook.title,
+        currentChapter.title,
+        currentBook.subject,
+        currentBook.gradeNumber
+      );
+    }
+  }, [currentBook, currentChapter, onActiveContextChange]);
 
   // Keyboard shortcut listener for Lecture Presentation Mode
   useEffect(() => {

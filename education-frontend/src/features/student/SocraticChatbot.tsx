@@ -52,6 +52,9 @@ interface SocraticChatbotProps {
   onClose: () => void;
   onOpen?: () => void;
   activeLessonTitle?: string;
+  activeSubject?: string;
+  activeBookTitle?: string;
+  activeChapterTitle?: string;
   onNavigateToLesson?: (lessonId: string) => void;
 }
 
@@ -107,6 +110,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   onClose,
   onOpen,
   activeLessonTitle = "Khái niệm Phân số và Các tính chất cơ bản",
+  activeSubject = "Toán học",
+  activeBookTitle,
+  activeChapterTitle,
   onNavigateToLesson,
 }) => {
   const [selectedMode, setSelectedMode] = useState<TutorMode>("SOCRATIC");
@@ -447,7 +453,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           text,
           currentMode,
           selectedGrade,
-          activeLessonTitle
+          activeChapterTitle ? `${activeBookTitle ? activeBookTitle + " - " : ""}${activeChapterTitle}` : activeLessonTitle
         );
         setMessages((prev) => [...prev, botMsg]);
         setIsTyping(false);
@@ -456,12 +462,16 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       return;
     }
 
+    const resolvedContext = activeChapterTitle
+      ? `${activeBookTitle ? activeBookTitle + " - " : ""}${activeChapterTitle}`
+      : activeLessonTitle;
+
     try {
       const res: SocraticChatResponse = await api.sendLearningChat(text, undefined, sessionId, {
         mode: currentMode,
         gradeLevel: selectedGrade,
-        contextLessonTitle: activeLessonTitle,
-        contextSubject: "Toán học K-12",
+        contextLessonTitle: resolvedContext,
+        contextSubject: activeSubject || "Toán học K-12",
         studentAnswer: currentMode === "ERROR_DIAGNOSIS" ? text : undefined,
         customKnowledge: customKnowledge || undefined,
       });
@@ -905,6 +915,23 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         </div>
       )}
 
+      {/* 2c. Active Curriculum Context & Topic Guardrail Status */}
+      <div className="bg-blue-50/70 dark:bg-blue-950/30 px-3.5 py-1.5 border-b border-blue-100 dark:border-blue-900/40 flex items-center justify-between text-[11px] shrink-0">
+        <div className="flex items-center gap-1.5 text-blue-900 dark:text-blue-300 font-medium truncate">
+          <PiBookBookmarkDuotone className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+          <span className="truncate">
+            <span className="font-bold">{activeSubject || "Toán học"}:</span>{" "}
+            {activeChapterTitle
+              ? `${activeBookTitle ? activeBookTitle + " › " : ""}${activeChapterTitle}`
+              : activeLessonTitle}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Crawl SGK & Bám sát chủ đề 100%</span>
+        </div>
+      </div>
+
       {/* Cooldown Timer Bar */}
       {cooldownSec > 0 && (
         <div className="bg-blue-50/90 dark:bg-blue-950/60 px-3.5 py-1.5 border-b border-blue-200/80 dark:border-blue-900/60 flex items-center justify-between text-[11px] text-blue-800 dark:text-blue-200 shrink-0">
@@ -1121,15 +1148,42 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                   </div>
                 )}
 
-                {/* Misconception Reason Box */}
+                {/* Misconception Reason Box / Topic Guardrail Alert */}
                 {isBot && m.misconceptionReason && (
-                  <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-200">
-                      <PiWarningCircleDuotone className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span>Chẩn đoán sai lầm & Cách khắc phục:</span>
+                  <div
+                    className={`p-3.5 rounded-2xl border space-y-1.5 ${
+                      m.misconceptionReason === "OFF_TOPIC_REDIRECT"
+                        ? "bg-blue-50/90 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/60"
+                        : "bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold">
+                      {m.misconceptionReason === "OFF_TOPIC_REDIRECT" ? (
+                        <>
+                          <PiShieldCheckDuotone className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span className="text-blue-900 dark:text-blue-200">
+                            Rào cản bảo vệ chủ đề học tập (Topic Guardrail):
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <PiWarningCircleDuotone className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span className="text-amber-900 dark:text-amber-200">
+                            Chẩn đoán sai lầm & Cách khắc phục:
+                          </span>
+                        </>
+                      )}
                     </div>
-                    <p className="text-xs text-amber-950 dark:text-amber-100 leading-relaxed font-medium">
-                      {m.misconceptionReason}
+                    <p
+                      className={`text-xs leading-relaxed font-medium ${
+                        m.misconceptionReason === "OFF_TOPIC_REDIRECT"
+                          ? "text-blue-950 dark:text-blue-100"
+                          : "text-amber-950 dark:text-amber-100"
+                      }`}
+                    >
+                      {m.misconceptionReason === "OFF_TOPIC_REDIRECT"
+                        ? "Hệ thống khuyến khích em tập trung vào môn học và nội dung bài học để đạt hiệu quả cao nhất."
+                        : m.misconceptionReason}
                     </p>
                   </div>
                 )}
@@ -1147,15 +1201,25 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                           key={cIdx}
                           className="p-2.5 rounded-xl bg-white dark:bg-[#0D1A30] border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1"
                         >
-                          <div className="font-bold text-slate-900 dark:text-slate-100 line-clamp-1">
-                            {cite.title}
+                          <div className="font-bold text-slate-900 dark:text-slate-100 line-clamp-1 flex items-center justify-between">
+                            <span>{cite.title}</span>
+                            {cite.targetUrl && (
+                              <a
+                                href={cite.targetUrl}
+                                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-bold"
+                              >
+                                Xem SGK ↗
+                              </a>
+                            )}
                           </div>
                           <div className="text-slate-500 dark:text-slate-400">
-                            {cite.sourceBook} · {cite.chapter}
+                            {cite.sourceBook} {cite.chapter ? `· ${cite.chapter}` : ""}
                           </div>
-                          <div className="text-[#1865F2] dark:text-blue-400 font-semibold flex items-center gap-1 pt-0.5">
-                            <span>Mốc video: {cite.videoTime}</span>
-                          </div>
+                          {cite.videoTime && (
+                            <div className="text-[#1865F2] dark:text-blue-400 font-semibold flex items-center gap-1 pt-0.5">
+                              <span>Mốc bài học: {cite.videoTime}</span>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
