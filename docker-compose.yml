@@ -232,6 +232,7 @@ services:
       - "9090:9090"
     volumes:
       - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -240,6 +241,20 @@ services:
       - "--web.enable-lifecycle"
     depends_on:
       - backend
+
+  # Alertmanager Automated Incident Alerting (Telegram / Discord / Webhook)
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: education_alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./docker/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
 
   # Grafana Centralized Observability Dashboard
   grafana:
@@ -265,5 +280,6 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+  alertmanager_data:
   certbot_www:
   certbot_conf:

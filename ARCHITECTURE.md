@@ -347,6 +347,23 @@ npm run dev
 # Tuyến đường admin: http://localhost:3000/admin
 ```
 
+### 8.3 Hệ thống Giám sát & Cảnh báo Sự cố (Prometheus + Grafana + Alertmanager)
+- **Prometheus Dashboard**: `http://localhost:9090` (Scrape tự động Spring Boot Actuator, Go SSE Proxy, Go Live Gateway).
+- **Grafana Metrics**: `http://localhost:3001` (Tài khoản mặc định: `admin` / `admin`).
+- **Alertmanager Cảnh báo Tức thì**: `http://localhost:9093`
+  - Tự động kích hoạt khi: Dịch vụ ngừng hoạt động (`up == 0`), tỷ lệ lỗi 5xx > 5%, tràn bộ nhớ JVM Heap > 85%, cạn kiệt kết nối HikariCP > 85%, hoặc đột biến mã lỗi 429 do tấn công.
+  - Hỗ trợ thông báo qua Telegram Bot và Discord/Slack Webhook.
+
+### 8.4 Kịch bản Kiểm thử Tải Trọng Cao (K6 Load Testing)
+- Chạy kiểm thử tải mô phỏng 500 - 1.000 học sinh đồng thời:
+```bash
+# Chạy trực tiếp qua script tự động (tận dụng Docker hoặc K6 cục bộ):
+bash scripts/run-load-test.sh http://localhost:8080
+```
+- Tiêu chí đạt chuẩn kiểm thử:
+  - 95% số yêu cầu có thời gian phản hồi $P95 < 300\text{ms}$.
+  - Tỷ lệ lỗi toàn hệ thống $< 1\%$.
+
 ---
 
 > *Tài liệu được quản lý bởi Ban Kỹ Thuật DMKLab. Mọi đề xuất thay đổi kiến trúc cần được rà soát qua quy trình RFC trước khi áp dụng.*

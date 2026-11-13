@@ -1,0 +1,37 @@
+# ==============================================================================
+# DMKLab Education Platform - Alertmanager Configuration
+# Hỗ trợ gửi cảnh báo trực tiếp về Telegram Bot & Discord / Slack Webhook
+# ==============================================================================
+
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'service', 'severity']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 3h
+  receiver: 'default-receiver'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical-receiver'
+      repeat_interval: 1h
+
+receivers:
+  - name: 'default-receiver'
+    webhook_configs:
+      - url: '${ALERT_WEBHOOK_URL:-http://localhost:5001/alerts}'
+        send_resolved: true
+
+  - name: 'critical-receiver'
+    webhook_configs:
+      - url: '${ALERT_WEBHOOK_URL:-http://localhost:5001/alerts}'
+        send_resolved: true
+    # Nếu dùng Telegram Bot:
+    # telegram_configs:
+    #   - bot_token: '${TELEGRAM_BOT_TOKEN}'
+    #     chat_id: ${TELEGRAM_CHAT_ID}
+    #     send_resolved: true
+    #     parse_mode: 'HTML'
+    #     message: '🚨 <b>[DMKLab Alert]</b>: {{ .CommonAnnotations.summary }}\n<b>Mức độ:</b> {{ .CommonLabels.severity }}\n<b>Chi tiết:</b> {{ .CommonAnnotations.description }}'

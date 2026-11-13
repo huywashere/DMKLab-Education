@@ -1,0 +1,65 @@
+# ==============================================================================
+# DMKLab Education Platform - Prometheus Alerting Rules
+# ==============================================================================
+
+groups:
+  - name: dmklab_infrastructure_alerts
+    rules:
+      # 1. Cảnh báo dịch vụ ngừng hoạt động (Critical)
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Dịch vụ {{ $labels.service }} (Instance {{ $labels.instance }}) bị sập"
+          description: "Prometheus không thể kết nối tới instance {{ $labels.instance }} thuộc dịch vụ {{ $labels.service }} trong hơn 1 phút."
+
+      # 2. Cảnh báo tỷ lệ lỗi 5xx vượt ngưỡng (Warning / Critical)
+      - alert: HighHttp5xxRate
+        expr: >
+          sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+          /
+          sum(rate(http_server_requests_seconds_count[5m])) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tỷ lệ lỗi HTTP 5xx trên backend vượt quá 5%"
+          description: "Backend đang trả về hơn 5% lỗi 5xx trong 5 phút qua. Hiện tại: {{ $value | humanizePercentage }}."
+
+      # 3. Cảnh báo tràn bộ nhớ JVM Heap (Warning)
+      - alert: JvmHeapMemoryHigh
+        expr: >
+          jvm_memory_used_bytes{area="heap"} 
+          / 
+          jvm_memory_max_bytes{area="heap"} > 0.85
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Bộ nhớ JVM Heap backend đang sử dụng trên 85%"
+          description: "Bộ nhớ Heap đã vượt ngưỡng 85% trong 3 phút qua. Cần kiểm tra rò rỉ bộ nhớ hoặc nâng cấp -Xmx."
+
+      # 4. Cảnh báo cạn kiệt Connection Pool HikariCP (Critical)
+      - alert: HikariPoolExhaustion
+        expr: >
+          hikaricp_connections_active 
+          / 
+          hikaricp_connections_max > 0.85
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Connection Pool CSDL (HikariCP) gần cạn kiệt (> 85%)"
+          description: "Số kết nối CSDL PostgreSQL đang active vượt quá 85% giới hạn pool. Nguy cơ nghẽn I/O hoặc truy vấn treo."
+
+      # 5. Cảnh báo tấn công / vượt hạn ngạch Rate Limit (Info / Warning)
+      - alert: RateLimitSurge429
+        expr: sum(rate(http_server_requests_seconds_count{status="429"}[2m])) > 20
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Số yêu cầu bị chặn bởi Rate Limiter (HTTP 429) tăng đột biến"
+          description: "Hệ thống đang chặn hơn 20 req/s với mã HTTP 429. Có thể đang có bot quét dữ liệu hoặc tấn công brute-force."
