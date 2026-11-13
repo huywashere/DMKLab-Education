@@ -8,3 +8,5 @@ export * from "./spotlight-card";
 export * from "./tilt-card";
 export * from "./animated-shiny-text";
 export * from "./grid-pattern";
+export * from "./motion-container";
+export * from "./gsap-interactive";

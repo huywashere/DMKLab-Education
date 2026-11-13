@@ -126,3 +126,4 @@ Lớp `api.ts` đóng vai trò là API Gateway phía client:
      `"Thao tác quá nhanh! Vui lòng chờ {x} giây trước khi gửi tiếp."`
 3. **Giải mã luồng dữ liệu Server-Sent Events (SSE)**:
    - Hỗ trợ phương thức `streamLearningChat`, đọc từng token văn bản truyền về qua luồng `text/event-stream`, tạo hiệu ứng gõ chữ mượt mà cho Gia sư Socratic AI (độ trễ 25ms/token).
+

@@ -183,3 +183,4 @@ Cloudflare R2 Bucket (dmklab-education-assets)/
 - Toàn bộ thao tác tải lên của người dùng được bảo vệ thông qua URL có chữ ký điện tử HMAC-SHA256 (`POST /api/v1/storage/presigned-upload`).
 - URL này chỉ có giá trị sử dụng trong vòng **15 phút**.
 - Khi xem video, trình duyệt tải các phân đoạn `.ts` thông qua CDN toàn cầu của Cloudflare. Nhờ chính sách **Zero Egress Fee** của Cloudflare R2, hệ thống hoàn toàn không phải chi trả bất kỳ chi phí băng thông nào cho dù học sinh xem hàng triệu lượt video mỗi tháng.
+

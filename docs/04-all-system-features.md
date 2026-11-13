@@ -171,3 +171,4 @@ Trung tâm điều hành và quản trị dữ liệu dành cho Ban Giám hiệu
 - **Trang Bài viết sư phạm (`/articles`)**: Kho bài viết chia sẻ phương pháp học tập hiệu quả, mẹo ôn thi THPT Quốc gia, cẩm nang đồng hành cùng con của các chuyên gia giáo dục.
 - **Trang Giới thiệu (`/about`)**: Giới thiệu sứ mệnh, tầm nhìn và đội ngũ sáng lập DMKLab Education.
 - **Trang Liên hệ (`/contact`)**: Biểu mẫu gửi câu hỏi tư vấn tuyển sinh, đóng góp ý kiến và thông tin hỗ trợ kỹ thuật 24/7.
+

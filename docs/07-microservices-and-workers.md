@@ -96,3 +96,4 @@ Phục vụ các tính năng tương tác trực tiếp trong phòng học ảo:
 - Đóng vai trò là reverse proxy chuyên trách cho các luồng truyền token AI độ trễ thấp từ các nhà cung cấp (Gemini, Groq, OpenAI).
 - Giảm tải cho máy chủ Spring Boot: Spring Boot chỉ cần ủy quyền việc duy trì kết nối HTTP dài hạn (Long-lived SSE Connections) cho Go Proxy.
 - Tích hợp bộ đệm In-Memory và bộ đếm giới hạn tốc độ gõ chữ mượt mà (Smoothing Typist Token Delivery) cho học sinh.
+

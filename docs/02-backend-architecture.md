@@ -174,3 +174,4 @@ spring:
   - `jvm_memory_used_bytes` / `jvm_gc_pause_seconds_count`: Theo dõi áp lực bộ nhớ và tần suất Garbage Collection.
   - `hikaricp_connections_active` / `hikaricp_connections_pending`: Cảnh báo nghẽn Connection Pool cơ sở dữ liệu.
   - `http_server_requests_seconds`: Đo lường chính xác phân vị thời gian phản hồi API (P50, P90, P99).
+

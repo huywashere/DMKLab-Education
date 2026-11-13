@@ -37,6 +37,10 @@ import {
   ShimmerButton,
   AnimatedShinyText,
   GridPattern,
+  FadeIn,
+  StaggerContainer,
+  StaggerItem,
+  MagneticElement,
 } from "@/components/ui";
 
 interface HomepageProps {
@@ -224,7 +228,7 @@ export const Homepage: React.FC<HomepageProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left: Editorial Serif Headline + Subhead + Pill CTAs + Laurel Awards */}
-            <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
+            <FadeIn direction="up" delay={0.05} className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
               <h1 className="font-editorial text-4xl sm:text-5xl md:text-6xl lg:text-[68px] xl:text-[76px] font-normal sm:font-medium text-slate-900 dark:text-white leading-[1.08] tracking-tight">
                 {isVi ? (
                   <>
@@ -247,23 +251,27 @@ export const Homepage: React.FC<HomepageProps> = ({
                   : "A world-class tutor for every home. Built by top learning experts from MIT and Harvard."}
               </p>
 
-              {/* 2 Signature Pill CTA Buttons */}
+              {/* 2 Signature Pill CTA Buttons with GSAP Magnetic Interaction */}
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 sm:gap-4 pt-2">
-                <button
-                  type="button"
-                  onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                  className="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-full bg-[#05ac60] hover:bg-[#049653] active:scale-98 text-white font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center"
-                >
-                  {isVi ? "Tôi là người học" : "I’m a learner"}
-                </button>
+                <MagneticElement strength={0.22} className="w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => onOpenLesson(MOCK_LESSONS[0])}
+                    className="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-full bg-[#05ac60] hover:bg-[#049653] active:scale-98 text-white font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
+                  >
+                    {isVi ? "Tôi là người học" : "I’m a learner"}
+                  </button>
+                </MagneticElement>
 
-                <button
-                  type="button"
-                  onClick={onOpenAiChat}
-                  className="w-full sm:w-auto px-7 sm:px-8 py-4 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-98 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-semibold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center"
-                >
-                  {isVi ? "Tôi là phụ huynh hoặc giáo viên" : "I’m a parent or teacher"}
-                </button>
+                <MagneticElement strength={0.22} className="w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={onOpenAiChat}
+                    className="w-full sm:w-auto px-7 sm:px-8 py-4 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-98 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-semibold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
+                  >
+                    {isVi ? "Tôi là phụ huynh hoặc giáo viên" : "I’m a parent or teacher"}
+                  </button>
+                </MagneticElement>
               </div>
 
               {/* Authentic Laurel Wreath Awards */}
@@ -314,7 +322,7 @@ export const Homepage: React.FC<HomepageProps> = ({
                   </svg>
                 </div>
               </div>
-            </div>
+            </FadeIn>
 
             {/* Right: Modern Spline 3D Interactive WebGL Hero (Verified Online Standard) */}
             <div className="lg:col-span-5 flex justify-center">
@@ -666,27 +674,31 @@ export const Homepage: React.FC<HomepageProps> = ({
             </SpotlightCard>
           </div>
 
-          {/* Quick Filter Pill Badges */}
-          <div className="pt-4 flex flex-wrap justify-center gap-2.5">
+          {/* Quick Filter Pill Badges with Staggered Motion */}
+          <StaggerContainer
+            staggerChildren={0.04}
+            className="pt-4 flex flex-wrap justify-center gap-2.5"
+          >
             {SUBJECT_ITEMS.map((item, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => onOpenLesson(MOCK_LESSONS[idx % MOCK_LESSONS.length])}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold border border-[#E4E7EB] dark:border-slate-700 hover:border-[#1865F2] hover:shadow-xs bg-[#F7F8FA] dark:bg-[#1E293B] transition-all cursor-pointer"
-              >
-                <span
-                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs"
-                  style={{ backgroundColor: item.bg, color: item.color }}
+              <StaggerItem key={idx}>
+                <button
+                  type="button"
+                  onClick={() => onOpenLesson(MOCK_LESSONS[idx % MOCK_LESSONS.length])}
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold border border-[#E4E7EB] dark:border-slate-700 hover:border-[#1865F2] hover:shadow-xs bg-[#F7F8FA] dark:bg-[#1E293B] hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer"
                 >
-                  {item.icon}
-                </span>
-                <span className="text-[#21242C] dark:text-slate-100">
-                  {t(item.labelKey, item.fallback)}
-                </span>
-              </button>
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-xs"
+                    style={{ backgroundColor: item.bg, color: item.color }}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="text-[#21242C] dark:text-slate-100">
+                    {t(item.labelKey, item.fallback)}
+                  </span>
+                </button>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

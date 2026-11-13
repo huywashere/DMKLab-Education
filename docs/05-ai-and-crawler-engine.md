@@ -190,3 +190,4 @@ Phương thức `checkIsOffTopicStray` quét câu hỏi dựa trên:
 - Khi học sinh bấm đánh giá, client gọi API:  
   `POST /api/v1/ai/messages/{messageId}/feedback`
 - Backend cập nhật trực tiếp hai trường `feedback_rating` và `feedback_comment` trong bảng `chat_messages` (được tạo qua migration `V7__ai_message_feedback.sql`). Dữ liệu này được xuất định kỳ để đánh giá chất lượng prompt và huấn luyện tinh chỉnh mô hình AI.
+

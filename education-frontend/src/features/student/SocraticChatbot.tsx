@@ -37,6 +37,7 @@ import {
   PiFileTextDuotone,
 } from "react-icons/pi";
 import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 import { api, SocraticChatResponse, InteractiveQuizData, CitationData } from "@/lib/api";
 
 export type TutorMode =
@@ -702,22 +703,27 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         </div>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.92 }}
           onClick={onOpen}
-          className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1865F2] via-[#1253cc] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-white/20"
+          className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1865F2] via-[#1253cc] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-shadow duration-200 flex items-center justify-center cursor-pointer border border-white/20"
           title="Trò chuyện với Gia Sư AI Socratic 24/7"
           aria-label="Mở gia sư AI DMKLab"
         >
           <PiSparkleDuotone className="w-7 h-7 text-white" />
           <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-[#0B1528]" />
-        </button>
+        </motion.button>
       </div>
     );
   }
 
   return (
-    <div
-      className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 bg-white dark:bg-[#0B1528] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-200 animate-in fade-in zoom-in-95 ${
+    <motion.div
+      initial={{ opacity: 0, scale: 0.94, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 bg-white dark:bg-[#0B1528] rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-200 ${
         isExpanded
           ? "w-[calc(100vw-2rem)] sm:w-[720px] h-[720px] max-h-[calc(100vh-4rem)]"
           : "w-[calc(100vw-2rem)] sm:w-[460px] h-[640px] max-h-[calc(100vh-4.5rem)]"
@@ -1504,6 +1510,6 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           <span>Kiểm duyệt an toàn K-12 · Dữ liệu học sinh được bảo vệ và mã hóa riêng tư.</span>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };

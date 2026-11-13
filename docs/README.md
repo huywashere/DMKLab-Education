@@ -128,3 +128,4 @@ Truy cập hệ thống:
 - **Swagger UI API Backend**: `http://localhost:8080/swagger-ui.html`
 - **Grafana Metrics Dashboard**: `http://localhost:3001` (admin / admin)
 - **Prometheus Monitoring**: `http://localhost:9090`
+
