@@ -31,6 +31,9 @@ public class AiService {
             .connectTimeout(java.time.Duration.ofSeconds(10))
             .build();
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+
     @Value("${app.ai.provider:${AI_PROVIDER:gemini}}")
     private String aiProvider;
 
@@ -139,12 +142,13 @@ public class AiService {
                 .content(output.reply)
                 .tokensUsed(output.reply.length() / 4)
                 .build();
-        messageRepository.save(assistantMsg);
+        assistantMsg = messageRepository.save(assistantMsg);
 
         int remaining = Math.max(0, (int) (dailyQuota - (usedToday + 1)));
 
         return AiChatDto.ChatResponse.builder()
                 .sessionId(session.getId())
+                .messageId(assistantMsg.getId())
                 .reply(output.reply)
                 .isSocraticHint(true)
                 .mode(mode)
@@ -236,6 +240,17 @@ public class AiService {
                 .toList();
     }
 
+    @Transactional
+    public boolean recordMessageFeedback(UUID messageId, String rating, String comment) {
+        return messageRepository.findById(messageId).map(msg -> {
+            msg.setFeedbackRating(rating);
+            msg.setFeedbackComment(comment);
+            messageRepository.save(msg);
+            log.info("[AI_RLHF_FEEDBACK] Đã ghi nhận phản hồi {} cho tin nhắn {}", rating, messageId);
+            return true;
+        }).orElse(false);
+    }
+
     private ChatSession createSession(UUID userId, String type, String title) {
         return sessionRepository.save(ChatSession.builder()
                 .userId(userId)
@@ -288,6 +303,27 @@ public class AiService {
         // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
         addStandardCitations(out, gradeLevel, context);
 
+        // 0. Kiểm tra Semantic Cache trong Redis (Nếu là tài liệu chuẩn, trả về ngay 0ms, 0đ token)
+        String cacheKey = (customKnowledge == null || customKnowledge.isBlank())
+                ? buildCacheKey(gradeLevel, mode, subj, context, message)
+                : null;
+
+        if (cacheKey != null && redisTemplate != null) {
+            try {
+                String cachedReply = redisTemplate.opsForValue().get(cacheKey);
+                if (cachedReply != null && !cachedReply.isBlank()) {
+                    log.info("[AI_CACHE_HIT] Phản hồi tức thì từ Redis Cache (0ms, 0đ token) cho câu hỏi: {}", message);
+                    out.reply = cachedReply;
+                    out.stepByStepHints.add("Gợi ý 1: Đọc kỹ câu hỏi và xác định rõ yêu cầu bài toán.");
+                    out.stepByStepHints.add("Gợi ý 2: Áp dụng định nghĩa và tính chất cơ bản đã học trong bài '" + context + "'.");
+                    out.stepByStepHints.add("Gợi ý 3: Tự nhẩm thử hoặc vẽ hình trực quan để kiểm tra kết quả.");
+                    return out;
+                }
+            } catch (Exception ex) {
+                log.warn("[AI_CACHE_WARN] Lỗi đọc Redis Cache: {}", ex.getMessage());
+            }
+        }
+
         // 1. Thử gọi mô hình AI ưu tiên (Groq Cloud -> Gemini -> OpenAI -> Fallback Socratic nội bộ)
         String liveReply = null;
         if ("groq".equalsIgnoreCase(aiProvider) || (groqApiKey != null && groqApiKey.startsWith("gsk_"))) {
@@ -318,6 +354,16 @@ public class AiService {
             out.stepByStepHints.add("Gợi ý 1: Đọc kỹ câu hỏi và xác định rõ yêu cầu bài toán.");
             out.stepByStepHints.add("Gợi ý 2: Áp dụng định nghĩa và tính chất cơ bản đã học trong bài '" + context + "'.");
             out.stepByStepHints.add("Gợi ý 3: Tự nhẩm thử hoặc vẽ hình trực quan để kiểm tra kết quả.");
+
+            // Lưu bộ đệm Redis Semantic Cache (TTL 24 giờ) để tái sử dụng cho các học sinh khác
+            if (cacheKey != null && redisTemplate != null) {
+                try {
+                    redisTemplate.opsForValue().set(cacheKey, liveReply, java.time.Duration.ofHours(24));
+                } catch (Exception ex) {
+                    log.warn("[AI_CACHE_WARN] Không thể ghi cache Redis: {}", ex.getMessage());
+                }
+            }
+
             return out;
         }
 
@@ -346,6 +392,21 @@ public class AiService {
         }
 
         return out;
+    }
+
+    private String buildCacheKey(int gradeLevel, String mode, String subject, String context, String message) {
+        String raw = (gradeLevel + ":" + mode + ":" + subject + ":" + context + ":" + message.trim().toLowerCase()).replaceAll("\\s+", " ");
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(raw.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return "cache:ai:socratic:" + hex.substring(0, 32);
+        } catch (Exception e) {
+            return "cache:ai:socratic:" + Math.abs(raw.hashCode());
+        }
     }
 
     /**

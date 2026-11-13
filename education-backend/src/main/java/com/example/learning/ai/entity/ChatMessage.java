@@ -28,6 +28,12 @@ public class ChatMessage {
     @Builder.Default
     private int tokensUsed = 0;
 
+    @Column(name = "feedback_rating", length = 20)
+    private String feedbackRating; // HELPFUL, UNHELPFUL
+
+    @Column(name = "feedback_comment", length = 500)
+    private String feedbackComment;
+
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 

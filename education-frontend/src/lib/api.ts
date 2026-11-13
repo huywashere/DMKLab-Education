@@ -96,6 +96,7 @@ export interface CitationData {
 
 export interface SocraticChatResponse {
   sessionId: string;
+  messageId?: string;
   reply: string;
   dailyQuotaRemaining: number;
   suggestedAction?: string;
@@ -793,6 +794,25 @@ export const api = {
       throw new Error(json.message || "Lỗi kết nối Trợ lý DMK AI");
     }
     return json.data;
+  },
+
+  // Gửi đánh giá phản hồi chất lượng câu trả lời AI (RLHF Feedback)
+  async submitAiFeedback(
+    messageId: string,
+    rating: "HELPFUL" | "UNHELPFUL",
+    comment?: string
+  ): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/ai/messages/${messageId}/feedback`, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ rating, comment }),
+      });
+      const json = await res.json().catch(() => ({}));
+      return json.success || false;
+    } catch {
+      return false;
+    }
   },
 
   streamLearningChat(

@@ -33,6 +33,7 @@ public class AiChatDto {
     @Builder
     public static class ChatResponse {
         private UUID sessionId;
+        private UUID messageId;
         private String reply;
         private boolean isSocraticHint;
         private int dailyQuotaRemaining;
@@ -44,6 +45,15 @@ public class AiChatDto {
         private List<CitationDto> citations;
         private String misconceptionReason;
         private String safetyWarning;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class MessageFeedbackRequest {
+        private String rating; // HELPFUL, UNHELPFUL
+        private String comment;
     }
 
     @Data

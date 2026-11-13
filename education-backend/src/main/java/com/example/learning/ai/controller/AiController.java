@@ -72,4 +72,13 @@ public class AiController {
         return ResponseEntity.ok(ApiResponse.success(
                 aiService.getSessionHistory(sessionId)));
     }
+
+    @PostMapping("/messages/{messageId}/feedback")
+    @Operation(summary = "Đánh giá chất lượng câu trả lời của AI (RLHF Feedback thu thập dữ liệu huấn luyện)")
+    public ResponseEntity<ApiResponse<Boolean>> submitFeedback(
+            @PathVariable UUID messageId,
+            @RequestBody AiChatDto.MessageFeedbackRequest req) {
+        return ResponseEntity.ok(ApiResponse.success(
+                aiService.recordMessageFeedback(messageId, req.getRating(), req.getComment())));
+    }
 }

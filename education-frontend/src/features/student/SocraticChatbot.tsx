@@ -29,6 +29,7 @@ import {
   PiWifiHighDuotone,
   PiUserCircleDuotone,
   PiThumbsUpDuotone,
+  PiThumbsDownDuotone,
   PiCopyDuotone,
   PiCaretDownBold,
   PiClockCountdownDuotone,
@@ -118,6 +119,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const [likedMsgIds, setLikedMsgIds] = useState<Set<string>>(new Set());
+  const [feedbackMap, setFeedbackMap] = useState<Record<string, "HELPFUL" | "UNHELPFUL">>({});
 
   // Tin nhắn ban đầu thân thiện với học sinh
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -258,6 +260,18 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       else next.add(msgId);
       return next;
     });
+  };
+
+  // Gửi đánh giá RLHF phản hồi chất lượng câu trả lời của AI
+  const handleFeedback = async (
+    msgId: string,
+    rating: "HELPFUL" | "UNHELPFUL",
+    backendMsgId?: string
+  ) => {
+    setFeedbackMap((prev) => ({ ...prev, [msgId]: rating }));
+    if (backendMsgId) {
+      await api.submitAiFeedback(backendMsgId, rating);
+    }
   };
 
   // Làm mới cuộc trò chuyện
@@ -431,6 +445,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
         const botMsg: ChatMessage = {
           id: `msg-${Date.now() + 1}`,
+          backendMessageId: res.messageId,
           role: "assistant",
           content: res.reply,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -1131,15 +1146,37 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                         )}
                       </button>
 
+                      {/* Phản hồi Sư phạm RLHF: Thumbs Up */}
                       <button
-                        onClick={() => handleToggleLike(m.id)}
+                        onClick={() => handleFeedback(m.id, "HELPFUL", m.backendMessageId)}
                         className={`p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ${
-                          isLiked ? "text-blue-600 font-bold" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                          feedbackMap[m.id] === "HELPFUL"
+                            ? "text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/40"
+                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                         }`}
-                        title="Hữu ích"
+                        title="Gợi ý rất dễ hiểu (Học tập hiệu quả)"
                       >
                         <PiThumbsUpDuotone className="w-3.5 h-3.5" />
                       </button>
+
+                      {/* Phản hồi Sư phạm RLHF: Thumbs Down */}
+                      <button
+                        onClick={() => handleFeedback(m.id, "UNHELPFUL", m.backendMessageId)}
+                        className={`p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ${
+                          feedbackMap[m.id] === "UNHELPFUL"
+                            ? "text-rose-600 font-bold bg-rose-50 dark:bg-rose-950/40"
+                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                        }`}
+                        title="Chưa hiểu rõ / Cần gợi ý thêm"
+                      >
+                        <PiThumbsDownDuotone className="w-3.5 h-3.5" />
+                      </button>
+
+                      {feedbackMap[m.id] && (
+                        <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 animate-in fade-in">
+                          ✓ Đã ghi nhận!
+                        </span>
+                      )}
                     </div>
                   ) : (
                     <div />

@@ -115,6 +115,8 @@ export interface ChatMessage {
   }[];
   misconceptionReason?: string;
   safetyWarning?: string;
+  backendMessageId?: string;
+  feedbackRating?: "HELPFUL" | "UNHELPFUL";
 }
 
 export interface MediaAsset {
