@@ -45,6 +45,7 @@ public class AiChatDto {
         private List<CitationDto> citations;
         private String misconceptionReason;
         private String safetyWarning;
+        private List<String> quickReplies;
     }
 
     @Data

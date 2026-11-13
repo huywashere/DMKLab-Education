@@ -195,6 +195,35 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     }
   }, [isOpen]);
 
+  // Định dạng công thức toán học KaTeX và văn bản Markdown trực quan
+  const renderFormattedContent = (content: string) => {
+    const parts = content.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("$$") && part.endsWith("$$")) {
+        const formula = part.slice(2, -2).trim();
+        return (
+          <span
+            key={index}
+            className="block my-2 p-2 rounded-xl bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-900/60 text-blue-900 dark:text-blue-200 font-mono font-bold text-center text-xs sm:text-sm overflow-x-auto"
+          >
+            {formula}
+          </span>
+        );
+      } else if (part.startsWith("$") && part.endsWith("$")) {
+        const formula = part.slice(1, -1).trim();
+        return (
+          <span
+            key={index}
+            className="inline-block px-1.5 py-0.5 mx-0.5 rounded-md bg-blue-50 dark:bg-blue-950/70 border border-blue-200/90 dark:border-blue-800 text-blue-700 dark:text-blue-300 font-mono font-bold text-[11px] sm:text-xs shadow-xs"
+          >
+            {formula}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   // Kiểm tra thông tin cá nhân (PII Protection)
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -456,6 +485,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           citations: res.citations,
           misconceptionReason: res.misconceptionReason,
           safetyWarning: res.safetyWarning,
+          quickReplies: res.quickReplies,
         };
 
         setMessages((prev) => [...prev, botMsg]);
@@ -965,8 +995,24 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                   </div>
                 )}
 
-                {/* Message Body */}
-                <p className="whitespace-pre-line leading-relaxed">{m.content}</p>
+                {/* Message Body với KaTeX Math Formatter */}
+                <div className="whitespace-pre-line leading-relaxed">{renderFormattedContent(m.content)}</div>
+
+                {/* Gợi ý phản hồi nhanh 1 chạm (Quick Action Chips) */}
+                {isBot && m.quickReplies && m.quickReplies.length > 0 && (
+                  <div className="pt-1 flex flex-wrap gap-1.5 animate-in fade-in duration-200">
+                    {m.quickReplies.map((qr, qrIdx) => (
+                      <button
+                        key={qrIdx}
+                        disabled={isTyping}
+                        onClick={() => handleSend(qr)}
+                        className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/70 dark:hover:bg-blue-900/70 text-[#1865F2] dark:text-blue-300 border border-blue-200/80 dark:border-blue-800 transition active:scale-95 cursor-pointer shadow-xs"
+                      >
+                        {qr}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Step-by-Step Guidance Box */}
                 {isBot && m.stepByStepHints && m.stepByStepHints.length > 0 && (

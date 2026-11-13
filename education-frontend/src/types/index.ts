@@ -117,6 +117,7 @@ export interface ChatMessage {
   safetyWarning?: string;
   backendMessageId?: string;
   feedbackRating?: "HELPFUL" | "UNHELPFUL";
+  quickReplies?: string[];
 }
 
 export interface MediaAsset {

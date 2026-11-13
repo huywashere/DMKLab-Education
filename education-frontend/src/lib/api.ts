@@ -108,6 +108,7 @@ export interface SocraticChatResponse {
   citations?: CitationData[];
   misconceptionReason?: string;
   safetyWarning?: string;
+  quickReplies?: string[];
 }
 
 export interface AdminOverviewReport {

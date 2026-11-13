@@ -129,11 +129,11 @@ public class AiService {
             }
         }
 
-        // 6. Generate Advanced AI Tutor Response (với In-Context Grounding từ tài liệu đã upload)
+        // 6. Generate Advanced AI Tutor Response (với In-Context Grounding & Multi-Turn Context Memory)
         String mode = req.getMode() != null ? req.getMode().toUpperCase() : "SOCRATIC";
         int gradeLevel = req.getGradeLevel() != null ? req.getGradeLevel() : 5;
 
-        TutorOutput output = generateTutorResponse(mode, gradeLevel, rawMessage, lessonTitle, subject, req.getStudentAnswer(), effectiveKnowledge);
+        TutorOutput output = generateTutorResponse(session.getId(), mode, gradeLevel, rawMessage, lessonTitle, subject, req.getStudentAnswer(), effectiveKnowledge);
 
         // 7. Save Assistant response
         ChatMessage assistantMsg = ChatMessage.builder()
@@ -158,6 +158,7 @@ public class AiService {
                 .citations(output.citations)
                 .misconceptionReason(output.misconceptionReason)
                 .safetyWarning(safetyWarning)
+                .quickReplies(output.quickReplies)
                 .dailyQuotaRemaining(remaining)
                 .timestamp(Instant.now())
                 .build();
@@ -284,24 +285,45 @@ public class AiService {
         AiChatDto.InteractiveQuizDto interactiveQuiz;
         List<AiChatDto.CitationDto> citations = new ArrayList<>();
         String misconceptionReason;
+        List<String> quickReplies = new ArrayList<>();
     }
 
     /**
-     * Bộ máy sư phạm AI Tutor đa chế độ:
+     * Bộ máy sư phạm AI Tutor đa chế độ với Trí nhớ Ngữ cảnh Nhiều lượt (Multi-turn Context Memory):
      * 1. Giải thích bài học theo trình độ lớp (Lớp 1-5, 6-9, 10-12)
      * 2. Gợi ý từng bước thay vì chỉ đưa đáp án (Socratic)
      * 3. Tạo câu hỏi luyện tập tương tác
      * 4. Giải thích vì sao câu trả lời sai (Misconception Diagnosis)
      * 5. Trích dẫn bài học hoặc tài liệu SGK làm căn cứ
      */
-    private TutorOutput generateTutorResponse(String mode, int gradeLevel, String message, String lessonTitle, String subject, String studentAnswer, String customKnowledge) {
+    private TutorOutput generateTutorResponse(UUID sessionId, String mode, int gradeLevel, String message, String lessonTitle, String subject, String studentAnswer, String customKnowledge) {
         TutorOutput out = new TutorOutput();
         String qLower = message.toLowerCase();
         String context = lessonTitle != null ? lessonTitle : "Toán học K-12";
         String subj = subject != null ? subject : "Toán học";
 
+        // Gợi ý phản hồi nhanh thông minh 1 chạm (Quick Reply Action Chips)
+        out.quickReplies.add("💡 Thầy gợi ý bước tiếp theo giúp em");
+        out.quickReplies.add("🔍 Em chưa rõ đoạn này, thầy giải thích kỹ hơn");
+        out.quickReplies.add("📝 Cho em một bài tập tương tự để luyện");
+        out.quickReplies.add("✨ Em đã hiểu rồi, cảm ơn thầy!");
+
         // Gắn trích dẫn bài học căn cứ mặc định theo chương trình GDPT 2018
         addStandardCitations(out, gradeLevel, context);
+
+        // Truy xuất lịch sử hội thoại gần nhất (tối đa 6 tin nhắn trước đó) để duy trì trí nhớ liên tục (Multi-turn Memory)
+        List<ChatMessage> recentHistory = new ArrayList<>();
+        if (sessionId != null) {
+            try {
+                List<ChatMessage> fullHistory = messageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId);
+                int sz = fullHistory.size();
+                if (sz > 1) {
+                    recentHistory = fullHistory.subList(Math.max(0, sz - 7), sz - 1);
+                }
+            } catch (Exception ex) {
+                log.warn("[AI_HISTORY_WARN] Không thể tải lịch sử hội thoại: {}", ex.getMessage());
+            }
+        }
 
         // 0. Kiểm tra Semantic Cache trong Redis (Nếu là tài liệu chuẩn, trả về ngay 0ms, 0đ token)
         String cacheKey = (customKnowledge == null || customKnowledge.isBlank())
@@ -324,28 +346,28 @@ public class AiService {
             }
         }
 
-        // 1. Thử gọi mô hình AI ưu tiên (Groq Cloud -> Gemini -> OpenAI -> Fallback Socratic nội bộ)
+        // 1. Thử gọi mô hình AI ưu tiên (Groq Cloud -> Gemini -> OpenAI -> Fallback Socratic nội bộ) kèm Multi-turn Context
         String liveReply = null;
         if ("groq".equalsIgnoreCase(aiProvider) || (groqApiKey != null && groqApiKey.startsWith("gsk_"))) {
-            liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+            liveReply = callGroqLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
         }
 
         if (liveReply == null && ("openai".equalsIgnoreCase(aiProvider))) {
-            liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+            liveReply = callOpenAiLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             if (liveReply == null) {
                 // Fallback sang Gemini
-                liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+                liveReply = callGeminiLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
         } else if (liveReply == null) {
             // Mặc định ưu tiên Gemini (vì đang hoạt động 200 OK với quota lớn)
-            liveReply = callGeminiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+            liveReply = callGeminiLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             if (liveReply == null) {
                 // Fallback sang Groq nếu chưa gọi
-                liveReply = callGroqLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+                liveReply = callGroqLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
             if (liveReply == null) {
                 // Fallback sang OpenAI
-                liveReply = callOpenAiLiveTutor(mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
+                liveReply = callOpenAiLiveTutor(recentHistory, mode, gradeLevel, message, context, subj, studentAnswer, customKnowledge);
             }
         }
 
@@ -450,7 +472,7 @@ public class AiService {
     /**
      * Gọi Google Gemini 2.5 Flash API để tạo câu trả lời sư phạm Socratic K-12
      */
-    private String callGeminiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
+    private String callGeminiLiveTutor(List<ChatMessage> recentHistory, String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (geminiApiKey == null || geminiApiKey.isBlank() || "mock-key".equalsIgnoreCase(geminiApiKey)) {
             return null;
         }
@@ -469,8 +491,23 @@ public class AiService {
             java.util.Map<String, Object> sysPart = java.util.Map.of("text", systemPrompt);
             java.util.Map<String, Object> sysInstruction = java.util.Map.of("parts", java.util.List.of(sysPart));
 
-            java.util.Map<String, Object> userPart = java.util.Map.of("text", userPrompt);
-            java.util.Map<String, Object> userContent = java.util.Map.of("role", "user", "parts", java.util.List.of(userPart));
+            // Xây dựng danh sách contents chứa toàn bộ lịch sử trò chuyện (Multi-turn Conversation)
+            List<java.util.Map<String, Object>> contentsList = new ArrayList<>();
+            if (recentHistory != null) {
+                for (ChatMessage m : recentHistory) {
+                    if (m.getContent() != null && !m.getContent().isBlank()) {
+                        String role = "USER".equalsIgnoreCase(m.getSenderRole()) ? "user" : "model";
+                        contentsList.add(java.util.Map.of(
+                            "role", role,
+                            "parts", java.util.List.of(java.util.Map.of("text", m.getContent()))
+                        ));
+                    }
+                }
+            }
+            contentsList.add(java.util.Map.of(
+                "role", "user",
+                "parts", java.util.List.of(java.util.Map.of("text", userPrompt))
+            ));
 
             java.util.Map<String, Object> genConfig = java.util.Map.of(
                 "temperature", 0.6,
@@ -479,7 +516,7 @@ public class AiService {
 
             java.util.Map<String, Object> body = new java.util.HashMap<>();
             body.put("system_instruction", sysInstruction);
-            body.put("contents", java.util.List.of(userContent));
+            body.put("contents", contentsList);
             body.put("generationConfig", genConfig);
 
             String jsonPayload = objectMapper.writeValueAsString(body);
@@ -519,7 +556,7 @@ public class AiService {
     /**
      * Gọi OpenAI ChatGPT API (gpt-4o-mini) với cơ chế an toàn và tương thích
      */
-    private String callOpenAiLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
+    private String callOpenAiLiveTutor(List<ChatMessage> recentHistory, String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (openAiApiKey == null || openAiApiKey.isBlank() || "mock-key".equalsIgnoreCase(openAiApiKey)) {
             return null;
         }
@@ -536,12 +573,21 @@ public class AiService {
             String endpoint = baseUrl + "/chat/completions";
             String targetModel = (openAiModel != null && !openAiModel.isBlank()) ? openAiModel : "gpt-4o-mini";
 
-            java.util.Map<String, Object> sysMsg = java.util.Map.of("role", "system", "content", systemPrompt);
-            java.util.Map<String, Object> userMsg = java.util.Map.of("role", "user", "content", userPrompt);
+            List<java.util.Map<String, Object>> messagesList = new ArrayList<>();
+            messagesList.add(java.util.Map.of("role", "system", "content", systemPrompt));
+            if (recentHistory != null) {
+                for (ChatMessage m : recentHistory) {
+                    if (m.getContent() != null && !m.getContent().isBlank()) {
+                        String role = "USER".equalsIgnoreCase(m.getSenderRole()) ? "user" : "assistant";
+                        messagesList.add(java.util.Map.of("role", role, "content", m.getContent()));
+                    }
+                }
+            }
+            messagesList.add(java.util.Map.of("role", "user", "content", userPrompt));
 
             java.util.Map<String, Object> body = new java.util.HashMap<>();
             body.put("model", targetModel);
-            body.put("messages", java.util.List.of(sysMsg, userMsg));
+            body.put("messages", messagesList);
             body.put("temperature", 0.6);
             body.put("max_tokens", 800);
 
@@ -581,7 +627,7 @@ public class AiService {
      * Gọi Groq Cloud API (LPU Inference siêu tốc - OpenAI Compatible)
      * Hỗ trợ các Open Models hàng đầu: llama-3.3-70b-versatile, deepseek-r1-distill-llama-70b, qwen-2.5-32b
      */
-    private String callGroqLiveTutor(String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
+    private String callGroqLiveTutor(List<ChatMessage> recentHistory, String mode, int gradeLevel, String message, String context, String subject, String studentAnswer, String customKnowledge) {
         if (groqApiKey == null || groqApiKey.isBlank() || "mock-key".equalsIgnoreCase(groqApiKey)) {
             return null;
         }
@@ -598,12 +644,21 @@ public class AiService {
             String endpoint = baseUrl + "/chat/completions";
             String targetModel = (groqModel != null && !groqModel.isBlank()) ? groqModel : "llama-3.3-70b-versatile";
 
-            java.util.Map<String, Object> sysMsg = java.util.Map.of("role", "system", "content", systemPrompt);
-            java.util.Map<String, Object> userMsg = java.util.Map.of("role", "user", "content", userPrompt);
+            List<java.util.Map<String, Object>> messagesList = new ArrayList<>();
+            messagesList.add(java.util.Map.of("role", "system", "content", systemPrompt));
+            if (recentHistory != null) {
+                for (ChatMessage m : recentHistory) {
+                    if (m.getContent() != null && !m.getContent().isBlank()) {
+                        String role = "USER".equalsIgnoreCase(m.getSenderRole()) ? "user" : "assistant";
+                        messagesList.add(java.util.Map.of("role", role, "content", m.getContent()));
+                    }
+                }
+            }
+            messagesList.add(java.util.Map.of("role", "user", "content", userPrompt));
 
             java.util.Map<String, Object> body = new java.util.HashMap<>();
             body.put("model", targetModel);
-            body.put("messages", java.util.List.of(sysMsg, userMsg));
+            body.put("messages", messagesList);
             body.put("temperature", 0.6);
             body.put("max_tokens", 800);
 
