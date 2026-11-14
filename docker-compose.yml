@@ -201,6 +201,8 @@ services:
       dockerfile: Dockerfile
     container_name: education_nginx_gateway
     restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
     ports:
       - "80:80"
       - "443:443"

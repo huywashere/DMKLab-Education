@@ -1,0 +1,365 @@
+version: '3.8'
+
+# ==============================================================================
+# DMKLab Education Platform - Production Docker Compose Stack
+# Tuned for Zero-Expose High-Security Production VPS Deployment
+# ==============================================================================
+
+services:
+  # 1. PostgreSQL 16 with pgvector & Production Memory Tuning
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: education_postgres
+    restart: unless-stopped
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=16MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_connections=100
+    environment:
+      POSTGRES_DB: ${DB_NAME:-learning_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      # BIND LOCALHOST ONLY: Chống quét cổng DB từ bên ngoài Internet
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-learning_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 2. Redis 7 In-Memory Cache, Rate Limiting & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: education_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      # BIND LOCALHOST ONLY: Chống tấn công Redis không mật khẩu từ Internet
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 3. MinIO S3 Object Storage (Chạy khi offline hoặc chế độ local, khi có R2 thì dùng R2)
+  minio:
+    image: minio/minio:latest
+    container_name: education_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 4. Spring Boot 3.3.4 (Java 21) Modular Monolith Backend
+  backend:
+    build:
+      context: ./education-backend
+      dockerfile: Dockerfile
+    container_name: education_backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-learning_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-r2}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET: ${R2_BUCKET:-education-media}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL:-https://media.dmklab.edu.vn}
+      S3_ENDPOINT: http://minio:9000
+      JWT_SECRET: ${JWT_SECRET:-KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform}
+      AI_PROVIDER: ${AI_PROVIDER:-gemini}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM: ${RESEND_FROM:-DMKLab Education <onboarding@resend.dev>}
+      CORS_ALLOWED_ORIGINS: "https://${DOMAIN_NAME:-localhost},https://www.${DOMAIN_NAME:-localhost},http://localhost"
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 5. Next.js 16 (React 19 + Turbopack) Frontend
+  frontend:
+    build:
+      context: ./education-frontend
+      dockerfile: Dockerfile
+    container_name: education_frontend
+    restart: unless-stopped
+    environment:
+      # Sử dụng URL tương đối qua Nginx Gateway để triệt tiêu 100% lỗi CORS & Mixed Content
+      NEXT_PUBLIC_API_URL: /api/v1
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 6. Golang High-Performance Video Transcoder Worker
+  video_worker:
+    build:
+      context: ./video-transcoder-worker
+      dockerfile: Dockerfile
+    container_name: education_video_worker
+    restart: unless-stopped
+    environment:
+      PORT: 8085
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      REDIS_QUEUE: queue:video:transcode
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-r2}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID:-}
+      R2_BUCKET: ${R2_BUCKET:-education-media}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL:-https://media.dmklab.edu.vn}
+      S3_ENDPOINT: http://minio:9000
+      MAX_CONCURRENT_JOBS: 2
+    ports:
+      - "127.0.0.1:8085:8085"
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 7. Golang AI Streaming Proxy & Prompt Cache
+  ai_proxy:
+    build:
+      context: ./ai-streaming-proxy
+      dockerfile: Dockerfile
+    container_name: education_ai_proxy
+    restart: unless-stopped
+    environment:
+      PORT: 8086
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      CACHE_TTL_MINUTES: 1440
+      TYPING_CADENCE_MS: 25
+    ports:
+      - "127.0.0.1:8086:8086"
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 8. Golang Live Gateway & Progress Heartbeat Aggregator
+  live_gateway:
+    build:
+      context: ./live-gateway
+      dockerfile: Dockerfile
+    container_name: education_live_gateway
+    restart: unless-stopped
+    environment:
+      PORT: 8087
+      REDIS_ADDR: redis:6379
+      REDIS_PASSWORD: ""
+      FLUSH_INTERVAL_SECONDS: 60
+      MAX_BATCH_SIZE: 500
+      BACKEND_SYNC_URL: http://backend:8080/api/v1/internal/progress/batch-sync
+    ports:
+      - "127.0.0.1:8087:8087"
+    depends_on:
+      redis:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 9. Nginx Unified Reverse Proxy & SSL Gateway (CỬA NGÕ CÔNG KHAI DUY NHẤT)
+  nginx_gateway:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: education_nginx_gateway
+    restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+      - live_gateway
+      - ai_proxy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  # 10. Certbot Let's Encrypt SSL Auto-Renew Companion
+  certbot:
+    image: certbot/certbot:latest
+    container_name: education_certbot
+    restart: unless-stopped
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 11. Prometheus Real-Time Metrics Scraper
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: education_prometheus
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/monitoring/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+    depends_on:
+      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 12. Alertmanager Automated Incident Alerting
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: education_alertmanager
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9093:9093"
+    volumes:
+      - ./docker/monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # 13. Grafana Centralized Observability Dashboard
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: education_grafana
+    restart: unless-stopped
+    ports:
+      # BIND LOCALHOST ONLY: Mở qua SSH Tunnel (ssh -L 3001:localhost:3001 user@vps_ip) để an toàn tuyệt đối
+      - "127.0.0.1:3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-AdminSecure2026@Pass}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./docker/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docker/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+  minio_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
+  certbot_www:
+  certbot_conf:

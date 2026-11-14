@@ -32,6 +32,7 @@ Bộ tài liệu này được cấu trúc thành các chuyên đề chuyên sâ
 | **06** | [**06-database-and-storage.md**](./06-database-and-storage.md) | **Cơ sở dữ liệu & Tầng lưu trữ**: Sơ đồ ERD quan hệ thực thể, Lịch sử Flyway Migrations (V1 đến V7), Chiến lược lập chỉ mục (Composite Indexes), Tích hợp Cloudflare R2 Presigned URL (0đ Egress). |
 | **07** | [**07-microservices-and-workers.md**](./07-microservices-and-workers.md) | **Dịch vụ vệ tinh & Xử lý nền**: `video-transcoder-worker` (Go & FFmpeg xử lý HLS), `live-gateway` (Go WebSocket thời gian thực), `ai-streaming-proxy` (Go SSE proxy). |
 | **08** | [**08-security-monitoring-devops.md**](./08-security-monitoring-devops.md) | **Bảo mật, Giám sát & Vận hành (DevOps)**: Phòng thủ đa tầng OWASP Top 10, Bảo vệ PII học sinh, Giám sát Prometheus + Alertmanager + Grafana, Kịch bản k6 Load Testing, Docker Compose. |
+| **09** | [**09-vps-and-domain-deployment-guide.md**](./09-vps-and-domain-deployment-guide.md) | **Cẩm nang triển khai VPS & gắn Tên miền (Turnkey Deployment)**: Hướng dẫn trọn gói 1-Click setup Ubuntu VPS, trỏ DNS, cấp phát SSL HTTPS Let's Encrypt tự động, bảo vệ tường lửa UFW và khởi động cùng hệ thống. |
 
 ---
 
