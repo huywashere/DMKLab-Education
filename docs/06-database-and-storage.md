@@ -131,6 +131,7 @@ Hệ thống quản lý schema hoàn toàn tự động bằng Flyway trong thư
 | `V5__query_optimization_indexes.sql` | **V5** | Bổ sung chỉ mục B-Tree trên `users(username)`, `users(email)`, `audit_logs(created_at DESC)` tăng tốc báo cáo quản trị. |
 | `V6__database_tuning_indexes.sql` | **V6** | Tinh chỉnh chỉ mục truy vấn lịch sử hội thoại `chat_messages(session_id, created_at ASC)` phục vụ bộ nhớ ngữ cảnh Multi-turn của AI. |
 | `V7__ai_message_feedback.sql` | **V7** | Bổ sung hai cột `feedback_rating VARCHAR(20)` và `feedback_comment TEXT` vào bảng `chat_messages` phục vụ thu thập dữ liệu đánh giá RLHF. |
+| `V8__covering_and_vector_optimization.sql` | **V8** | Bổ sung các chỉ mục che phủ (Covering Indexes với mệnh đề `INCLUDE`) trên `lessons`, `learning_progress`, `quiz_questions`, `chat_messages`, `users` phục vụ Index-Only Scan không cần truy cập Table Heap. |
 
 ---
 

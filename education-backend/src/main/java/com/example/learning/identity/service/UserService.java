@@ -35,15 +35,18 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public User findById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + id));
     }
 
+    @Transactional(readOnly = true)
     @org.springframework.cache.annotation.Cacheable(value = com.example.learning.platform.config.CacheConfig.CACHE_USER_PROFILES, key = "#id.toString()")
     public AuthDto.UserDto getUserProfile(UUID id) {
         return toDto(findById(id));

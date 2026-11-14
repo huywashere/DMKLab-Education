@@ -246,6 +246,7 @@ public class AiService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<AiChatDto.MessageItem> getSessionHistory(UUID sessionId) {
         return messageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId).stream()
                 .map(m -> AiChatDto.MessageItem.builder()

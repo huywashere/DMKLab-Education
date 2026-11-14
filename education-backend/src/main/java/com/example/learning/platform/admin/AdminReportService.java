@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class AdminReportService {
     private final LearningProgressRepository learningProgressRepository;
     private final RateLimiterService rateLimiterService;
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConfig.CACHE_ADMIN_OVERVIEW, key = "'kpi'")
     public AdminDto.OverviewReport getOverviewReport() {
         log.debug("[DB_AGGREGATE] Đang tổng hợp số liệu báo cáo KPI toàn hệ thống từ PostgreSQL");

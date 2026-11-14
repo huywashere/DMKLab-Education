@@ -66,6 +66,7 @@ public class ProgressService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public Optional<ProgressDto.ProgressResponse> getProgress(UUID userId, UUID lessonId) {
         return progressRepository.findByUserIdAndLessonId(userId, lessonId)
                 .map(p -> ProgressDto.ProgressResponse.builder()
@@ -78,6 +79,7 @@ public class ProgressService {
                         .build());
     }
 
+    @Transactional(readOnly = true)
     public ProgressDto.ProgressSummaryResponse getSummary(UUID userId) {
         long completed = progressRepository.countByUserIdAndIsCompletedTrue(userId);
         User user = userRepository.findById(userId).orElse(null);
