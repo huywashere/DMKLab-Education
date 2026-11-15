@@ -929,6 +929,8 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center px-4 border-b border-slate-200 dark:border-slate-800">
               <RiSearchLine className="w-5 h-5 text-slate-400 shrink-0" />
               <input
+                id="global_command_search"
+                aria-label="Tìm bài học, chủ đề, môn học hoặc phím tắt"
                 ref={searchInputRef}
                 type="text"
                 value={searchTerm}
@@ -1056,44 +1058,47 @@ export const Header: React.FC<HeaderProps> = ({
             )}
 
             <div className="space-y-2 text-xs">
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <label htmlFor="notif_chan_web" className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
                 <div>
                   <p className="font-bold text-slate-900 dark:text-white">Website & Ứng dụng</p>
                   <p className="text-[10px] text-slate-400">Chuông thông báo & streak hàng ngày</p>
                 </div>
                 <input
+                  id="notif_chan_web"
                   type="checkbox"
                   checked={channelSettings.website}
                   onChange={(e) => setChannelSettings((prev) => ({ ...prev, website: e.target.checked }))}
                   className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
-              </div>
+              </label>
 
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <label htmlFor="notif_chan_email" className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
                 <div>
                   <p className="font-bold text-slate-900 dark:text-white">Email hàng tuần</p>
                   <p className="text-[10px] text-slate-400">Báo cáo tổng kết tiến độ học tập</p>
                 </div>
                 <input
+                  id="notif_chan_email"
                   type="checkbox"
                   checked={channelSettings.email}
                   onChange={(e) => setChannelSettings((prev) => ({ ...prev, email: e.target.checked }))}
                   className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
-              </div>
+              </label>
 
-              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+              <label htmlFor="notif_chan_zalo" className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition">
                 <div>
                   <p className="font-bold text-slate-900 dark:text-white">Zalo OA Thông Báo</p>
                   <p className="text-[10px] text-slate-400">Nhắc nhở học tập mỗi tối 19:30</p>
                 </div>
                 <input
+                  id="notif_chan_zalo"
                   type="checkbox"
                   checked={channelSettings.zalo}
                   onChange={(e) => setChannelSettings((prev) => ({ ...prev, zalo: e.target.checked }))}
                   className="w-4 h-4 accent-[#1865F2] cursor-pointer"
                 />
-              </div>
+              </label>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">

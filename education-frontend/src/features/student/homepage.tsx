@@ -257,7 +257,7 @@ export const Homepage: React.FC<HomepageProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenLesson(MOCK_LESSONS[0])}
-                    className="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-full bg-[#05ac60] hover:bg-[#049653] active:scale-98 text-white font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
+                    className="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-full bg-[#05ac60] hover:bg-[#049653] active:scale-[0.98] text-white font-bold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
                   >
                     {isVi ? "Tôi là người học" : "I’m a learner"}
                   </button>
@@ -267,7 +267,7 @@ export const Homepage: React.FC<HomepageProps> = ({
                   <button
                     type="button"
                     onClick={onOpenAiChat}
-                    className="w-full sm:w-auto px-7 sm:px-8 py-4 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-98 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-semibold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
+                    className="w-full sm:w-auto px-7 sm:px-8 py-4 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-[0.98] text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-semibold text-base sm:text-lg shadow-sm hover:shadow-md transition-all cursor-pointer text-center block"
                   >
                     {isVi ? "Tôi là phụ huynh hoặc giáo viên" : "I’m a parent or teacher"}
                   </button>

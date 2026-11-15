@@ -282,10 +282,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         <div className="space-y-2.5 mb-6">
           <button
             type="button"
-            onClick={() => fillDemoAccount("student_an", "password123")}
+            onClick={() => {
+              setSsoProvider("GOOGLE");
+              setIsSsoModalOpen(true);
+            }}
             className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-300 rounded-full font-bold text-xs text-slate-700 shadow-2xs transition cursor-pointer"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -303,33 +306,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>Tiếp tục với Google</span>
+            <span className="truncate">Tiếp tục với Google Workspace</span>
           </button>
 
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => fillDemoAccount("teacher_mai", "password123")}
-              className="py-2 px-3 border border-slate-300 rounded-full font-bold text-[11px] text-[#0066CC] hover:bg-blue-50/50 transition cursor-pointer flex items-center justify-center gap-1.5"
+              className="py-2 px-2.5 border border-slate-300 rounded-full font-bold text-[11px] text-[#0066CC] hover:bg-blue-50/50 transition cursor-pointer flex items-center justify-center gap-1.5 min-w-0"
             >
-              <span className="font-extrabold text-sm">C</span>
-              <span>Clever</span>
+              <span className="font-extrabold text-sm shrink-0">C</span>
+              <span className="truncate">Clever</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemoAccount("admin", "password123")}
-              className="py-2 px-3 border border-slate-300 rounded-full font-bold text-[11px] text-[#1877F2] hover:bg-blue-50/50 transition cursor-pointer flex items-center justify-center gap-1.5"
+              className="py-2 px-2.5 border border-slate-300 rounded-full font-bold text-[11px] text-[#1877F2] hover:bg-blue-50/50 transition cursor-pointer flex items-center justify-center gap-1.5 min-w-0"
             >
-              <span className="font-extrabold text-sm">f</span>
-              <span>Facebook</span>
+              <span className="font-extrabold text-sm shrink-0">f</span>
+              <span className="truncate">Facebook</span>
             </button>
             <button
               type="button"
               onClick={() => fillDemoAccount("hocsinh1", "password123")}
-              className="py-2 px-3 border border-slate-300 rounded-full font-bold text-[11px] text-slate-800 hover:bg-slate-100 transition cursor-pointer flex items-center justify-center gap-1.5"
+              className="py-2 px-2.5 border border-slate-300 rounded-full font-bold text-[11px] text-slate-800 hover:bg-slate-100 transition cursor-pointer flex items-center justify-center gap-1.5 min-w-0"
             >
-              <span className="font-extrabold text-sm"></span>
-              <span>Apple</span>
+              <span className="font-extrabold text-sm shrink-0"></span>
+              <span className="truncate">Apple</span>
             </button>
           </div>
         </div>
@@ -474,11 +477,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           /* STEP 1: STANDARD USER / PASSWORD LOGIN */
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label htmlFor="login_username" className="block text-xs font-bold text-slate-700 mb-1.5">
                 Email hoặc tên đăng nhập
               </label>
               <div className="relative">
                 <input
+                  id="login_username"
+                  name="username"
+                  autoComplete="username"
                   type="text"
                   disabled={Boolean(lockedUntil)}
                   value={usernameOrEmail}
@@ -493,7 +499,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-700">Mật khẩu</label>
+                <label htmlFor="login_password" className="block text-xs font-bold text-slate-700">Mật khẩu</label>
                 <a
                   href="#"
                   onClick={(e) => {
@@ -510,6 +516,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </div>
               <div className="relative">
                 <input
+                  id="login_password"
+                  name="password"
+                  autoComplete="current-password"
                   type={showPassword ? "text" : "password"}
                   disabled={Boolean(lockedUntil)}
                   value={password}
@@ -523,6 +532,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 transition"
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -577,6 +587,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </div>
 
+        {/* Footer switch to Register */}
+        <div className="mt-6 text-center text-xs text-slate-500">
+          <span>Chưa có tài khoản? </span>
+          <button
+            onClick={onGoToRegister}
+            className="font-bold text-[#1865F2] hover:underline cursor-pointer"
+          >
+            Đăng ký tham gia ngay
+          </button>
+        </div>
+      </div>
 
       {/* MODAL QUÊN MẬT KHẨU & ĐẶT LẠI VỚI OTP 6 SỐ */}
       {isForgotPasswordOpen && (
@@ -615,8 +636,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   Nhập địa chỉ email tài khoản đã đăng ký trên hệ thống DMKLab. Hệ thống sẽ tạo mã OTP xác thực 6 chữ số có hiệu lực trong 10 phút.
                 </p>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Email của bạn:</label>
+                  <label htmlFor="forgot_email" className="block font-bold text-slate-700 mb-1">
+                    Email của bạn:
+                  </label>
                   <input
+                    id="forgot_email"
+                    name="email"
+                    autoComplete="email"
                     type="email"
                     required
                     placeholder="ví dụ: an.student@dmklab.edu.vn"
@@ -645,8 +671,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Mã OTP 6 chữ số:</label>
+                  <label htmlFor="forgot_otp" className="block font-bold text-slate-700 mb-1">
+                    Mã OTP 6 chữ số:
+                  </label>
                   <input
+                    id="forgot_otp"
+                    name="otp"
                     type="text"
                     maxLength={6}
                     required
@@ -657,8 +687,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Mật khẩu mới (tối thiểu 6 ký tự):</label>
+                  <label htmlFor="forgot_new_password" className="block font-bold text-slate-700 mb-1">
+                    Mật khẩu mới (tối thiểu 6 ký tự):
+                  </label>
                   <input
+                    id="forgot_new_password"
+                    name="newPassword"
+                    autoComplete="new-password"
                     type="password"
                     required
                     minLength={6}
@@ -689,17 +724,142 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </div>
       )}
-        {/* Footer switch to Register */}
-        <div className="mt-6 text-center text-xs text-slate-500">
-          <span>Chưa có tài khoản? </span>
-          <button
-            onClick={onGoToRegister}
-            className="font-bold text-[#1865F2] hover:underline cursor-pointer"
-          >
-            Đăng ký tham gia ngay
-          </button>
+
+      {/* MODAL SSO OAUTH CHO TRƯỜNG HỌC & TỔ CHỨC GIÁO DỤC */}
+      {isSsoModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-fade">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#1865F2]" />
+                <span>Đăng Nhập SSO Nhà Trường & Google Workspace</span>
+              </h3>
+              <button
+                onClick={() => setIsSsoModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {ssoError && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span>{ssoError}</span>
+              </div>
+            )}
+
+            <div className="space-y-3 text-xs">
+              <p className="text-slate-600 leading-relaxed">
+                Đăng nhập 1 chạm an toàn bằng tài khoản Google Workspace for Education hoặc Microsoft 365 Education theo chuẩn OAuth 2.0 / SAML 2.0.
+              </p>
+
+              <div>
+                <label htmlFor="sso_provider_select" className="block font-bold text-slate-700 mb-1">
+                  Nhà cung cấp danh tính (IdP):
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSsoProvider("GOOGLE")}
+                    className={`py-2 px-3 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      ssoProvider === "GOOGLE"
+                        ? "border-[#1865F2] bg-blue-50/50 text-[#1865F2]"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    Google Workspace
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSsoProvider("MICROSOFT")}
+                    className={`py-2 px-3 rounded-xl border text-center font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      ssoProvider === "MICROSOFT"
+                        ? "border-[#1865F2] bg-blue-50/50 text-[#1865F2]"
+                        : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    Microsoft 365
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="sso_email_input" className="block font-bold text-slate-700 mb-1">
+                  Email trường học (@school.edu.vn):
+                </label>
+                <input
+                  id="sso_email_input"
+                  type="email"
+                  placeholder="ví dụ: an.minh@hanoi.edu.vn"
+                  value={customSsoEmail}
+                  onChange={(e) => setCustomSsoEmail(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-[#1865F2] outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="sso_fullname_input" className="block font-bold text-slate-700 mb-1">
+                  Họ và tên học sinh / giáo viên:
+                </label>
+                <input
+                  id="sso_fullname_input"
+                  type="text"
+                  placeholder="ví dụ: Nguyễn Minh An"
+                  value={customSsoFullName}
+                  onChange={(e) => setCustomSsoFullName(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-[#1865F2] outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="sso_role_select" className="block font-bold text-slate-700 mb-1">
+                  Vai trò đăng nhập:
+                </label>
+                <select
+                  id="sso_role_select"
+                  value={customSsoRole}
+                  onChange={(e) => setCustomSsoRole(e.target.value as any)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-[#1865F2] outline-none"
+                >
+                  <option value="STUDENT">Học sinh K-12</option>
+                  <option value="TEACHER">Giáo viên bộ môn</option>
+                  <option value="PARENT">Phụ huynh học sinh</option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={ssoLoading}
+                  onClick={() => {
+                    const email = customSsoEmail.trim() || (ssoProvider === "GOOGLE" ? "an.google@dmklab.edu.vn" : "mai.ms@dmklab.edu.vn");
+                    const name = customSsoFullName.trim() || (customSsoRole === "TEACHER" ? "Cô Nguyễn Thị Mai" : "Nguyễn Minh An");
+                    handleSsoLogin(ssoProvider, email, name, customSsoRole);
+                  }}
+                  className="w-full py-2.5 bg-[#1865F2] hover:bg-[#1557D0] text-white font-extrabold rounded-xl shadow-md cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {ssoLoading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Xác thực & Đăng nhập ngay</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSsoModalOpen(false)}
+                  className="w-full py-2 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 cursor-pointer"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

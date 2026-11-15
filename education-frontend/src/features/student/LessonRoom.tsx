@@ -745,15 +745,17 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
                       className="space-y-2.5 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700"
                     >
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-700 dark:text-slate-300">
+                        <label htmlFor="lesson_note_textarea" className="font-bold text-slate-700 dark:text-slate-300">
                           Thêm ghi chú mới:
-                        </span>
+                        </label>
                         <span className="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-[#1865F2] dark:text-blue-300 font-mono text-[10px] font-bold flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           Mốc video: {formatTime(Math.floor(currentTime))}
                         </span>
                       </div>
                       <textarea
+                        id="lesson_note_textarea"
+                        name="lessonNote"
                         value={newNoteText}
                         onChange={(e) => setNewNoteText(e.target.value)}
                         placeholder="Nhập ghi chú hoặc công thức quan trọng em vừa nghe thấy trong video..."

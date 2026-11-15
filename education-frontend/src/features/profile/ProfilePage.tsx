@@ -786,20 +786,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 <div className="space-y-2 text-xs">
-                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4" />
+                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4 cursor-pointer" />
                     <span className="line-through text-slate-400">Hoàn thành bài tập Mệnh đề</span>
                   </label>
-                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4" />
+                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4 cursor-pointer" />
                     <span className="line-through text-slate-400">Làm quiz Vật lý Chuyển động</span>
                   </label>
-                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4" />
+                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input type="checkbox" defaultChecked className="accent-[#1865F2] rounded w-4 h-4 cursor-pointer" />
                     <span className="line-through text-slate-400">Duy trì streak 7 ngày</span>
                   </label>
-                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                    <input type="checkbox" className="accent-[#1865F2] rounded w-4 h-4" />
+                  <label className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <input type="checkbox" className="accent-[#1865F2] rounded w-4 h-4 cursor-pointer" />
                     <span className="font-semibold text-slate-900 dark:text-white">Luyện 1 bài tập Hóa học</span>
                   </label>
                 </div>
@@ -962,10 +962,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
               <form onSubmit={handleChangePassword} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="prof_old_pass" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Mật khẩu hiện tại
                   </label>
                   <input
+                    id="prof_old_pass"
+                    name="oldPassword"
+                    autoComplete="current-password"
                     type="password"
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
@@ -976,10 +979,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="prof_new_pass" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Mật khẩu mới
                   </label>
                   <input
+                    id="prof_new_pass"
+                    name="newPassword"
+                    autoComplete="new-password"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -990,10 +996,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="prof_confirm_pass" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     Xác nhận mật khẩu mới
                   </label>
                   <input
+                    id="prof_confirm_pass"
+                    name="confirmPassword"
+                    autoComplete="new-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1289,8 +1298,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Họ và tên</label>
+                <label htmlFor="prof_edit_name" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Họ và tên
+                </label>
                 <input
+                  id="prof_edit_name"
+                  name="fullName"
+                  autoComplete="name"
                   type="text"
                   value={editFullName}
                   onChange={(e) => setEditFullName(e.target.value)}
@@ -1300,8 +1314,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tiểu sử (Bio)</label>
+                <label htmlFor="prof_edit_bio" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Tiểu sử (Bio)
+                </label>
                 <textarea
+                  id="prof_edit_bio"
+                  name="bio"
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
                   rows={3}

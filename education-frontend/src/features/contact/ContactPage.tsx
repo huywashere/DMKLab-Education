@@ -326,10 +326,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Full Name */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_fullname" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Họ và Tên <span className="text-red-500">*</span>
                       </label>
                       <input
+                        id="contact_fullname"
+                        name="fullName"
+                        autoComplete="name"
                         type="text"
                         required
                         value={formData.fullName}
@@ -341,10 +344,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
                     {/* Email */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_email" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Địa Chỉ Email <span className="text-red-500">*</span>
                       </label>
                       <input
+                        id="contact_email"
+                        name="email"
+                        autoComplete="email"
                         type="email"
                         required
                         value={formData.email}
@@ -356,10 +362,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
                     {/* Phone */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_phone" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Số Điện Thoại / Zalo
                       </label>
                       <input
+                        id="contact_phone"
+                        name="phone"
+                        autoComplete="tel"
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -370,13 +379,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
                     {/* Role */}
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_role" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Bạn Là Ai?
                       </label>
                       <select
+                        id="contact_role"
+                        name="role"
                         value={formData.role}
                         onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors cursor-pointer"
                       >
                         <option value="student">Học sinh K–12</option>
                         <option value="parent">Phụ huynh học sinh</option>
@@ -389,13 +400,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                   {/* Grade & Subject of inquiry */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_grade" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Khối Lớp Quan Tâm
                       </label>
                       <select
+                        id="contact_grade"
+                        name="grade"
                         value={formData.grade}
                         onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors cursor-pointer"
                       >
                         <option value="Tiểu học (Lớp 1-5)">Tiểu học (Lớp 1–5)</option>
                         <option value="THCS (Lớp 6-9)">THCS (Lớp 6–9)</option>
@@ -407,13 +420,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      <label htmlFor="contact_subject" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                         Nội Dung Cần Hỗ Trợ
                       </label>
                       <select
+                        id="contact_subject"
+                        name="subject"
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-[#0A2540] bg-white focus:outline-none focus:ring-2 focus:ring-[#1865F2]/20 focus:border-[#1865F2] transition-colors cursor-pointer"
                       >
                         <option value="Lộ trình học tập cá nhân hóa">
                           Tư vấn lộ trình học Socratic
@@ -434,10 +449,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
                   {/* Message body */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    <label htmlFor="contact_message" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                       Nội Dung Tin Nhắn <span className="text-red-500">*</span>
                     </label>
                     <textarea
+                      id="contact_message"
+                      name="message"
                       required
                       rows={4}
                       value={formData.message}
