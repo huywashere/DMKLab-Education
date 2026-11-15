@@ -127,6 +127,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
   const [likedMsgIds, setLikedMsgIds] = useState<Set<string>>(new Set());
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "HELPFUL" | "UNHELPFUL">>({});
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   // Tin nhắn ban đầu thân thiện với học sinh
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -310,24 +311,28 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     }
   };
 
-  // Làm mới cuộc trò chuyện
+  // Làm mới cuộc trò chuyện với Custom Modal (loại bỏ hoàn toàn window.confirm mặc định của trình duyệt)
   const handleResetChat = () => {
-    if (window.confirm("Bắt đầu cuộc trò chuyện mới với Gia Sư AI?")) {
-      setMessages([
-        {
-          id: `msg-${Date.now()}`,
-          role: "assistant",
-          content: `Chào ${currentUser.fullName || "em"}! Thầy đã sẵn sàng cho câu hỏi tiếp theo. Em đang muốn học hay làm bài tập về chủ đề gì nào?`,
-          timestamp: "Vừa xong",
-          isSocraticHint: true,
-          mode: selectedMode,
-          gradeLevel: selectedGrade,
-        },
-      ]);
-      setQuizAnswers({});
-      setInput("");
-      setPiiWarning(null);
-    }
+    setIsResetConfirmOpen(true);
+  };
+
+  const confirmResetChat = () => {
+    setMessages([
+      {
+        id: `msg-${Date.now()}`,
+        role: "assistant",
+        content: `Chào ${currentUser.fullName || "em"}! Thầy/cô đã sẵn sàng cho bài học mới. Em đang muốn học hay rèn luyện chủ đề gì nào?`,
+        timestamp: "Vừa xong",
+        isSocraticHint: true,
+        mode: selectedMode,
+        gradeLevel: selectedGrade,
+      },
+    ]);
+    setQuizAnswers({});
+    setInput("");
+    setPiiWarning(null);
+    setSessionId(undefined);
+    setIsResetConfirmOpen(false);
   };
 
   // Giả lập quét ảnh đề bài bài tập
@@ -729,6 +734,41 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           : "w-[calc(100vw-2rem)] sm:w-[460px] h-[640px] max-h-[calc(100vh-4.5rem)]"
       }`}
     >
+      {/* 0. CUSTOM CONFIRMATION DIALOG (Thay thế hoàn toàn window.confirm của trình duyệt) */}
+      {isResetConfirmOpen && (
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#0B1528] rounded-3xl p-5 max-w-[280px] sm:max-w-xs w-full shadow-2xl border border-slate-200 dark:border-slate-700 text-center space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 dark:text-amber-400 mx-auto flex items-center justify-center border border-amber-200/80 dark:border-amber-800 shadow-xs">
+              <PiArrowsClockwiseDuotone className="w-6 h-6 animate-spin [animation-duration:3s]" />
+            </div>
+            <div className="space-y-1.5">
+              <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                Bắt đầu bài học mới?
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Nội dung trao đổi hiện tại sẽ được làm mới để em bắt đầu chủ đề học tập mới cùng Gia sư AI.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setIsResetConfirmOpen(false)}
+                className="flex-1 py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Giữ lại
+              </button>
+              <button
+                type="button"
+                onClick={confirmResetChat}
+                className="flex-1 py-2 px-3 rounded-xl bg-[#1865F2] hover:bg-[#1253cc] text-white text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer"
+              >
+                Làm mới
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 1. TOP HEADER: Thanh tiêu đề thân thiện, chuẩn giao diện sư phạm EdTech */}
       <div className="bg-gradient-to-r from-[#1865F2] via-[#0E52C9] to-[#0A3D9A] dark:from-[#0B2149] dark:to-[#081C3D] text-white px-3.5 sm:px-4 py-3 flex items-center justify-between border-b border-blue-400/20 dark:border-blue-900/40 shrink-0 shadow-xs">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-2">
