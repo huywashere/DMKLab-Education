@@ -71,36 +71,36 @@ const TUTOR_MODES: TutorModeItem[] = [
   {
     id: "SOCRATIC",
     name: "Gợi ý từng bước",
-    shortName: "Gợi ý",
-    icon: <PiLightbulbDuotone className="w-4 h-4" />,
-    desc: "Gợi mở tư duy sư phạm, không làm hộ bài",
+    shortName: "💡 Gợi ý",
+    icon: <PiLightbulbDuotone className="w-4 h-4 text-amber-500" />,
+    desc: "Phương pháp Socratic gợi mở tư duy, không giải hộ bài",
   },
   {
     id: "GRADE_ADAPTED",
-    name: "Theo lớp học",
-    shortName: "Lớp học",
-    icon: <PiGraduationCapDuotone className="w-4 h-4" />,
-    desc: "Giải thích trực quan phù hợp tâm lý lứa tuổi",
+    name: "Theo lứa tuổi",
+    shortName: "🎓 Lớp học",
+    icon: <PiGraduationCapDuotone className="w-4 h-4 text-blue-500" />,
+    desc: "Giải thích trực quan phù hợp tâm lý lứa tuổi K-12",
   },
   {
     id: "PRACTICE",
-    name: "Tạo bài luyện tập",
-    shortName: "Luyện tập",
-    icon: <PiQuestionDuotone className="w-4 h-4" />,
-    desc: "Trắc nghiệm tương tác tức thì có tính điểm",
+    name: "Luyện tập tương tác",
+    shortName: "🎯 Luyện tập",
+    icon: <PiQuestionDuotone className="w-4 h-4 text-emerald-500" />,
+    desc: "Trắc nghiệm tương tác tức thì có tích điểm sao",
   },
   {
     id: "ERROR_DIAGNOSIS",
     name: "Vì sao em sai?",
-    shortName: "Chẩn đoán",
-    icon: <PiArrowsClockwiseDuotone className="w-4 h-4" />,
-    desc: "Phân tích bẫy tư duy và cách sửa sai",
+    shortName: "🔍 Bẫy sai",
+    icon: <PiArrowsClockwiseDuotone className="w-4 h-4 text-rose-500" />,
+    desc: "Chẩn đoán điểm ngộ nhận và cách khắc phục",
   },
   {
     id: "CITE_LESSON",
     name: "Căn cứ SGK",
-    shortName: "SGK & Video",
-    icon: <PiBookBookmarkDuotone className="w-4 h-4" />,
+    shortName: "📚 Chuẩn SGK",
+    icon: <PiBookBookmarkDuotone className="w-4 h-4 text-indigo-500" />,
     desc: "Trích dẫn chương trình GDPT 2018 & video bài giảng",
   },
 ];
@@ -133,7 +133,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     {
       id: "msg-01",
       role: "assistant",
-      content: `Chào ${currentUser.fullName || "em"}! Thầy là Gia sư AI đồng hành cùng em theo phương pháp Socratic (vận hành bởi Google Gemini & Groq AI).\n\nThay vì giải hộ đáp án, thầy sẽ gợi ý từng bước, lấy ví dụ thực tế và tạo bài tập luyện tập để em tự tin nắm chắc bài. Em đang cần thầy hỗ trợ ở câu hỏi hay bài tập nào?`,
+      content: `Chào ${currentUser.fullName || "em"}! Thầy/cô là Gia sư Trợ giảng AI đồng hành cùng em theo phương pháp gợi mở Socratic chuẩn GDPT 2018 ✨\n\nThay vì giải hộ đáp số cuối cùng, thầy/cô sẽ gợi ý từng bước, lấy ví dụ trực quan và đưa ra câu đố vui để em tự tin nắm chắc bài học. Hôm nay em đang cần thầy/cô hỗ trợ ở bài tập hay câu hỏi nào?`,
       timestamp: "Vừa xong",
       isSocraticHint: true,
       mode: "SOCRATIC",
@@ -697,21 +697,21 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
     if (!onOpen) return null;
     return (
       <div className="fixed bottom-6 right-6 z-40 group flex items-center">
-        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-[#0B1528] text-white text-xs font-bold shadow-xl border border-slate-700 hidden sm:flex items-center gap-2">
-          <PiRobotDuotone className="w-4 h-4 text-emerald-400" />
+        <div className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-2.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0B1528] text-slate-800 dark:text-slate-100 text-xs font-bold shadow-xl border border-slate-200/80 dark:border-slate-700 hidden sm:flex items-center gap-2">
+          <PiGraduationCapDuotone className="w-4 h-4 text-[#1865F2] dark:text-blue-400" />
           <span>Gia sư AI Socratic 24/7</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
         </div>
 
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
           onClick={onOpen}
-          className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1865F2] via-[#1253cc] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-shadow duration-200 flex items-center justify-center cursor-pointer border border-white/20"
+          className="relative w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1865F2] via-[#0E52C9] to-[#14BF96] text-white shadow-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-shadow duration-200 flex items-center justify-center cursor-pointer border border-white/25"
           title="Trò chuyện với Gia Sư AI Socratic 24/7"
           aria-label="Mở gia sư AI DMKLab"
         >
-          <PiSparkleDuotone className="w-7 h-7 text-white" />
+          <PiGraduationCapDuotone className="w-7 h-7 text-amber-300 drop-shadow-xs" />
           <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-[#0B1528]" />
         </motion.button>
       </div>
@@ -729,25 +729,26 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           : "w-[calc(100vw-2rem)] sm:w-[460px] h-[640px] max-h-[calc(100vh-4.5rem)]"
       }`}
     >
-      {/* 1. TOP HEADER: Thanh tiêu đề thông minh, hiện đại */}
-      <div className="bg-[#0A1A36] dark:bg-[#070F1E] text-white px-4 py-3 sm:py-3.5 flex items-center justify-between border-b border-slate-800 shrink-0">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shadow-md shrink-0 border border-white/20">
-            <PiRobotDuotone className="w-6 h-6" />
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full ring-2 ring-[#0A1A36]" />
+      {/* 1. TOP HEADER: Thanh tiêu đề thân thiện, chuẩn giao diện sư phạm EdTech */}
+      <div className="bg-gradient-to-r from-[#1865F2] via-[#0E52C9] to-[#0A3D9A] dark:from-[#0B2149] dark:to-[#081C3D] text-white px-3.5 sm:px-4 py-3 flex items-center justify-between border-b border-blue-400/20 dark:border-blue-900/40 shrink-0 shadow-xs">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-2">
+          <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-sm shrink-0 border border-white/25">
+            <PiGraduationCapDuotone className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300 drop-shadow-xs" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full ring-2 ring-[#0E52C9] dark:ring-[#0B2149]" />
           </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="font-black text-sm text-white tracking-tight truncate">
-                Gia Sư AI Socratic
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate">
+                Gia Sư Trợ Giảng AI
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40 shrink-0 flex items-center gap-1">
-                <span>Gemini / Groq ⚡</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 shrink-0 flex items-center gap-1">
+                <PiSparkleDuotone className="w-3 h-3 text-amber-300" />
+                <span>Trợ giảng 24/7</span>
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 flex items-center gap-1.5 truncate mt-0.5">
-              <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="truncate">Gợi mở tư duy · Không giải hộ · Chuẩn GDPT</span>
+            <p className="text-[11px] text-blue-100/90 flex items-center gap-1.5 truncate mt-0.5">
+              <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+              <span className="truncate">Gợi mở từng bước · Chuẩn SGK GDPT</span>
             </p>
           </div>
         </div>
@@ -758,35 +759,92 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           <div className="relative">
             <button
               onClick={() => setIsGradeDropdownOpen(!isGradeDropdownOpen)}
-              className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 transition cursor-pointer border border-white/15"
+              className="px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-bold flex items-center gap-1 transition cursor-pointer border border-white/20 shadow-xs"
               title="Đổi trình độ lớp học"
             >
               <span>Lớp {selectedGrade}</span>
-              <PiCaretDownBold className="w-3 h-3 opacity-80" />
+              <PiCaretDownBold className="w-3 h-3 opacity-90" />
             </button>
 
             {isGradeDropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0B1528] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-2.5 z-50 text-slate-800 dark:text-slate-100 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 px-2 py-1">
-                  Chọn trình độ lớp học:
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#0B1528] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-3 z-50 text-slate-800 dark:text-slate-100 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 px-1 pb-1.5 border-b border-slate-100 dark:border-slate-800">
+                  Chọn trình độ lớp học
                 </div>
-                <div className="grid grid-cols-3 gap-1.5 pt-1">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((g) => (
-                    <button
-                      key={g}
-                      onClick={() => {
-                        setSelectedGrade(g);
-                        setIsGradeDropdownOpen(false);
-                      }}
-                      className={`py-1.5 text-xs font-bold rounded-xl transition cursor-pointer ${
-                        selectedGrade === g
-                          ? "bg-[#1865F2] text-white shadow-xs"
-                          : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                      }`}
-                    >
-                      Lớp {g}
-                    </button>
-                  ))}
+
+                {/* Tiểu học */}
+                <div className="pt-2">
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 block px-1 mb-1">
+                    🌱 Tiểu học (Lớp 1 - 5)
+                  </span>
+                  <div className="grid grid-cols-5 gap-1">
+                    {[1, 2, 3, 4, 5].map((g) => (
+                      <button
+                        key={g}
+                        onClick={() => {
+                          setSelectedGrade(g);
+                          setIsGradeDropdownOpen(false);
+                        }}
+                        className={`py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
+                          selectedGrade === g
+                            ? "bg-amber-500 text-white shadow-xs"
+                            : "hover:bg-amber-50 dark:hover:bg-amber-950/40 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {g}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* THCS */}
+                <div className="pt-2.5">
+                  <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 block px-1 mb-1">
+                    📘 THCS (Lớp 6 - 9)
+                  </span>
+                  <div className="grid grid-cols-4 gap-1">
+                    {[6, 7, 8, 9].map((g) => (
+                      <button
+                        key={g}
+                        onClick={() => {
+                          setSelectedGrade(g);
+                          setIsGradeDropdownOpen(false);
+                        }}
+                        className={`py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
+                          selectedGrade === g
+                            ? "bg-[#1865F2] text-white shadow-xs"
+                            : "hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {g}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* THPT */}
+                <div className="pt-2.5">
+                  <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 block px-1 mb-1">
+                    🎓 THPT (Lớp 10 - 12)
+                  </span>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[10, 11, 12].map((g) => (
+                      <button
+                        key={g}
+                        onClick={() => {
+                          setSelectedGrade(g);
+                          setIsGradeDropdownOpen(false);
+                        }}
+                        className={`py-1.5 text-xs font-bold rounded-lg transition cursor-pointer ${
+                          selectedGrade === g
+                            ? "bg-purple-600 text-white shadow-xs"
+                            : "hover:bg-purple-50 dark:hover:bg-purple-950/40 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {g}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -795,8 +853,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           {/* Reset chat */}
           <button
             onClick={handleResetChat}
-            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-white/15 text-white/90 hover:text-white transition cursor-pointer"
             title="Làm mới cuộc trò chuyện"
+            aria-label="Làm mới cuộc trò chuyện"
           >
             <PiTrashDuotone className="w-4 h-4" />
           </button>
@@ -804,8 +863,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           {/* Expand/Collapse window */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer hidden sm:block"
+            className="p-1.5 rounded-xl hover:bg-white/15 text-white/90 hover:text-white transition cursor-pointer hidden sm:block"
             title={isExpanded ? "Thu nhỏ cửa sổ" : "Mở rộng cửa sổ"}
+            aria-label={isExpanded ? "Thu nhỏ cửa sổ" : "Mở rộng cửa sổ"}
           >
             {isExpanded ? (
               <PiArrowsInSimpleBold className="w-4 h-4" />
@@ -814,20 +874,12 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             )}
           </button>
 
-          {/* Minimize */}
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
-            title="Thu nhỏ"
-          >
-            <PiMinusBold className="w-4 h-4" />
-          </button>
-
           {/* Close */}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer"
+            className="p-1.5 rounded-xl hover:bg-white/15 text-white/90 hover:text-white transition cursor-pointer"
             title="Đóng chatbox"
+            aria-label="Đóng chatbox"
           >
             <PiXBold className="w-4 h-4" />
           </button>
@@ -835,7 +887,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       </div>
 
       {/* 2. SUB-HEADER: Thanh Chế Độ Sư Phạm & Quota Thân Thiện Học Sinh */}
-      <div className="bg-slate-50 dark:bg-[#071120] px-3.5 py-2 border-b border-slate-200/90 dark:border-slate-800 flex items-center justify-between gap-2 shrink-0">
+      <div className="bg-slate-50 dark:bg-[#071120] px-3.5 py-2 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2 shrink-0">
         {/* Scrollable Mode Selector Pills */}
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
           {TUTOR_MODES.map((mode) => {
@@ -844,9 +896,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               <button
                 key={mode.id}
                 onClick={() => setSelectedMode(mode.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
                   isActive
-                    ? "bg-[#1865F2] text-white shadow-xs"
+                    ? "bg-[#1865F2] text-white shadow-xs scale-[1.02]"
                     : "bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300"
                 }`}
                 title={mode.desc}
@@ -860,8 +912,8 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
         {/* Student-friendly Quota Capsule & Technical Info Toggle */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#1865F2] dark:text-blue-400 border border-blue-200/70 dark:border-blue-900/60 flex items-center gap-1">
-            <span>Còn {maxQuota - usedQuota}/{maxQuota} câu</span>
+          <div className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-900/60 flex items-center gap-1">
+            <span>⚡ Còn {maxQuota - usedQuota}/{maxQuota}</span>
           </div>
 
           <button
@@ -872,6 +924,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
                 : "bg-white dark:bg-[#0E1B31] text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-slate-200/80 dark:border-slate-800"
             }`}
             title="Thông tin kỹ thuật & Giám sát chi phí API"
+            aria-label="Thông tin kỹ thuật và giám sát chi phí"
           >
             <PiInfoDuotone className="w-4 h-4" />
           </button>
@@ -883,7 +936,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         <div className="bg-slate-100 dark:bg-[#0A1629] p-3 border-b border-slate-200 dark:border-slate-800 text-xs space-y-2 animate-in fade-in slide-in-from-top-1 duration-150 shrink-0">
           <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400">
             <span>QUẢN TRỊ HẠN MỨC & ĐỘNG CƠ AI</span>
-            <span>Mô hình: GPT-4o-mini</span>
+            <span>Mô hình: Gemini 2.5 Flash / Groq LPU</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px]">
             <div className="p-2 rounded-xl bg-white dark:bg-[#0E1B31] border border-slate-200/80 dark:border-slate-800">
@@ -902,7 +955,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               <div>
                 <span className="text-slate-400 block text-[10px]">Động cơ hiện tại</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">
-                  {aiEngineMode === "CLOUD_OPENAI" ? "OpenAI Cloud" : "Offline Socratic"}
+                  {aiEngineMode === "CLOUD_OPENAI" ? "Multi-tier Cloud" : "Offline Socratic"}
                 </span>
               </div>
               <button
@@ -932,9 +985,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               : activeLessonTitle}
           </span>
         </div>
-        <div className="flex items-center gap-1 text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
+        <div className="flex items-center gap-1 text-[10px] text-emerald-800 dark:text-emerald-300 font-bold bg-emerald-100 dark:bg-emerald-950/70 px-2 py-0.5 rounded-full border border-emerald-300/80 dark:border-emerald-800 shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Crawl SGK & Bám sát chủ đề 100%</span>
+          <span>Chuẩn SGK GDPT 2018</span>
         </div>
       </div>
 
@@ -998,32 +1051,32 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               className={`flex gap-2.5 ${isBot ? "items-start" : "items-end justify-end"}`}
             >
               {isBot && (
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm border border-white/20">
-                  <PiRobotDuotone className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#0E52C9] flex items-center justify-center text-white shrink-0 mt-0.5 shadow-xs border border-blue-400/30">
+                  <PiGraduationCapDuotone className="w-4 h-4 text-amber-300 drop-shadow-xs" />
                 </div>
               )}
 
               <div
                 className={`max-w-[88%] sm:max-w-[82%] rounded-2xl text-xs sm:text-sm leading-relaxed space-y-3 ${
                   isBot
-                    ? "bg-white dark:bg-[#0D1A30] border border-slate-200/90 dark:border-slate-800 p-4 text-slate-800 dark:text-slate-100 shadow-sm rounded-tl-sm"
-                    : "bg-[#1865F2] text-white p-3.5 font-medium rounded-tr-sm shadow-md"
+                    ? "bg-white dark:bg-[#0D1A30] border border-blue-100/90 dark:border-slate-800 p-4 text-slate-800 dark:text-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.04)] rounded-tl-xs"
+                    : "bg-[#1865F2] text-white p-3.5 font-medium rounded-tr-xs shadow-md shadow-blue-500/20"
                 }`}
               >
                 {/* Assistant Mode Tag */}
                 {isBot && m.mode && (
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 dark:text-slate-400 pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <PiSparkleDuotone className="w-3.5 h-3.5 text-[#1865F2] dark:text-blue-400" />
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#1865F2] dark:text-blue-300 pb-2 border-b border-blue-100/80 dark:border-slate-800">
+                    <PiSparkleDuotone className="w-3.5 h-3.5 text-amber-500" />
                     <span>
                       {m.mode === "GRADE_ADAPTED"
-                        ? `Giải thích chuẩn Lớp ${m.gradeLevel || selectedGrade}`
+                        ? `Giải thích trực quan Lớp ${m.gradeLevel || selectedGrade}`
                         : m.mode === "PRACTICE"
                           ? "Bài tập luyện tập tương tác"
                           : m.mode === "ERROR_DIAGNOSIS"
-                            ? "Chẩn đoán sai lầm & Bẫy tư duy"
+                            ? "Chẩn đoán bẫy sai lầm & Cách sửa"
                             : m.mode === "CITE_LESSON"
                               ? "Căn cứ bài học SGK & Video"
-                              : "Gợi ý sư phạm từng bước"}
+                              : "Gợi mở tư duy từng bước"}
                     </span>
                   </div>
                 )}
@@ -1049,15 +1102,15 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
                 {/* Step-by-Step Guidance Box */}
                 {isBot && m.stepByStepHints && m.stepByStepHints.length > 0 && (
-                  <div className="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/70 dark:border-blue-900/50 space-y-2.5">
+                  <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 space-y-2.5">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-200">
                       <PiLightbulbDuotone className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Hướng dẫn gợi mở từng bước:</span>
+                      <span>Gợi mở từng bước (Em làm thử theo nhé):</span>
                     </div>
                     <div className="space-y-2 text-xs text-blue-950 dark:text-blue-100">
                       {m.stepByStepHints.map((hint, hIdx) => (
                         <div key={hIdx} className="flex items-start gap-2.5 leading-relaxed">
-                          <span className="w-5 h-5 rounded-lg bg-blue-200 dark:bg-blue-800 text-blue-950 dark:text-blue-100 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="w-5 h-5 rounded-full bg-[#1865F2] text-white text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                             {hIdx + 1}
                           </span>
                           <span className="flex-1 font-medium">{hint}</span>
@@ -1196,34 +1249,40 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
                 {/* Citations Box */}
                 {isBot && m.citations && m.citations.length > 0 && (
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#071120] border border-slate-200 dark:border-slate-800 space-y-2">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                      <PiBookBookmarkDuotone className="w-4 h-4 text-[#1865F2]" />
-                      <span>Căn cứ sách giáo khoa GDPT 2018:</span>
+                  <div className="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-[#0A1629] border border-amber-200/70 dark:border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-amber-900 dark:text-amber-300">
+                      <span className="flex items-center gap-1.5">
+                        <PiBookBookmarkDuotone className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                        <span>Căn cứ Sách giáo khoa & Bài giảng:</span>
+                      </span>
+                      <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-100/80 dark:bg-amber-950/60 px-2 py-0.5 rounded-full">
+                        GDPT 2018
+                      </span>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       {m.citations.map((cite, cIdx) => (
                         <div
                           key={cIdx}
-                          className="p-2.5 rounded-xl bg-white dark:bg-[#0D1A30] border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1"
+                          className="p-3 rounded-xl bg-white dark:bg-[#0D1A30] border-l-4 border-l-[#1865F2] border-y border-r border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1 shadow-xs"
                         >
-                          <div className="font-bold text-slate-900 dark:text-slate-100 line-clamp-1 flex items-center justify-between">
-                            <span>{cite.title}</span>
+                          <div className="font-bold text-slate-900 dark:text-slate-100 flex items-center justify-between">
+                            <span className="text-xs text-blue-900 dark:text-blue-300">{cite.title}</span>
                             {cite.targetUrl && (
                               <a
                                 href={cite.targetUrl}
-                                className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5 font-bold"
+                                className="text-[10px] text-[#1865F2] hover:underline flex items-center gap-0.5 font-bold"
                               >
                                 Xem SGK ↗
                               </a>
                             )}
                           </div>
-                          <div className="text-slate-500 dark:text-slate-400">
-                            {cite.sourceBook} {cite.chapter ? `· ${cite.chapter}` : ""}
+                          <div className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                            <span>📖 {cite.sourceBook}</span>
+                            {cite.chapter && <span className="text-slate-400">· {cite.chapter}</span>}
                           </div>
                           {cite.videoTime && (
-                            <div className="text-[#1865F2] dark:text-blue-400 font-semibold flex items-center gap-1 pt-0.5">
-                              <span>Mốc bài học: {cite.videoTime}</span>
+                            <div className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md mt-1 border border-blue-200/60 dark:border-blue-900/50">
+                              <span>▶ Video bài học: {cite.videoTime}</span>
                             </div>
                           )}
                         </div>
@@ -1305,7 +1364,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               </div>
 
               {!isBot && (
-                <div className="w-8 h-8 rounded-xl bg-[#0A1A36] dark:bg-slate-700 flex items-center justify-center text-white shrink-0 mb-0.5 shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 flex items-center justify-center text-[#1865F2] dark:text-blue-300 shrink-0 mb-0.5 shadow-2xs">
                   <PiUserCircleDuotone className="w-5 h-5" />
                 </div>
               )}
@@ -1315,15 +1374,15 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
 
         {isTyping && (
           <div className="flex gap-2.5 items-start">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#14BF96] flex items-center justify-center text-white shrink-0 shadow-sm border border-white/20">
-              <PiRobotDuotone className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#0E52C9] flex items-center justify-center text-white shrink-0 shadow-xs border border-blue-400/30">
+              <PiGraduationCapDuotone className="w-4 h-4 text-amber-300 drop-shadow-xs" />
             </div>
-            <div className="bg-white dark:bg-[#0D1A30] border border-slate-200/90 dark:border-slate-800 p-3.5 rounded-2xl text-xs text-slate-500 dark:text-slate-400 shadow-sm flex items-center gap-2">
+            <div className="bg-white dark:bg-[#0D1A30] border border-blue-100/90 dark:border-slate-800 p-3.5 rounded-2xl text-xs text-slate-500 dark:text-slate-400 shadow-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce" />
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.2s]" />
               <span className="w-2 h-2 rounded-full bg-[#1865F2] animate-bounce [animation-delay:0.4s]" />
               <span className="ml-1 text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                Thầy đang chuẩn bị gợi ý sư phạm cho em...
+                Thầy/cô đang chuẩn bị gợi ý sư phạm cho em...
               </span>
             </div>
           </div>
@@ -1337,7 +1396,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           <button
             key={idx}
             onClick={() => handleSend(p)}
-            className="text-[11px] font-semibold whitespace-nowrap bg-slate-100 dark:bg-[#0D1A30] hover:bg-blue-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-[#1865F2] dark:hover:text-blue-400 px-3 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0 border border-slate-200/70 dark:border-slate-800"
+            className="text-[11px] font-bold whitespace-nowrap bg-blue-50/80 dark:bg-[#0D1A30] hover:bg-blue-100 text-[#1865F2] dark:text-blue-300 hover:text-blue-700 px-3 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer shrink-0 border border-blue-200/70 dark:border-blue-900/60 shadow-2xs hover:scale-[1.02] active:scale-95"
           >
             <span>{p}</span>
           </button>
@@ -1427,7 +1486,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
       )}
 
       {/* 6. INPUT BAR WITH ENTER KEY & SMART BUTTONS */}
-      <div className="p-3 bg-white dark:bg-[#0B1528] border-t border-slate-200/90 dark:border-slate-800 shrink-0">
+      <div className="p-3 bg-white dark:bg-[#0B1528] border-t border-slate-200/80 dark:border-slate-800 shrink-0">
         <input
           type="file"
           ref={fileInputRef}
@@ -1435,13 +1494,14 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
           className="hidden"
           onChange={handleFileUpload}
         />
-        <div className="flex items-end gap-2 bg-slate-100 dark:bg-[#071120] rounded-2xl p-2 border border-slate-200 dark:border-slate-800 focus-within:border-[#1865F2] focus-within:bg-white dark:focus-within:bg-[#0D1A30] transition">
+        <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#071120] rounded-2xl p-2 border border-slate-200/90 dark:border-slate-800 focus-within:border-[#1865F2] focus-within:ring-2 focus-within:ring-blue-500/15 focus-within:bg-white dark:focus-within:bg-[#0D1A30] transition-all">
           {/* Homework Photo Scan Button */}
           <button
             type="button"
             onClick={() => setIsPhotoMenuOpen(!isPhotoMenuOpen)}
-            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
-            title="Quét ảnh đề bài tập"
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-[#1865F2] hover:bg-blue-50 dark:hover:bg-slate-800 transition cursor-pointer shrink-0"
+            title="Quét ảnh đề bài tập SGK"
+            aria-label="Quét ảnh bài tập"
           >
             <PiCameraDuotone className="w-5 h-5" />
           </button>
@@ -1452,10 +1512,11 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             onClick={handleToggleVoiceInput}
             className={`p-2 rounded-xl transition cursor-pointer shrink-0 ${
               isListening
-                ? "bg-rose-500 text-white animate-pulse"
-                : "text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-200/70 dark:hover:bg-slate-800"
+                ? "bg-rose-500 text-white animate-pulse shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-[#1865F2] hover:bg-blue-50 dark:hover:bg-slate-800"
             }`}
-            title={isListening ? "Đang lắng nghe..." : "Hỏi bằng giọng nói"}
+            title={isListening ? "Đang lắng nghe câu hỏi của em..." : "Hỏi bằng giọng nói"}
+            aria-label="Hỏi bằng giọng nói"
           >
             <PiMicrophoneDuotone className="w-5 h-5" />
           </button>
@@ -1473,7 +1534,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               }
             }}
             placeholder={`Hỏi thầy về bài toán, hiện tượng tự nhiên (Lớp ${selectedGrade})...`}
-            className="flex-1 bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm resize-none focus:outline-none min-h-[36px] max-h-[120px] py-1.5 leading-relaxed"
+            className="flex-1 bg-transparent text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm resize-none focus:outline-none min-h-[42px] max-h-[120px] py-2 px-1 leading-normal"
           />
 
           {/* Clear text button */}
@@ -1483,6 +1544,7 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
               onClick={() => setInput("")}
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
               title="Xóa nội dung"
+              aria-label="Xóa nội dung đã nhập"
             >
               <PiXBold className="w-3.5 h-3.5" />
             </button>
@@ -1493,8 +1555,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
             type="button"
             disabled={!input.trim() || cooldownSec > 0}
             onClick={() => handleSend()}
-            className="w-10 h-10 rounded-xl bg-[#1865F2] hover:bg-[#1253cc] active:scale-95 disabled:opacity-40 text-white flex items-center justify-center transition shadow-md shadow-blue-500/20 cursor-pointer shrink-0 font-bold"
+            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1865F2] to-[#0E52C9] hover:from-[#1453CC] hover:to-[#0B40A3] active:scale-95 disabled:opacity-40 text-white flex items-center justify-center transition shadow-md shadow-blue-500/20 cursor-pointer shrink-0 font-bold"
             title={cooldownSec > 0 ? `Vui lòng chờ ${cooldownSec}s` : "Gửi câu hỏi (Nhấn Enter)"}
+            aria-label="Gửi câu hỏi cho gia sư"
           >
             {cooldownSec > 0 ? (
               <span className="font-mono text-xs">{cooldownSec}s</span>
@@ -1505,9 +1568,9 @@ export const SocraticChatbot: React.FC<SocraticChatbotProps> = ({
         </div>
 
         {/* Security & COPPA compliance badge */}
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center mt-2 flex items-center justify-center gap-1.5">
-          <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-          <span>Kiểm duyệt an toàn K-12 · Dữ liệu học sinh được bảo vệ và mã hóa riêng tư.</span>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center mt-2 flex items-center justify-center gap-1.5 font-medium">
+          <PiShieldCheckDuotone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <span>Không gian học tập an toàn K-12 · Chuẩn sư phạm GDPT 2018</span>
         </p>
       </div>
     </motion.div>
