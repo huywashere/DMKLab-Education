@@ -14,6 +14,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
 
     List<ChatMessage> findBySessionIdOrderByCreatedAtAsc(UUID sessionId);
 
-    @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.sessionId IN (SELECT s.id FROM ChatSession s WHERE s.userId = :userId) AND m.senderRole = 'USER' AND m.createdAt >= :since")
+    @Query("SELECT COUNT(m) FROM ChatMessage m JOIN ChatSession s ON m.sessionId = s.id WHERE s.userId = :userId AND m.senderRole = 'USER' AND m.createdAt >= :since")
     long countUserMessagesSince(UUID userId, Instant since);
 }
