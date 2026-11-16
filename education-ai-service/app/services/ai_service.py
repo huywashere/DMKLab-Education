@@ -21,6 +21,7 @@ from app.models.schemas import (
     ChatRequest, ChatResponse,
     InteractiveQuizDto, CitationDto,
 )
+from app.services.knowledge_crawler import KnowledgeCrawlerService, KnowledgeCrawlResult
 
 logger = logging.getLogger("ai_service")
 
@@ -60,6 +61,7 @@ class AiService:
     def __init__(self, redis=None):
         self.redis = redis
         self._http = httpx.AsyncClient(timeout=15.0)
+        self.crawler = KnowledgeCrawlerService()
 
     # =========================================================
     # PUBLIC: processLearningChat
@@ -99,28 +101,69 @@ class AiService:
         db.add(user_msg)
         await db.flush()
 
-        # 5. Resolve lesson knowledge (nếu có lessonId)
+        # 5. Resolve lesson knowledge (nếu có lesson_id)
         effective_knowledge = req.custom_knowledge
         lesson_title = req.context_lesson_title
         subject = req.context_subject
-        # (Lesson lookup được xử lý bởi Java backend qua lessonId → truyền qua customKnowledge)
+
+        if req.lesson_id:
+            try:
+                res = await db.execute(
+                    text("SELECT l.title, l.description, s.name FROM lessons l LEFT JOIN subjects s ON l.subject_id = s.id WHERE l.id = :lid"),
+                    {"lid": str(req.lesson_id)}
+                )
+                row = res.fetchone()
+                if row:
+                    ltitle, ldesc, sname = row
+                    if not lesson_title and ltitle:
+                        lesson_title = ltitle
+                    if not subject and sname:
+                        subject = sname
+                    if ldesc:
+                        lesson_desc = f"Tài liệu bài học '{ltitle}': {ldesc}"
+                        effective_knowledge = (
+                            f"{effective_knowledge}\n\n{lesson_desc}" if effective_knowledge else lesson_desc
+                        )
+            except Exception as ex:
+                logger.warning("[AI_LESSON_RESOLVE_WARN] Không thể nạp bài học %s: %s", req.lesson_id, ex)
 
         # 6. Determine mode & grade
         mode = (req.mode or "SOCRATIC").upper()
         grade_level = req.grade_level or 5
+        context_title = lesson_title or "Toán học K-12"
+        subj = subject or "Toán học"
 
-        # 7. Off-topic check
-        is_on_topic = not bool(OFF_TOPIC_RE.search(raw_message))
-        off_topic_advice = None if is_on_topic else self._build_off_topic_reply(lesson_title or "bài học")
+        # 7. Crawl tri thức hệ thống & Rào cản bảo vệ chủ đề (System Crawler & Topic Guardrail)
+        crawl_result = self.crawler.crawl_and_ground_knowledge(
+            raw_message, grade_level, subj, context_title, effective_knowledge
+        )
+
+        # Xử lý rào cản bảo vệ chủ đề nếu câu hỏi bị xác định là lạc đề / phi học thuật
+        if not crawl_result.on_topic and crawl_result.off_topic_redirect_advice:
+            out = TutorOutput()
+            out.reply = crawl_result.off_topic_redirect_advice
+            out.misconception_reason = "OFF_TOPIC_REDIRECT"
+            out.quick_replies = [
+                f"📖 Trở lại bài học: {context_title}",
+                "💡 Cho em xem công thức SGK trọng tâm",
+                "📝 Thử một câu hỏi luyện tập",
+                "✨ Em đã sẵn sàng tiếp tục!",
+            ]
+            out.step_by_step_hints = [
+                f"Bước 1: Tập trung vào mục tiêu bài học: {context_title}",
+                "Bước 2: Xem lại các định nghĩa và công thức cơ bản trong SGK.",
+                "Bước 3: Đặt câu hỏi cho thầy/cô về phần em chưa hiểu trong bài nhé.",
+            ]
+            out.citations = crawl_result.citations if crawl_result.citations else self._standard_citations(grade_level, context_title)
+            return await self._build_response(db, session, out, mode, grade_level, used_today, safety_warning)
 
         # 8. Retrieve multi-turn history (tối đa 6 tin nhắn gần nhất)
         recent_history = await self._get_recent_history(db, session.id, limit=7)
 
-        # 9. Build Socratic system prompt
-        context_title = lesson_title or "Toán học K-12"
-        subj = subject or "Toán học"
+        # 9. Build Socratic system prompt (với In-Context Grounding từ SGK)
+        grounded_knowledge = crawl_result.grounded_prompt_knowledge or effective_knowledge
         system_prompt = self._build_socratic_system_prompt(
-            grade_level, subj, context_title, mode, effective_knowledge
+            grade_level, subj, context_title, mode, grounded_knowledge
         )
 
         # 10. Redis semantic cache check
@@ -133,36 +176,21 @@ class AiService:
                 out = TutorOutput(
                     reply=cached,
                     step_by_step_hints=self._standard_hints(context_title),
-                    citations=self._standard_citations(grade_level, context_title),
+                    citations=crawl_result.citations if crawl_result.citations else self._standard_citations(grade_level, context_title),
                     quick_replies=self._standard_quick_replies(),
                 )
                 return await self._build_response(db, session, out, mode, grade_level, used_today, safety_warning)
 
         # 11. Multi-tier AI fallback
-        live_reply = None
-        if not is_on_topic and off_topic_advice:
-            live_reply = off_topic_advice
-
-        if live_reply is None:
-            live_reply = await self._call_with_fallback(
-                recent_history, mode, grade_level, raw_message,
-                context_title, subj, req.student_answer, effective_knowledge, system_prompt
-            )
+        live_reply = await self._call_with_fallback(
+            recent_history, mode, grade_level, raw_message,
+            context_title, subj, req.student_answer, grounded_knowledge, system_prompt
+        )
 
         # 12. Build TutorOutput
         out = TutorOutput()
         out.quick_replies = self._standard_quick_replies()
-
-        if not is_on_topic:
-            out.misconception_reason = "OFF_TOPIC_REDIRECT"
-            out.quick_replies = [
-                f"📖 Trở lại bài học: {context_title}",
-                "💡 Cho em xem công thức SGK trọng tâm",
-                "📝 Thử một câu hỏi luyện tập",
-                "✨ Em đã sẵn sàng tiếp tục!",
-            ]
-
-        out.citations = self._standard_citations(grade_level, context_title)
+        out.citations = crawl_result.citations if crawl_result.citations else self._standard_citations(grade_level, context_title)
 
         if live_reply:
             out.reply = live_reply
