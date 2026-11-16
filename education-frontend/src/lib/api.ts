@@ -2,6 +2,7 @@ import { Grade, Subject, Lesson, Question, User } from "@/types";
 import { MOCK_GRADES, MOCK_SUBJECTS, MOCK_LESSONS, MOCK_USERS } from "./mock-data";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+const AI_API_BASE = process.env.NEXT_PUBLIC_AI_API_URL || "http://localhost:8000/api/v1";
 const TOKEN_KEY = "khan_k12_jwt_token";
 
 export interface BackendGrade {
@@ -785,7 +786,7 @@ export const api = {
       contextSubject: options?.contextSubject,
       customKnowledge: options?.customKnowledge,
     };
-    const res = await fetch(`${API_BASE}/ai/learning/chat`, {
+    const res = await fetch(`${AI_API_BASE}/ai/learning/chat`, {
       method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify(payload),
@@ -804,7 +805,7 @@ export const api = {
     comment?: string
   ): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE}/ai/messages/${messageId}/feedback`, {
+      const res = await fetch(`${AI_API_BASE}/ai/messages/${messageId}/feedback`, {
         method: "POST",
         headers: this.getAuthHeaders(),
         body: JSON.stringify({ rating, comment }),
@@ -899,7 +900,7 @@ export const api = {
   },
 
   async sendAdminChat(message: string, sessionId?: string): Promise<SocraticChatResponse> {
-    const res = await fetch(`${API_BASE}/ai/admin/chat`, {
+    const res = await fetch(`${AI_API_BASE}/ai/admin/chat`, {
       method: "POST",
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ message, sessionId }),

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/dmklab_edu"
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/learning_db"
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
 
     # JWT (same secret as Java backend for token verification)
-    jwt_secret: str = "dmklab-secret"
+    jwt_secret: str = "KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform"
 
     # Quota
     student_daily_quota: int = 30

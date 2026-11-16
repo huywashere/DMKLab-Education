@@ -1,16 +1,26 @@
 """
 DMKLab AI Service - Pydantic Schemas (request/response)
-Tương đương với AiChatDto.java
+Hỗ trợ camelCase tự động để tương thích hoàn toàn 100% với Frontend TypeScript
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
+from pydantic.alias_generators import to_camel
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 
 
+class CamelModel(BaseModel):
+    """Base model tự động chuyển đổi camelCase <-> snake_case"""
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        from_attributes=True,
+    )
+
+
 # ============ Request Models ============
 
-class ChatRequest(BaseModel):
+class ChatRequest(CamelModel):
     message: str
     session_id: Optional[UUID] = None
     lesson_id: Optional[UUID] = None
@@ -22,14 +32,14 @@ class ChatRequest(BaseModel):
     student_answer: Optional[str] = None    # Cho ERROR_DIAGNOSIS mode
 
 
-class MessageFeedbackRequest(BaseModel):
+class MessageFeedbackRequest(CamelModel):
     rating: str  # HELPFUL | UNHELPFUL
     comment: Optional[str] = None
 
 
 # ============ Response Models ============
 
-class InteractiveQuizDto(BaseModel):
+class InteractiveQuizDto(CamelModel):
     id: str
     question: str
     options: List[str]
@@ -38,7 +48,7 @@ class InteractiveQuizDto(BaseModel):
     points: int = 10
 
 
-class CitationDto(BaseModel):
+class CitationDto(CamelModel):
     title: str
     chapter: Optional[str] = None
     source_book: Optional[str] = None
@@ -46,7 +56,7 @@ class CitationDto(BaseModel):
     target_url: Optional[str] = None
 
 
-class ChatResponse(BaseModel):
+class ChatResponse(CamelModel):
     session_id: UUID
     message_id: UUID
     reply: str
@@ -63,14 +73,14 @@ class ChatResponse(BaseModel):
     quick_replies: List[str] = []
 
 
-class MessageItem(BaseModel):
+class MessageItem(CamelModel):
     id: UUID
     sender_role: str
     content: str
     created_at: datetime
 
 
-class ApiResponse(BaseModel):
+class ApiResponse(CamelModel):
     success: bool = True
     data: Optional[object] = None
     message: Optional[str] = None
