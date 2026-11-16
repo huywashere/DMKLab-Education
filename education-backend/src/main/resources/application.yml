@@ -102,6 +102,10 @@ app:
     secret: ${JWT_SECRET:KhanAcademySecureJWTSecretKeyWithHighEntropy2026SuperStrongHMACSHA512KeyDMKLabPlatform}
     expiration-ms: 86400000 # 24h
   ai:
+    # Python AI Microservice (FastAPI) - primary AI handler
+    python-service-url: ${AI_SERVICE_URL:http://localhost:8000}
+    python-service-enabled: ${AI_SERVICE_ENABLED:true}
+    # Legacy Java AI config (fallback nếu Python service không khả dụng)
     gemini:
       api-key: ${GEMINI_API_KEY:}
       model: ${GEMINI_MODEL:gemini-2.5-flash}
