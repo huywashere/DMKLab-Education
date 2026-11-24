@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  output: process.env.DOCKER_BUILD ? "standalone" : undefined,
   /* Performance & Optimization Options */
   compress: true,
   poweredByHeader: false,
@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.plyr.io; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://api.dicebear.com; media-src 'self' data: blob: https: https://cdn.plyr.io https://commondatastorage.googleapis.com; connect-src 'self' http://localhost:8080 https:; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net https://cdn.plyr.io; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.plyr.io; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://api.dicebear.com; media-src 'self' data: blob: https: https://cdn.plyr.io https://commondatastorage.googleapis.com; connect-src 'self' blob: http://localhost:8080 https:; frame-ancestors 'self'; object-src 'none'; base-uri 'self';",
           },
         ],
       },

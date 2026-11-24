@@ -30,7 +30,7 @@ import {
   Maximize2,
   Minimize2,
 } from "lucide-react";
-import { PlyrVideoPlayer, PlyrPlayerHandle } from "@/components/PlyrVideoPlayer";
+import { VidstackPlayer, VidstackPlayerHandle } from "@/components/VidstackPlayer";
 import { useBookmarks } from "@/lib/bookmarks/BookmarksContext";
 import { useAccessibility } from "@/lib/a11y/AccessibilityContext";
 import { ShimmerButton } from "@/components/ui";
@@ -201,6 +201,14 @@ const FractionVisualizerWidget: React.FC = () => {
   );
 };
 
+// Mốc thời gian chương học chuẩn hóa cho bài giảng phân số
+const LESSON_CHAPTERS = [
+  { time: 0, title: "00:00 - Giới thiệu bài học" },
+  { time: 120, title: "02:00 - Khái niệm Tử số và Mẫu số" },
+  { time: 330, title: "05:30 - Ví dụ thực tế: Cắt bánh Pizza" },
+  { time: 480, title: "08:00 - Rút gọn phân số & Tổng kết" },
+];
+
 export const LessonRoom: React.FC<LessonRoomProps> = ({
   currentLesson: initialLesson,
   onBack,
@@ -210,8 +218,8 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
   const [activeLesson, setActiveLesson] = useState<Lesson>(initialLesson);
   const [activeTab, setActiveTab] = useState<"quiz" | "visualizer" | "notes" | "textbook">("visualizer");
 
-  // Plyr Video Player Reference & States
-  const playerRef = useRef<PlyrPlayerHandle>(null);
+  // Vidstack Video Player Reference & States
+  const playerRef = useRef<VidstackPlayerHandle>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(activeLesson.positionSeconds || 0);
   const [duration, setDuration] = useState(activeLesson.durationSeconds || 600);
@@ -251,13 +259,7 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
     setNoteRateLimitAlert(null);
   };
 
-  // Mốc thời gian chương học
-  const CHAPTERS = [
-    { time: 0, title: "00:00 - Giới thiệu bài học" },
-    { time: 120, title: "02:00 - Khái niệm Tử số và Mẫu số" },
-    { time: 330, title: "05:30 - Ví dụ thực tế: Cắt bánh Pizza" },
-    { time: 480, title: "08:00 - Rút gọn phân số & Tổng kết" },
-  ];
+  const CHAPTERS = LESSON_CHAPTERS;
 
   const jumpToChapter = (seconds: number) => {
     if (playerRef.current) {
@@ -459,12 +461,12 @@ export const LessonRoom: React.FC<LessonRoomProps> = ({
             isTheaterMode ? "lg:col-span-12" : "lg:col-span-8"
           } space-y-6 transition-all duration-300`}
         >
-          {/* Plyr Video Player with Modern Ambient Glow and Top Overlay HUD */}
-          <PlyrVideoPlayer
+          {/* Vidstack Video Player with Modern Ambient Glow and Top Overlay HUD */}
+          <VidstackPlayer
             ref={playerRef}
             src={
               activeLesson.videoUrl ||
-              "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+              "https://files.vidstack.io/sprite-fight/720p.mp4"
             }
             title={activeLesson.title}
             initialTime={activeLesson.positionSeconds || 0}

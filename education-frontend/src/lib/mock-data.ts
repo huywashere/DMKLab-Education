@@ -113,8 +113,8 @@ export const MOCK_LESSONS: Lesson[] = [
     description:
       "Khám phá bản chất của phân số thông qua ví dụ thực tế về chia bánh pizza và đo lường thể tích.",
     contentType: "VIDEO",
-    // Link video mẫu công khai chất lượng cao cho giáo dục (Big Buck Bunny mp4 hoặc Blender educational)
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    // Link video mẫu công khai chất lượng cao cho giáo dục (Vidstack 720p mp4)
+    videoUrl: "https://files.vidstack.io/sprite-fight/720p.mp4",
     durationSeconds: 596,
     orderNum: 1,
     isCompleted: true,
@@ -164,7 +164,7 @@ export const MOCK_LESSONS: Lesson[] = [
       "Học phương pháp tìm mẫu số chung nhỏ nhất và kỹ thuật quy đồng hai hoặc nhiều phân số.",
     contentType: "VIDEO",
     videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      "https://files.vidstack.io/sprite-fight/hls/stream.m3u8",
     durationSeconds: 653,
     orderNum: 2,
     isCompleted: false,
@@ -197,7 +197,7 @@ export const MOCK_LESSONS: Lesson[] = [
     description: "Ứng dụng quy đồng mẫu số để thực hiện phép cộng và trừ phân số chính xác.",
     contentType: "VIDEO",
     videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "https://files.vidstack.io/sprite-fight/1080p.mp4",
     durationSeconds: 480,
     orderNum: 3,
     isCompleted: false,
@@ -212,7 +212,7 @@ export const MOCK_LESSONS: Lesson[] = [
       "Chuyển đổi giữa phân số thập phân sang số thập phân, nhận diện phần nguyên và phần thập phân.",
     contentType: "VIDEO",
     videoUrl:
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "https://files.vidstack.io/sprite-fight/480p.mp4",
     durationSeconds: 520,
     orderNum: 4,
     isCompleted: false,
